@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -32,6 +32,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         h1 {
@@ -90,6 +92,12 @@
         .row {
             display: grid;
             grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 16px;
         }
 
@@ -211,6 +219,7 @@
             font-size: 14px;
             color: #718096;
             flex-wrap: wrap;
+            margin-top: 8px;
         }
 
         .result-details span {
@@ -244,7 +253,111 @@
             margin-bottom: 16px;
         }
 
-        /* История */
+        /* ===== БЛОК МАРЖИНАЛЬНОСТИ ===== */
+        .margin-block {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 10px 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .margin-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 3px 0;
+            flex-wrap: wrap;
+        }
+
+        .margin-label {
+            font-size: 14px;
+            color: #4a5568;
+            font-weight: 500;
+            min-width: 140px;
+        }
+
+        .margin-value {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .margin-value.cost {
+            color: #718096;
+        }
+
+        .margin-value.price {
+            color: #2b6cb0;
+            font-size: 17px;
+        }
+
+        .margin-value.profit {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .margin-badge {
+            background: #edf2f7;
+            padding: 1px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .margin-emoji {
+            font-size: 18px;
+            margin-left: 4px;
+        }
+
+        .margin-progress {
+            width: 100%;
+            height: 6px;
+            background: #edf2f7;
+            border-radius: 3px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .margin-progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* ===== СВОДКА ===== */
+        .margin-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding: 16px 20px;
+            background: #f7fafc;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .margin-summary-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .margin-summary-item .label {
+            font-size: 12px;
+            color: #a0aec0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .margin-summary-item .value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        /* ===== ИСТОРИЯ ===== */
         .history {
             margin-top: 30px;
             border-top: 2px solid #edf2f7;
@@ -256,6 +369,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .history-header h3 {
@@ -290,6 +405,8 @@
             font-size: 14px;
             cursor: pointer;
             transition: all 0.2s;
+            flex-wrap: wrap;
+            gap: 6px;
         }
 
         .history-item:hover {
@@ -311,11 +428,77 @@
             font-weight: 600;
         }
 
+        .history-item .hcost {
+            color: #a0aec0;
+            font-size: 12px;
+            text-decoration: line-through;
+        }
+
         .history-empty {
             color: #a0aec0;
             text-align: center;
             padding: 20px;
             font-size: 14px;
+        }
+
+        /* ===== НАСТРОЙКА НАЦЕНКИ ===== */
+        .margin-settings {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f7fafc;
+            padding: 10px 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .margin-settings label {
+            margin-bottom: 0;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .margin-settings input {
+            width: 80px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .margin-settings .hint {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        @media (max-width: 768px) {
+            .row-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .margin-summary {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .margin-summary-item {
+                flex-direction: row;
+                justify-content: space-between;
+                width: 100%;
+            }
+
+            .margin-summary-item .label {
+                font-size: 13px;
+            }
+
+            .margin-summary-item .value {
+                font-size: 16px;
+            }
         }
 
         @media (max-width: 600px) {
@@ -342,18 +525,47 @@
                 align-items: flex-start;
                 gap: 4px;
             }
+
+            .margin-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 2px;
+            }
+
+            .margin-label {
+                min-width: auto;
+            }
+
+            .margin-settings {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .margin-settings input {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- ШАПКА -->
         <div class="header">
             <h1>🚚 Калькулятор грузоперевозок</h1>
-            <span class="version">v2.0</span>
+            <span class="version">v3.0</span>
         </div>
-        <p class="subtitle">Расчёт стоимости перевозки по таблице тарифов</p>
+        <p class="subtitle">Расчёт стоимости перевозки с учётом маржинальности</p>
 
+        <!-- НАСТРОЙКА НАЦЕНКИ -->
+        <div class="margin-settings">
+            <label>⚙️ Наценка:</label>
+            <input type="number" id="marginPercent" value="43" min="0" max="300" step="0.5" />
+            <span class="hint">% (коэффициент ×<span id="marginMultiplierDisplay">1.43</span>)</span>
+            <button id="resetMarginBtn" style="background:none;border:none;color:#4299e1;cursor:pointer;font-weight:600;font-size:13px;">↺ Сбросить</button>
+        </div>
+
+        <!-- ВЫБОР МАРШРУТА -->
         <div class="row">
             <div class="form-group">
                 <label>📍 Откуда</label>
@@ -369,6 +581,7 @@
             </div>
         </div>
 
+        <!-- ЕДИНИЦЫ ИЗМЕРЕНИЯ -->
         <div class="form-group">
             <label>Единица измерения</label>
             <div class="unit-toggle">
@@ -377,15 +590,19 @@
             </div>
         </div>
 
+        <!-- ЗНАЧЕНИЕ -->
         <div class="form-group">
             <label id="valueLabel">Вес (кг)</label>
             <input type="number" id="valueInput" placeholder="Например: 150" min="0.1" step="0.1" />
         </div>
 
+        <!-- КНОПКА РАСЧЁТА -->
         <button class="calc-btn" id="calcBtn">🧮 Рассчитать стоимость</button>
 
+        <!-- РЕЗУЛЬТАТЫ -->
         <div id="resultsContainer" class="results"></div>
 
+        <!-- ИСТОРИЯ -->
         <div class="history" id="historyContainer">
             <div class="history-header">
                 <h3>📋 История расчётов</h3>
@@ -397,7 +614,7 @@
 
     <script>
         // ============================================================
-        // 1. БАЗА ДАННЫХ ТАРИФОВ (полная из вашей таблицы)
+        // 1. БАЗА ДАННЫХ ТАРИФОВ
         // ============================================================
         const tariffsDB = [
             // ВЛАДИВОСТОК → ПЕТРОПАВЛОВСК-КАМЧАТСКИЙ
@@ -710,7 +927,53 @@
         }
 
         // ============================================================
-        // 3. ИНТЕРФЕЙС
+        // 3. РАСЧЁТ С МАРЖОЙ
+        // ============================================================
+        function calculateWithMargin(from, to, value, unit, marginPercent) {
+            const results = calculatePrice(from, to, value, unit);
+
+            if (results.error) return results;
+
+            const multiplier = 1 + (marginPercent / 100);
+
+            return results.map(r => {
+                const priceWithMargin = Math.round(r.price * multiplier);
+                const marginRub = priceWithMargin - r.price;
+                const marginPercentActual = Math.round((marginRub / r.price) * 100);
+
+                return {
+                    ...r,
+                    costPrice: r.price,
+                    priceWithMargin: priceWithMargin,
+                    marginRub: marginRub,
+                    marginPercent: marginPercentActual,
+                    marginMultiplier: multiplier
+                };
+            });
+        }
+
+        // ============================================================
+        // 4. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        // ============================================================
+        function getMarginColor(percent) {
+            if (percent >= 50) return '#48bb78';
+            if (percent >= 30) return '#ecc94b';
+            if (percent >= 15) return '#ed8936';
+            return '#fc8181';
+        }
+
+        function formatMargin(percent, rub) {
+            const color = getMarginColor(percent);
+            const emoji = percent >= 50 ? '🟢' : percent >= 30 ? '🟡' : percent >= 15 ? '🟠' : '🔴';
+            return {
+                text: `${rub.toLocaleString()} ₽ (${percent}%)`,
+                color: color,
+                emoji: emoji
+            };
+        }
+
+        // ============================================================
+        // 5. ИНТЕРФЕЙС
         // ============================================================
         const fromSelect = document.getElementById('fromCity');
         const toSelect = document.getElementById('toCity');
@@ -720,6 +983,9 @@
         const resultsContainer = document.getElementById('resultsContainer');
         const historyList = document.getElementById('historyList');
         const clearHistoryBtn = document.getElementById('clearHistory');
+        const marginPercentInput = document.getElementById('marginPercent');
+        const marginMultiplierDisplay = document.getElementById('marginMultiplierDisplay');
+        const resetMarginBtn = document.getElementById('resetMarginBtn');
 
         // Уникальные города
         const cities = [...new Set(tariffsDB.map(t => t.from))].sort();
@@ -752,6 +1018,7 @@
             toSelect.disabled = false;
         });
 
+        // Единицы измерения
         document.querySelectorAll('.unit-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
@@ -762,8 +1029,20 @@
             });
         });
 
+        // Настройка наценки
+        marginPercentInput.addEventListener('input', function() {
+            const val = parseFloat(this.value) || 0;
+            const multiplier = 1 + (val / 100);
+            marginMultiplierDisplay.textContent = multiplier.toFixed(2);
+        });
+
+        resetMarginBtn.addEventListener('click', function() {
+            marginPercentInput.value = '43';
+            marginMultiplierDisplay.textContent = '1.43';
+        });
+
         // ============================================================
-        // 4. ИСТОРИЯ (localStorage)
+        // 6. ИСТОРИЯ
         // ============================================================
         function getHistory() {
             try {
@@ -799,12 +1078,17 @@
             historyList.innerHTML = history.map((item, index) => `
                 <div class="history-item" data-index="${index}">
                     <span class="route">${item.from} → ${item.to}</span>
-                    <span class="info">${item.value} ${item.unit} · ${item.carrier}</span>
-                    <span class="hprice">${item.price.toLocaleString()} ₽</span>
+                    <span class="info">
+                        ${item.value} ${item.unit} · ${item.carrier}
+                        ${item.marginPercent ? ` · +${item.marginPercent}%` : ''}
+                    </span>
+                    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                        <span class="hcost">${(item.costPrice || item.price).toLocaleString()} ₽</span>
+                        <span class="hprice">${(item.priceWithMargin || item.price).toLocaleString()} ₽</span>
+                    </div>
                 </div>
             `).join('');
 
-            // Клик по истории — подставить значения
             historyList.querySelectorAll('.history-item').forEach(el => {
                 el.addEventListener('click', function() {
                     const idx = parseInt(this.dataset.index);
@@ -827,13 +1111,14 @@
         clearHistoryBtn.addEventListener('click', clearHistory);
 
         // ============================================================
-        // 5. ОСНОВНОЙ РАСЧЁТ
+        // 7. ОСНОВНОЙ РАСЧЁТ
         // ============================================================
         calcBtn.addEventListener('click', function() {
             const from = fromSelect.value;
             const to = toSelect.value;
             const unit = document.querySelector('.unit-btn.active').dataset.unit;
             const value = parseFloat(valueInput.value);
+            const marginPercent = parseFloat(marginPercentInput.value) || 0;
 
             if (!from || !to) {
                 resultsContainer.innerHTML = `
@@ -855,7 +1140,7 @@
                 return;
             }
 
-            const results = calculatePrice(from, to, value, unit);
+            const results = calculateWithMargin(from, to, value, unit, marginPercent);
 
             if (results.error) {
                 resultsContainer.innerHTML = `
@@ -867,13 +1152,45 @@
                 return;
             }
 
-            let html = `<h3 style="margin-bottom:16px;color:#2d3748;">✅ Найдено ${results.length} вариантов</h3>`;
-
-            const best = results[0];
             const unitLabel = unit === 'kg' ? 'кг' : 'м³';
+            const best = results[0];
+            const avgMargin = Math.round(results.reduce((sum, r) => sum + r.marginPercent, 0) / results.length);
+
+            let html = `
+                <h3 style="margin-bottom:16px;color:#2d3748;">
+                    ✅ Найдено ${results.length} вариантов
+                    <span style="font-size:14px;font-weight:400;color:#718096;margin-left:12px;">
+                        Наценка: +${marginPercent}% (×${(1 + marginPercent/100).toFixed(2)})
+                    </span>
+                </h3>
+
+                <div class="margin-summary">
+                    <div class="margin-summary-item">
+                        <span class="label">🏆 Лучший</span>
+                        <span class="value" style="color:#38a169;">
+                            ${best.priceWithMargin.toLocaleString()} ₽
+                        </span>
+                    </div>
+                    <div class="margin-summary-item">
+                        <span class="label">📈 Средняя маржа</span>
+                        <span class="value" style="color: ${getMarginColor(avgMargin)};">
+                            ${avgMargin}%
+                        </span>
+                    </div>
+                    <div class="margin-summary-item">
+                        <span class="label">💰 Маржа лучшего</span>
+                        <span class="value" style="color:#48bb78;">
+                            ${best.marginRub.toLocaleString()} ₽
+                        </span>
+                    </div>
+                </div>
+            `;
 
             results.forEach((r, index) => {
                 const isBest = index === 0;
+                const marginInfo = formatMargin(r.marginPercent, r.marginRub);
+                const marginColor = getMarginColor(r.marginPercent);
+
                 html += `
                     <div class="result-item ${isBest ? 'best' : ''}">
                         <div class="result-header">
@@ -882,12 +1199,38 @@
                                 ${isBest ? ' <span class="badge best-badge">⭐ Лучший</span>' : ''}
                             </span>
                             <span class="result-price ${isBest ? 'best-price' : ''}">
-                                ${r.price.toLocaleString()} ₽
+                                ${r.priceWithMargin.toLocaleString()} ₽
                             </span>
                         </div>
+
+                        <div class="margin-block">
+                            <div class="margin-row">
+                                <span class="margin-label">📦 Себестоимость:</span>
+                                <span class="margin-value cost">${r.costPrice.toLocaleString()} ₽</span>
+                            </div>
+                            <div class="margin-row">
+                                <span class="margin-label">💰 Цена с наценкой:</span>
+                                <span class="margin-value price">${r.priceWithMargin.toLocaleString()} ₽</span>
+                                <span class="margin-badge">+${r.marginPercent}%</span>
+                            </div>
+                            <div class="margin-row">
+                                <span class="margin-label">📈 Маржа:</span>
+                                <span class="margin-value profit" style="color: ${marginColor}">
+                                    ${marginInfo.text}
+                                </span>
+                                <span class="margin-emoji">${marginInfo.emoji}</span>
+                            </div>
+                            <div class="margin-progress">
+                                <div class="margin-progress-bar" 
+                                     style="width: ${Math.min(r.marginPercent, 100)}%; 
+                                            background: ${marginColor};">
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="result-details">
-                            <span>📦 ${r.unitPrice} ₽/${unitLabel}</span>
-                            <span>📅 ${r.delivery} дн.</span>
+                            <span>📊 Тариф: ${r.unitPrice} ₽/${unitLabel}</span>
+                            <span>📅 Срок: ${r.delivery} дн.</span>
                             <span>🚛 ${r.type}</span>
                         </div>
                     </div>
@@ -903,21 +1246,26 @@
                 unit,
                 value,
                 carrier: best.carrier,
+                costPrice: best.costPrice,
+                priceWithMargin: best.priceWithMargin,
+                marginPercent: best.marginPercent,
+                marginRub: best.marginRub,
                 price: best.price
             });
         });
 
+        // Enter для расчёта
         valueInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') calcBtn.click();
         });
 
-        // Инициализация истории
+        // Инициализация
         renderHistory();
 
-        console.log('🚚 Калькулятор грузоперевозок v2.0 загружен!');
+        console.log('🚚 Калькулятор грузоперевозок v3.0 загружен!');
         console.log(`📊 Загружено ${tariffsDB.length} тарифов`);
         console.log('🏙️ Доступные города:', cities.join(', '));
-        console.log('💾 История сохраняется в localStorage');
+        console.log('⚙️ Наценка настраивается в интерфейсе');
     </script>
 
 </body>
