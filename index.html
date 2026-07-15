@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🚚 Калькулятор грузоперевозок</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f4f8;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .version {
+            font-size: 12px;
+            color: #a0aec0;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .subtitle {
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.2s;
+            background: white;
+            color: #1a202c;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        select:focus,
+        input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .unit-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .unit-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.2s;
+            color: #4a5568;
+        }
+
+        .unit-btn.active {
+            background: #4299e1;
+            color: white;
+            border-color: #4299e1;
+        }
+
+        .unit-btn:hover:not(.active) {
+            border-color: #4299e1;
+        }
+
+        .calc-btn {
+            width: 100%;
+            padding: 14px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .calc-btn:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        }
+
+        .calc-btn:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        .result-item {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            border-left: 4px solid #4299e1;
+            transition: all 0.2s;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-item:hover {
+            transform: translateX(6px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .result-item.best {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .result-carrier {
+            font-weight: 700;
+            font-size: 18px;
+            color: #1a202c;
+        }
+
+        .result-price {
+            font-weight: 700;
+            font-size: 20px;
+            color: #2b6cb0;
+        }
+
+        .result-price.best-price {
+            color: #38a169;
+        }
+
+        .result-details {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #718096;
+            flex-wrap: wrap;
+        }
+
+        .result-details span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .badge {
+            background: #edf2f7;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .badge.best-badge {
+            background: #48bb78;
+            color: white;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #718096;
+        }
+
+        .no-results .emoji {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        /* История */
+        .history {
+            margin-top: 30px;
+            border-top: 2px solid #edf2f7;
+            padding-top: 20px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .history-header h3 {
+            color: #2d3748;
+            font-size: 16px;
+        }
+
+        .clear-history {
+            background: none;
+            border: none;
+            color: #fc8181;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .clear-history:hover {
+            background: #fff5f5;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: #f7fafc;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            background: #edf2f7;
+        }
+
+        .history-item .route {
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        .history-item .info {
+            color: #718096;
+            font-size: 13px;
+        }
+
+        .history-item .hprice {
+            color: #2b6cb0;
+            font-weight: 600;
+        }
+
+        .history-empty {
+            color: #a0aec0;
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .row {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>🚚 Калькулятор грузоперевозок</h1>
+            <span class="version">v2.0</span>
+        </div>
+        <p class="subtitle">Расчёт стоимости перевозки по таблице тарифов</p>
+
+        <div class="row">
+            <div class="form-group">
+                <label>📍 Откуда</label>
+                <select id="fromCity">
+                    <option value="">Выберите город</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>📍 Куда</label>
+                <select id="toCity" disabled>
+                    <option value="">Сначала выберите "Откуда"</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Единица измерения</label>
+            <div class="unit-toggle">
+                <button class="unit-btn active" data-unit="kg">📦 За кг</button>
+                <button class="unit-btn" data-unit="m3">📐 За м³</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label id="valueLabel">Вес (кг)</label>
+            <input type="number" id="valueInput" placeholder="Например: 150" min="0.1" step="0.1" />
+        </div>
+
+        <button class="calc-btn" id="calcBtn">🧮 Рассчитать стоимость</button>
+
+        <div id="resultsContainer" class="results"></div>
+
+        <div class="history" id="historyContainer">
+            <div class="history-header">
+                <h3>📋 История расчётов</h3>
+                <button class="clear-history" id="clearHistory">Очистить</button>
+            </div>
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 1. БАЗА ДАННЫХ ТАРИФОВ (полная из вашей таблицы)
+        // ============================================================
+        const tariffsDB = [
+            // ВЛАДИВОСТОК → ПЕТРОПАВЛОВСК-КАМЧАТСКИЙ
+            { from: "Владивосток", to: "Петропавловск-Камчатский", carrier: "Баграм",
+                kg: { min: 2300, upTo500: 15 }, m3: { min: 2300, upTo1: 4200 }, delivery: "12-14", type: "Конт, море" },
+            { from: "Владивосток", to: "Петропавловск-Камчатский", carrier: "ЕТЛ",
+                kg: { min: 2050, upTo500: 13.5, upTo5000: 14.5 }, m3: { min: 2050, upTo1: 4200, upTo7: 4100 },
+                delivery: "12-14", type: "Конт, море" },
+            { from: "Владивосток", to: "Петропавловск-Камчатский", carrier: "ДВ ТЭК",
+                kg: { min: 1500, upTo500: 15 }, m3: { min: 1500, upTo1: 5000 }, delivery: "12-14", type: "Конт, море" },
+            { from: "Владивосток", to: "Петропавловск-Камчатский", carrier: "Феско",
+                kg: { min: 2500, upTo500: 16.5 }, m3: { min: 2500, upTo1: 4300 }, delivery: "12-14", type: "Конт, море" },
+            { from: "Владивосток", to: "Петропавловск-Камчатский", carrier: "Энни-Транс",
+                kg: { min: 2400, upTo500: 12 }, m3: { min: 2400, upTo1: 4200 }, delivery: "12-14", type: "Конт, море" },
+
+            // ВЛАДИВОСТОК → МАГАДАН
+            { from: "Владивосток", to: "Магадан", carrier: "Баграм",
+                kg: { min: 2600, upTo500: 15 }, m3: { min: 2600, upTo1: 5100 }, delivery: "12-14", type: "Конт, море" },
+            { from: "Владивосток", to: "Магадан", carrier: "ЕТЛ",
+                kg: { min: 3300, upTo500: 17.5 }, m3: { min: 3300, upTo1: 5500 }, delivery: "12-14", type: "Конт, море" },
+            { from: "Владивосток", to: "Магадан", carrier: "ДВ ТЭК",
+                kg: { min: 1500, upTo500: 15 }, m3: { min: 1500, upTo1: 5800 }, delivery: "12-14", type: "Конт, море" },
+            { from: "Владивосток", to: "Магадан", carrier: "Феско",
+                kg: { min: 2500, upTo500: 19 }, m3: { min: 2500, upTo1: 5000 }, delivery: "12-14", type: "Конт, море" },
+            { from: "Владивосток", to: "Магадан", carrier: "Энни-Транс",
+                kg: { min: 2600, upTo500: 15 }, m3: { min: 2600, upTo1: 5000 }, delivery: "12-14", type: "Конт, море" },
+
+            // ВЛАДИВОСТОК → ЮЖНО-САХАЛИНСК
+            { from: "Владивосток", to: "Южно-Сахалинск", carrier: "Баграм",
+                kg: { min: 2300, upTo500: 15 }, m3: { min: 2300, upTo1: 4200 }, delivery: "12-14", type: "Конт, море" },
+            { from: "Владивосток", to: "Южно-Сахалинск", carrier: "ЕТЛ",
+                kg: { min: 2550, upTo500: 15.5, upTo5000: 14.5 }, m3: { min: 2550, upTo1: 4400, upTo7: 4300 },
+                delivery: "12-14", type: "Конт, море" },
+            { from: "Владивосток", to: "Южно-Сахалинск", carrier: "ДВ ТЭК",
+                kg: { min: 1500, upTo500: 14 }, m3: { min: 1500, upTo1: 4800 }, delivery: "12-14", type: "Конт, море" },
+            { from: "Владивосток", to: "Южно-Сахалинск", carrier: "Феско",
+                kg: { min: 2500, upTo500: 15 }, m3: { min: 2500, upTo1: 4000 }, delivery: "12-14", type: "Конт, море" },
+            { from: "Владивосток", to: "Южно-Сахалинск", carrier: "Энни-Транс",
+                kg: { min: 2200, upTo500: 12 }, m3: { min: 2200, upTo1: 4000 }, delivery: "12-14", type: "Конт, море" },
+
+            // ВЛАДИВОСТОК → МОСКВА
+            { from: "Владивосток", to: "Москва", carrier: "Транслиния",
+                kg: { min: 0, upTo500: 58 }, m3: { min: 0, upTo1: 11500 }, delivery: "—", type: "Авто" },
+
+            // ВЛАДИВОСТОК → НОВОСИБИРСК
+            { from: "Владивосток", to: "Новосибирск", carrier: "Транслиния",
+                kg: { min: 0, upTo500: 48 }, m3: { min: 0, upTo1: 9600 }, delivery: "—", type: "Авто" },
+
+            // МОСКВА → БЛАГОВЕЩЕНСК
+            { from: "Москва", to: "Благовещенск", carrier: "Рейл Континент",
+                kg: { min: 1750, upTo500: 29.5, upTo5000: 26.5, upTo20000: 25 },
+                m3: { min: 1750, upTo1: 7970, upTo7: 7400, upTo40: 6770 }, delivery: "18", type: "ЖД" },
+            { from: "Москва", to: "Благовещенск", carrier: "Трансот",
+                kg: { min: 4080, upTo500: 54 }, m3: { min: 4080, upTo1: 12700 }, delivery: "—", type: "ЖД ПБ" },
+            { from: "Москва", to: "Благовещенск", carrier: "ТрейдТрансГрупп",
+                kg: { min: 4700, upTo500: 37.5, upTo5000: 35.5, upTo20000: 35 },
+                m3: { min: 4700, upTo1: 8800, upTo7: 8600, upTo40: 8300 }, delivery: "24-27", type: "ЖД" },
+            { from: "Москва", to: "Благовещенск", carrier: "Транслиния",
+                kg: { min: 5900, upTo500: 58 }, m3: { min: 5900, upTo1: 12000 }, delivery: "16-20", type: "АВТО" },
+            { from: "Москва", to: "Благовещенск", carrier: "Транслиния (ЖД)",
+                kg: { min: 3900, upTo500: 25 }, m3: { min: 3900, upTo1: 6600 }, delivery: "23-28", type: "ЖД" },
+
+            // МОСКВА → ВЛАДИВОСТОК
+            { from: "Москва", to: "Владивосток", carrier: "Трансот",
+                kg: { min: 4080, upTo500: 54 }, m3: { min: 4080, upTo1: 12700 }, delivery: "8-9", type: "ЖД ПБ" },
+            { from: "Москва", to: "Владивосток", carrier: "ТрейдТрансГрупп",
+                kg: { min: 3600, upTo500: 18.5, upTo5000: 16.5, upTo20000: 16 },
+                m3: { min: 3600, upTo1: 5300, upTo7: 5100, upTo40: 4800 }, delivery: "22-25", type: "ЖД" },
+            { from: "Москва", to: "Владивосток", carrier: "Транслиния",
+                kg: { min: 3800, upTo500: 48 }, m3: { min: 3800, upTo1: 11800 }, delivery: "13-14", type: "авто" },
+            { from: "Москва", to: "Владивосток", carrier: "Транслиния (ЖД)",
+                kg: { min: 3100, upTo500: 14 }, m3: { min: 3100, upTo1: 4300 }, delivery: "20-25", type: "жд" },
+            { from: "Москва", to: "Владивосток", carrier: "Бюро перевозок",
+                kg: { min: 1100, upTo500: 43.5, upTo5000: 42.5, upTo20000: 41.5 },
+                m3: { min: 1100, upTo1: 9570, upTo7: 9350, upTo40: 9130 }, delivery: "11-12", type: "авто" },
+            { from: "Москва", to: "Владивосток", carrier: "Бюро перевозок (Экспресс)",
+                kg: { min: 1200, upTo500: 45 }, m3: { min: 1200, upTo1: 9900 }, delivery: "8-9", type: "Авто" },
+
+            // МОСКВА → ИРКУТСК
+            { from: "Москва", to: "Иркутск", carrier: "Трансот",
+                kg: { min: 4080, upTo500: 45 }, m3: { min: 4080, upTo1: 9900 }, delivery: "5-6", type: "ЖД ПБ" },
+            { from: "Москва", to: "Иркутск", carrier: "Транслиния",
+                kg: { min: 1850, upTo500: 42 }, m3: { min: 1850, upTo1: 10800 }, delivery: "7-9", type: "АВТО" },
+            { from: "Москва", to: "Иркутск", carrier: "Транслиния (ЖД)",
+                kg: { min: 2600, upTo500: 21 }, m3: { min: 2600, upTo1: 5500 }, delivery: "15-17", type: "ЖД" },
+            { from: "Москва", to: "Иркутск", carrier: "Бюро перевозок",
+                kg: { min: 600, upTo500: 33, upTo5000: 32.5, upTo20000: 32 },
+                m3: { min: 600, upTo1: 7260, upTo7: 7150, upTo40: 7040 }, delivery: "8-9", type: "Авто" },
+
+            // МОСКВА → КРАСНОЯРСК
+            { from: "Москва", to: "Красноярск", carrier: "Транслиния (ЖД)",
+                kg: { min: 2300, upTo500: 9 }, m3: { min: 2300, upTo1: 3000 }, delivery: "13-15", type: "ЖД" },
+            { from: "Москва", to: "Красноярск", carrier: "Транслиния",
+                kg: { min: 1800, upTo500: 34 }, m3: { min: 1800, upTo1: 7800 }, delivery: "6-8", type: "АВТО" },
+            { from: "Москва", to: "Красноярск", carrier: "Трансот",
+                kg: { min: 4080, upTo500: 41.5 }, m3: { min: 4080, upTo1: 8922.5 }, delivery: "4-5", type: "ЖД ПБ" },
+            { from: "Москва", to: "Красноярск", carrier: "Бюро перевозок",
+                kg: { min: 550, upTo500: 30, upTo5000: 29, upTo20000: 28 },
+                m3: { min: 550, upTo1: 6600, upTo7: 6380, upTo40: 6160 }, delivery: "7-8", type: "авто" },
+
+            // МОСКВА → НОВОСИБИРСК
+            { from: "Москва", to: "Новосибирск", carrier: "Трансот",
+                kg: { min: 4080, upTo500: 30 }, m3: { min: 4080, upTo1: 6000 }, delivery: "—", type: "ЖД ПБ" },
+            { from: "Москва", to: "Новосибирск", carrier: "АРПИ",
+                kg: { min: 793, upTo500: 44.53 }, m3: { min: 793, upTo1: 11132.5 }, delivery: "60 часов", type: "экспресс" },
+            { from: "Москва", to: "Новосибирск", carrier: "Транслиния (ЖД)",
+                kg: { min: 1800, upTo500: 8 }, m3: { min: 1800, upTo1: 2300 }, delivery: "10-12", type: "ЖД" },
+            { from: "Москва", to: "Новосибирск", carrier: "Транслиния",
+                kg: { min: 2800, upTo500: 20 }, m3: { min: 3200, upTo1: 4100 }, delivery: "4-6", type: "Авто" },
+            { from: "Москва", to: "Новосибирск", carrier: "Вега (экспресс)",
+                kg: { min: 10000, upTo500: 25 }, m3: { min: 10000, upTo1: 6500 }, delivery: "60 часов", type: "экспресс" },
+            { from: "Москва", to: "Новосибирск", carrier: "Вега",
+                kg: { min: 10000, upTo500: 20 }, m3: { min: 10000, upTo1: 5500 }, delivery: "5", type: "Авто" },
+            { from: "Москва", to: "Новосибирск", carrier: "Шерл",
+                kg: { min: 2300, upTo500: 23, upTo5000: 21, upTo20000: 20 },
+                m3: { min: 2300, upTo1: 5900, upTo7: 5600, upTo40: 4900 }, delivery: "5", type: "Авто" },
+            { from: "Москва", to: "Новосибирск", carrier: "Шерл (ЖД)",
+                kg: { min: 2200, upTo500: 11.2, upTo5000: 10.3, upTo20000: 9.8 },
+                m3: { min: 2200, upTo1: 3400, upTo7: 3350, upTo40: 3100 }, delivery: "9-12", type: "ЖД" },
+            { from: "Москва", to: "Новосибирск", carrier: "ТрейдТрансГрупп",
+                kg: { min: 2200, upTo500: 12, upTo5000: 10, upTo20000: 9.5 },
+                m3: { min: 2200, upTo1: 3200, upTo7: 3000, upTo40: 2700 }, delivery: "12-15", type: "ЖД" },
+            { from: "Москва", to: "Новосибирск", carrier: "Бюро перевозок",
+                kg: { min: 550, upTo500: 25, upTo5000: 24, upTo20000: 23 },
+                m3: { min: 550, upTo1: 5500, upTo7: 5280, upTo40: 5060 }, delivery: "6-7", type: "авто" },
+
+            // МОСКВА → ХАБАРОВСК
+            { from: "Москва", to: "Хабаровск", carrier: "ТрейдТрансГрупп",
+                kg: { min: 3600, upTo500: 18.5, upTo5000: 16.5, upTo20000: 16 },
+                m3: { min: 3600, upTo1: 5300, upTo7: 5100, upTo40: 4800 }, delivery: "20-25", type: "ЖД" },
+            { from: "Москва", to: "Хабаровск", carrier: "Транслиния",
+                kg: { min: 3800, upTo500: 46 }, m3: { min: 3800, upTo1: 10000 }, delivery: "12-14", type: "АВТО" },
+            { from: "Москва", to: "Хабаровск", carrier: "Транслиния (ЖД)",
+                kg: { min: 3100, upTo500: 14 }, m3: { min: 3100, upTo1: 4300 }, delivery: "20-25", type: "ЖД" },
+            { from: "Москва", to: "Хабаровск", carrier: "Трансот",
+                kg: { min: 4080, upTo500: 54 }, m3: { min: 4080, upTo1: 12700 }, delivery: "8-9", type: "ЖД ПБ" },
+            { from: "Москва", to: "Хабаровск", carrier: "Бюро перевозок",
+                kg: { min: 1000, upTo500: 42.5, upTo5000: 41.5, upTo20000: 40.5 },
+                m3: { min: 1000, upTo1: 9350, upTo7: 9130, upTo40: 8910 }, delivery: "10-11", type: "Авто" },
+
+            // НОВОСИБИРСК → ВЛАДИВОСТОК
+            { from: "Новосибирск", to: "Владивосток", carrier: "ТрейдТрансГрупп",
+                kg: { min: 2300, upTo500: 18, upTo5000: 16, upTo20000: 15.5 },
+                m3: { min: 2300, upTo1: 4400, upTo7: 4200, upTo40: 3900 }, delivery: "18-20", type: "ЖД" },
+            { from: "Новосибирск", to: "Владивосток", carrier: "Транслиния",
+                kg: { min: 2700, upTo500: 26.5 }, m3: { min: 2700, upTo1: 6200 }, delivery: "9-11", type: "Авто" },
+            { from: "Новосибирск", to: "Владивосток", carrier: "Транслиния (ЖД)",
+                kg: { min: 1800, upTo500: 14 }, m3: { min: 1800, upTo1: 3600 }, delivery: "15-20", type: "ЖД" },
+
+            // НОВОСИБИРСК → ХАБАРОВСК
+            { from: "Новосибирск", to: "Хабаровск", carrier: "ТрейдТрансГрупп",
+                kg: { min: 2300, upTo500: 18, upTo5000: 16, upTo20000: 15.5 },
+                m3: { min: 2300, upTo1: 4400, upTo7: 4200, upTo40: 3900 }, delivery: "15-18", type: "ЖД" },
+            { from: "Новосибирск", to: "Хабаровск", carrier: "Транслиния",
+                kg: { min: 2700, upTo500: 25.5 }, m3: { min: 2700, upTo1: 5950 }, delivery: "8-10", type: "АВТО" },
+            { from: "Новосибирск", to: "Хабаровск", carrier: "Транслиния (ЖД)",
+                kg: { min: 1800, upTo500: 14 }, m3: { min: 1800, upTo1: 3600 }, delivery: "15-20", type: "ЖД" },
+
+            // НОВОСИБИРСК → КОМСОМОЛЬСК-НА-АМУРЕ
+            { from: "Новосибирск", to: "Комсомольск-на-Амуре", carrier: "ТрейдТрансГрупп",
+                kg: { min: 3500, upTo500: 24, upTo5000: 22, upTo20000: 21.5 },
+                m3: { min: 3500, upTo1: 6400, upTo7: 6200, upTo40: 5900 }, delivery: "21-25", type: "ЖД" },
+            { from: "Новосибирск", to: "Комсомольск-на-Амуре", carrier: "Транслиния",
+                kg: { min: 3700, upTo500: 37 }, m3: { min: 3700, upTo1: 7400 }, delivery: "12-14", type: "Авто" },
+            { from: "Новосибирск", to: "Комсомольск-на-Амуре", carrier: "Транслиния (ЖД)",
+                kg: { min: 2700, upTo500: 19.5 }, m3: { min: 2700, upTo1: 5400 }, delivery: "23-25", type: "ЖД" },
+
+            // ХАБАРОВСК → ВЛАДИВОСТОК
+            { from: "Хабаровск", to: "Владивосток", carrier: "ЕТЛ",
+                kg: { min: 1000, upTo500: 5 }, m3: { min: 1000, upTo1: 1000 }, delivery: "1", type: "Авто" },
+
+            // ХАБАРОВСК → КОМСОМОЛЬСК-НА-АМУРЕ
+            { from: "Хабаровск", to: "Комсомольск-на-Амуре", carrier: "ТК Партнер",
+                kg: { min: 750, upTo500: 8.5, upTo5000: 8, upTo20000: 6 },
+                m3: { min: 750, upTo1: 1700, upTo7: 1550, upTo40: 1450 }, delivery: "—", type: "Авто" },
+            { from: "Хабаровск", to: "Комсомольск-на-Амуре", carrier: "Навигатогр ДВ",
+                kg: { min: 2800, upTo500: 14 }, m3: { min: 2800, upTo1: 2800 }, delivery: "—", type: "Авто" },
+            { from: "Хабаровск", to: "Комсомольск-на-Амуре", carrier: "ЕТЛ",
+                kg: { min: 2200, upTo500: 11 }, m3: { min: 2200, upTo1: 2200 }, delivery: "1", type: "Авто" },
+            { from: "Хабаровск", to: "Комсомольск-на-Амуре", carrier: "Транслиния",
+                kg: { min: 1100, upTo500: 8.8 }, m3: { min: 1100, upTo1: 1450 }, delivery: "2-3", type: "Авто" },
+
+            // ХАБАРОВСК → БЛАГОВЕЩЕНСК
+            { from: "Хабаровск", to: "Благовещенск", carrier: "Навигатогр ДВ",
+                kg: { min: 2300, upTo500: 11.5 }, m3: { min: 2300, upTo1: 2300 }, delivery: "—", type: "Авто" },
+            { from: "Хабаровск", to: "Благовещенск", carrier: "ТК Партнер",
+                kg: { min: 1000, upTo500: 11, upTo5000: 10, upTo20000: 8.5 },
+                m3: { min: 1000, upTo1: 2150, upTo7: 1950, upTo40: 1800 }, delivery: "—", type: "Авто" },
+            { from: "Хабаровск", to: "Благовещенск", carrier: "ЕТЛ",
+                kg: { min: 2400, upTo500: 12 }, m3: { min: 2400, upTo1: 2400 }, delivery: "—", type: "Авто" },
+            { from: "Хабаровск", to: "Благовещенск", carrier: "Транслиния",
+                kg: { min: 1250, upTo500: 10.8 }, m3: { min: 1250, upTo1: 1950 }, delivery: "3-4", type: "Авто" },
+
+            // ХАБАРОВСК → БИРОБИДЖАН
+            { from: "Хабаровск", to: "Биробиджан", carrier: "ТК Партнер",
+                kg: { min: 850, upTo500: 8, upTo5000: 7.5, upTo20000: 7 },
+                m3: { min: 850, upTo1: 1400, upTo7: 1350, upTo40: 1300 }, delivery: "—", type: "Авто" },
+            { from: "Хабаровск", to: "Биробиджан", carrier: "Навигатогр ДВ",
+                kg: { min: 2100, upTo500: 20.5 }, m3: { min: 2100, upTo1: 2100 }, delivery: "—", type: "Авто" },
+            { from: "Хабаровск", to: "Биробиджан", carrier: "ЕТЛ",
+                kg: { min: 1600, upTo500: 10 }, m3: { min: 1600, upTo1: 1600 }, delivery: "—", type: "Авто" },
+            { from: "Хабаровск", to: "Биробиджан", carrier: "Транслиния",
+                kg: { min: 950, upTo500: 7.8 }, m3: { min: 950, upTo1: 1250 }, delivery: "3-4", type: "Авто" },
+
+            // НОВОСИБИРСК → БИРОБИДЖАН
+            { from: "Новосибирск", to: "Биробиджан", carrier: "Транслиния",
+                kg: { min: 3200, upTo500: 37 }, m3: { min: 3200, upTo1: 7400 }, delivery: "13-15", type: "Авто" },
+            { from: "Новосибирск", to: "Биробиджан", carrier: "Транслиния (ЖД)",
+                kg: { min: 2600, upTo500: 22 }, m3: { min: 2600, upTo1: 5000 }, delivery: "25-27", type: "ЖД" },
+
+            // НОВОСИБИРСК → БЛАГОВЕЩЕНСК
+            { from: "Новосибирск", to: "Благовещенск", carrier: "Транслиния",
+                kg: { min: 3700, upTo500: 30 }, m3: { min: 3700, upTo1: 6500 }, delivery: "13-15", type: "Авто" },
+            { from: "Новосибирск", to: "Благовещенск", carrier: "Транслиния (ЖД)",
+                kg: { min: 2700, upTo500: 20 }, m3: { min: 2700, upTo1: 5400 }, delivery: "25-27", type: "ЖД" },
+
+            // НОВОСИБИРСК → КРАСНОЯРСК
+            { from: "Новосибирск", to: "Красноярск", carrier: "Транслиния",
+                kg: { min: 1100, upTo500: 9.8 }, m3: { min: 1100, upTo1: 2050 }, delivery: "1-2", type: "АВТО" },
+
+            // НОВОСИБИРСК → ИРКУТСК
+            { from: "Новосибирск", to: "Иркутск", carrier: "Транслиния",
+                kg: { min: 1400, upTo500: 15 }, m3: { min: 1400, upTo1: 3760 }, delivery: "3-4", type: "АВТО" },
+
+            // ЕКАТЕРИНБУРГ → НОВОСИБИРСК
+            { from: "Екатеринбург", to: "Новосибирск", carrier: "Транслиния",
+                kg: { min: 1900, upTo500: 15 }, m3: { min: 1900, upTo1: 3300 }, delivery: "3-5", type: "АВТО" },
+
+            // ЧЕЛЯБИНСК → НОВОСИБИРСК
+            { from: "Челябинск", to: "Новосибирск", carrier: "Транслиния",
+                kg: { min: 2200, upTo500: 12 }, m3: { min: 2200, upTo1: 2550 }, delivery: "3-5", type: "АВТО" },
+
+            // МОСКВА → УЛАН-УДЭ
+            { from: "Москва", to: "Улан-Удэ", carrier: "Трансот",
+                kg: { min: 4080, upTo500: 43 }, m3: { min: 4080, upTo1: 10000 }, delivery: "6-7", type: "ЖД ПБ" },
+            { from: "Москва", to: "Улан-Удэ", carrier: "Бюро перевозок",
+                kg: { min: 650, upTo500: 33, upTo5000: 33, upTo20000: 32.5 },
+                m3: { min: 650, upTo1: 7370, upTo7: 7260, upTo40: 7150 }, delivery: "8-9", type: "Авто" },
+
+            // МОСКВА → ЧИТА
+            { from: "Москва", to: "Чита", carrier: "Трансот",
+                kg: { min: 4080, upTo500: 45 }, m3: { min: 4080, upTo1: 10600 }, delivery: "7-8", type: "ЖД ПБ" },
+            { from: "Москва", to: "Чита", carrier: "Бюро перевозок",
+                kg: { min: 650, upTo500: 34, upTo5000: 33.5, upTo20000: 33 },
+                m3: { min: 650, upTo1: 7480, upTo7: 7370, upTo40: 7260 }, delivery: "9-10", type: "Авто" },
+
+            // МОСКВА → ПЕТРОПАВЛОВСК-КАМЧАТСКИЙ
+            { from: "Москва", to: "Петропавловск-Камчатский", carrier: "ТрейдТрансГрупп",
+                kg: { min: 6200, upTo500: 38.5, upTo5000: 36.5, upTo20000: 36 },
+                m3: { min: 6200, upTo1: 11700, upTo7: 11500, upTo40: 11200 }, delivery: "38-43", type: "ЖД" },
+            { from: "Москва", to: "Петропавловск-Камчатский", carrier: "Бюро перевозок",
+                kg: { min: 1100, upTo500: 43.5, upTo5000: 42.5, upTo20000: 41.5 },
+                m3: { min: 1100, upTo1: 9570, upTo7: 9350, upTo40: 9130 }, delivery: "11-12", type: "авто" },
+
+            // МОСКВА → ЮЖНО-САХАЛИНСК
+            { from: "Москва", to: "Южно-Сахалинск", carrier: "ТрейдТрансГрупп",
+                kg: { min: 5200, upTo500: 36.5, upTo5000: 34.5, upTo20000: 34 },
+                m3: { min: 5200, upTo1: 8800, upTo7: 8600, upTo40: 8300 }, delivery: "34-39", type: "ЖД" },
+            { from: "Москва", to: "Южно-Сахалинск", carrier: "Бюро перевозок",
+                kg: { min: 1100, upTo500: 43.5, upTo5000: 42.5, upTo20000: 41.5 },
+                m3: { min: 1100, upTo1: 9570, upTo7: 9350, upTo40: 9130 }, delivery: "11-12", type: "авто" },
+        ];
+
+        // ============================================================
+        // 2. ЛОГИКА РАСЧЁТА
+        // ============================================================
+        function calculatePrice(from, to, value, unit) {
+            const routes = tariffsDB.filter(t => t.from === from && t.to === to);
+
+            if (routes.length === 0) {
+                return { error: "Маршрут не найден" };
+            }
+
+            const results = routes.map(route => {
+                let unitPrice;
+
+                if (unit === 'kg') {
+                    const kg = route.kg;
+                    if (value <= 500) unitPrice = kg.upTo500 || kg.min;
+                    else if (value <= 5000) unitPrice = kg.upTo5000 || kg.upTo500 || kg.min;
+                    else if (value <= 20000) unitPrice = kg.upTo20000 || kg.upTo5000 || kg.min;
+                    else unitPrice = kg.min || kg.upTo20000 || kg.upTo5000 || kg.upTo500;
+                } else {
+                    const m3 = route.m3;
+                    if (value <= 1) unitPrice = m3.upTo1 || m3.min;
+                    else if (value <= 7) unitPrice = m3.upTo7 || m3.upTo1 || m3.min;
+                    else if (value <= 40) unitPrice = m3.upTo40 || m3.upTo7 || m3.min;
+                    else unitPrice = m3.min || m3.upTo40 || m3.upTo7 || m3.upTo1;
+                }
+
+                if (unitPrice === undefined || unitPrice === null || unitPrice === 0) {
+                    return null;
+                }
+
+                return {
+                    carrier: route.carrier,
+                    price: Math.round(unitPrice * value),
+                    unitPrice: unitPrice,
+                    delivery: route.delivery || "—",
+                    type: route.type || "—"
+                };
+            }).filter(r => r !== null);
+
+            if (results.length === 0) {
+                return { error: "Нет данных для этого объёма" };
+            }
+
+            results.sort((a, b) => a.price - b.price);
+            return results;
+        }
+
+        // ============================================================
+        // 3. ИНТЕРФЕЙС
+        // ============================================================
+        const fromSelect = document.getElementById('fromCity');
+        const toSelect = document.getElementById('toCity');
+        const valueInput = document.getElementById('valueInput');
+        const valueLabel = document.getElementById('valueLabel');
+        const calcBtn = document.getElementById('calcBtn');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryBtn = document.getElementById('clearHistory');
+
+        // Уникальные города
+        const cities = [...new Set(tariffsDB.map(t => t.from))].sort();
+
+        cities.forEach(city => {
+            const option = document.createElement('option');
+            option.value = city;
+            option.textContent = city;
+            fromSelect.appendChild(option);
+        });
+
+        fromSelect.addEventListener('change', function() {
+            const from = this.value;
+            toSelect.innerHTML = '<option value="">Выберите город</option>';
+            toSelect.disabled = true;
+
+            if (!from) return;
+
+            const destinations = [...new Set(
+                tariffsDB.filter(t => t.from === from).map(t => t.to)
+            )].sort();
+
+            destinations.forEach(city => {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                toSelect.appendChild(option);
+            });
+
+            toSelect.disabled = false;
+        });
+
+        document.querySelectorAll('.unit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const unit = this.dataset.unit;
+                valueLabel.textContent = unit === 'kg' ? 'Вес (кг)' : 'Объём (м³)';
+                valueInput.placeholder = unit === 'kg' ? 'Например: 150' : 'Например: 2.5';
+            });
+        });
+
+        // ============================================================
+        // 4. ИСТОРИЯ (localStorage)
+        // ============================================================
+        function getHistory() {
+            try {
+                return JSON.parse(localStorage.getItem('calcHistory')) || [];
+            } catch {
+                return [];
+            }
+        }
+
+        function saveHistory(entry) {
+            const history = getHistory();
+            history.unshift({
+                ...entry,
+                timestamp: new Date().toLocaleString('ru-RU')
+            });
+            if (history.length > 50) history.pop();
+            localStorage.setItem('calcHistory', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function clearHistory() {
+            localStorage.removeItem('calcHistory');
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const history = getHistory();
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="history-empty">История расчётов пуста</div>';
+                return;
+            }
+
+            historyList.innerHTML = history.map((item, index) => `
+                <div class="history-item" data-index="${index}">
+                    <span class="route">${item.from} → ${item.to}</span>
+                    <span class="info">${item.value} ${item.unit} · ${item.carrier}</span>
+                    <span class="hprice">${item.price.toLocaleString()} ₽</span>
+                </div>
+            `).join('');
+
+            // Клик по истории — подставить значения
+            historyList.querySelectorAll('.history-item').forEach(el => {
+                el.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.index);
+                    const item = getHistory()[idx];
+                    if (item) {
+                        fromSelect.value = item.from;
+                        fromSelect.dispatchEvent(new Event('change'));
+                        setTimeout(() => {
+                            toSelect.value = item.to;
+                        }, 100);
+                        const unitBtn = document.querySelector(`.unit-btn[data-unit="${item.unit}"]`);
+                        if (unitBtn) unitBtn.click();
+                        valueInput.value = item.value;
+                        setTimeout(() => calcBtn.click(), 200);
+                    }
+                });
+            });
+        }
+
+        clearHistoryBtn.addEventListener('click', clearHistory);
+
+        // ============================================================
+        // 5. ОСНОВНОЙ РАСЧЁТ
+        // ============================================================
+        calcBtn.addEventListener('click', function() {
+            const from = fromSelect.value;
+            const to = toSelect.value;
+            const unit = document.querySelector('.unit-btn.active').dataset.unit;
+            const value = parseFloat(valueInput.value);
+
+            if (!from || !to) {
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        <div class="emoji">⚠️</div>
+                        <p>Выберите маршрут</p>
+                    </div>
+                `;
+                return;
+            }
+
+            if (!value || value <= 0) {
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        <div class="emoji">⚠️</div>
+                        <p>Введите корректное значение</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const results = calculatePrice(from, to, value, unit);
+
+            if (results.error) {
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        <div class="emoji">😕</div>
+                        <p>${results.error}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `<h3 style="margin-bottom:16px;color:#2d3748;">✅ Найдено ${results.length} вариантов</h3>`;
+
+            const best = results[0];
+            const unitLabel = unit === 'kg' ? 'кг' : 'м³';
+
+            results.forEach((r, index) => {
+                const isBest = index === 0;
+                html += `
+                    <div class="result-item ${isBest ? 'best' : ''}">
+                        <div class="result-header">
+                            <span class="result-carrier">
+                                ${r.carrier}
+                                ${isBest ? ' <span class="badge best-badge">⭐ Лучший</span>' : ''}
+                            </span>
+                            <span class="result-price ${isBest ? 'best-price' : ''}">
+                                ${r.price.toLocaleString()} ₽
+                            </span>
+                        </div>
+                        <div class="result-details">
+                            <span>📦 ${r.unitPrice} ₽/${unitLabel}</span>
+                            <span>📅 ${r.delivery} дн.</span>
+                            <span>🚛 ${r.type}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            resultsContainer.innerHTML = html;
+
+            // Сохраняем в историю
+            saveHistory({
+                from,
+                to,
+                unit,
+                value,
+                carrier: best.carrier,
+                price: best.price
+            });
+        });
+
+        valueInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calcBtn.click();
+        });
+
+        // Инициализация истории
+        renderHistory();
+
+        console.log('🚚 Калькулятор грузоперевозок v2.0 загружен!');
+        console.log(`📊 Загружено ${tariffsDB.length} тарифов`);
+        console.log('🏙️ Доступные города:', cities.join(', '));
+        console.log('💾 История сохраняется в localStorage');
+    </script>
+
+</body>
+</html>
