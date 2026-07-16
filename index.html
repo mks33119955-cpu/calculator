@@ -42,33 +42,12 @@
             gap: 14px;
         }
 
-        .logo {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            line-height: 1.1;
-            padding-right: 14px;
-            border-right: 2px solid #e2e8f0;
-        }
-
-        .logo .company {
-            font-size: 12px;
-            font-weight: 700;
-            color: #1a202c;
-            letter-spacing: 1px;
-        }
-
-        .logo .rf {
-            font-size: 10px;
-            font-weight: 600;
-            color: #4299e1;
-        }
-
-        .logo .full {
-            font-size: 9px;
-            font-weight: 600;
-            color: #4a5568;
-            letter-spacing: 0.5px;
+        .logo-img {
+            height: 48px;
+            width: auto;
+            object-fit: contain;
+            display: block;
+            max-height: 60px;
         }
 
         h1 {
@@ -581,9 +560,8 @@
                 flex-wrap: wrap;
             }
 
-            .logo {
-                border-right: none;
-                padding-right: 0;
+            .logo-img {
+                height: 38px;
             }
         }
 
@@ -631,8 +609,8 @@
                 width: 100%;
             }
 
-            .logo .full {
-                font-size: 8px;
+            .logo-img {
+                height: 32px;
             }
         }
     </style>
@@ -643,11 +621,7 @@
         <!-- ШАПКА С ЛОГОТИПОМ -->
         <div class="header">
             <div class="header-left">
-                <div class="logo">
-                    <span class="company">ГРУЗОВАЯ КОМПАНИЯ</span>
-                    <span class="rf">РФ</span>
-                    <span class="full">ТРАНСПОРТНАЯ ГРУЗОВАЯ КОМПАНИЯ</span>
-                </div>
+                <img src="logo.png" alt="Грузовая компания" class="logo-img" />
                 <h1>🚚 Калькулятор грузоперевозок</h1>
             </div>
             <span class="version">v3.3</span>
@@ -1232,7 +1206,6 @@
                     return null;
                 }
 
-                // ⚠️ НОВАЯ ЛОГИКА: проверяем минимальную сумму
                 const minSum = route.minSum || 0;
                 const calculatedPrice = Math.round(unitPrice * value);
                 let finalPrice = calculatedPrice;
@@ -1261,7 +1234,6 @@
                 return { error: "Нет данных для этого объёма" };
             }
 
-            // Сортируем
             results.sort((a, b) => {
                 if (a.isOurTruck && !b.isOurTruck) return -1;
                 if (!a.isOurTruck && b.isOurTruck) return 1;
@@ -1629,7 +1601,6 @@
 
             resultsContainer.innerHTML = html;
 
-            // Сохраняем в историю
             saveHistory({
                 from,
                 to,
@@ -1646,21 +1617,16 @@
             });
         });
 
-        // Enter для расчёта
         valueInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') calcBtn.click();
         });
 
-        // Инициализация
         renderHistory();
 
         console.log('🚚 Калькулятор грузоперевозок v3.3 загружен!');
         console.log(`📊 Загружено ${tariffsDB.length} тарифов`);
         console.log('🏙️ Доступные города:', cities.join(', '));
-        console.log('🏠 Добавлена "Наша машина" с маршрутами:');
-        console.log('   • Новосибирск → Чита (2 дн.) — 40 ₽/кг, 10 000 ₽/м³');
-        console.log('   • Новосибирск → Хабаровск (4 дн.) — 40 ₽/кг, 10 000 ₽/м³');
-        console.log('   • Новосибирск → Владивосток (5 дн.) — 40 ₽/кг, 10 000 ₽/м³');
+        console.log('🏠 Добавлена "Наша машина"');
         console.log('💰 Цена "Нашей машины" уже финальная (без наценки)');
         console.log('⚙️ Наценка настраивается в интерфейсе');
         console.log('💰 Добавлена логика минимальной суммы (minSum)');
