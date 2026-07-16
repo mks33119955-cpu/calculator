@@ -39,44 +39,41 @@
         .header-left {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
         }
 
-        /* ===== ТЕКСТОВЫЙ ЛОГОТИП ===== */
-        .logo-text {
+        /* ===== КРАСИВЫЙ ТЕКСТОВЫЙ ЛОГОТИП ===== */
+        .logo {
             display: flex;
             flex-direction: column;
             align-items: center;
             line-height: 1.15;
-            padding-right: 14px;
+            padding-right: 16px;
             border-right: 2px solid #e2e8f0;
         }
 
-        .logo-text .company {
-            font-size: 13px;
-            font-weight: 700;
+        .logo .company {
+            font-size: 14px;
+            font-weight: 800;
             color: #1a202c;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
         }
 
-        .logo-text .rf {
-            font-size: 10px;
-            font-weight: 600;
+        .logo .rf {
+            font-size: 11px;
+            font-weight: 700;
             color: #4299e1;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
 
-        /* ===== КАРТИНКА ЛОГОТИПА (закомментировано, но можно использовать) ===== */
-        /*
-        .logo-img {
-            height: 50px;
-            width: auto;
-            max-width: 180px;
-            object-fit: contain;
-            display: block;
+        .logo .full {
+            font-size: 9px;
+            font-weight: 600;
+            color: #4a5568;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
-        */
 
         h1 {
             font-size: 22px;
@@ -587,6 +584,18 @@
             .header-left {
                 flex-wrap: wrap;
             }
+
+            .logo .company {
+                font-size: 12px;
+            }
+
+            .logo .rf {
+                font-size: 10px;
+            }
+
+            .logo .full {
+                font-size: 8px;
+            }
         }
 
         @media (max-width: 600px) {
@@ -633,12 +642,22 @@
                 width: 100%;
             }
 
-            .logo-text .company {
+            .logo {
+                padding-right: 10px;
+                border-right: 1px solid #e2e8f0;
+            }
+
+            .logo .company {
                 font-size: 11px;
             }
 
-            .logo-text .rf {
-                font-size: 8px;
+            .logo .rf {
+                font-size: 9px;
+                letter-spacing: 2px;
+            }
+
+            .logo .full {
+                font-size: 7px;
             }
         }
     </style>
@@ -646,12 +665,13 @@
 <body>
 
     <div class="container">
-        <!-- ШАПКА С ТЕКСТОВЫМ ЛОГОТИПОМ -->
+        <!-- ШАПКА С ЛОГОТИПОМ (HTML/CSS) -->
         <div class="header">
             <div class="header-left">
-                <div class="logo-text">
-                    <span class="company">Грузовая компания</span>
+                <div class="logo">
+                    <span class="company">ГРУЗОВАЯ КОМПАНИЯ</span>
                     <span class="rf">РФ</span>
+                    <span class="full">ТРАНСПОРТНАЯ ГРУЗОВАЯ КОМПАНИЯ</span>
                 </div>
                 <h1>🚚 Калькулятор грузоперевозок</h1>
             </div>
@@ -1207,7 +1227,7 @@
         ];
 
         // ============================================================
-        // 2. ЛОГИКА РАСЧЁТА (с учётом minSum)
+        // 2. ЛОГИКА РАСЧЁТА
         // ============================================================
         function calculatePrice(from, to, value, unit) {
             const routes = tariffsDB.filter(t => t.from === from && t.to === to);
