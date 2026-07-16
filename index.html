@@ -42,13 +42,41 @@
             gap: 14px;
         }
 
+        /* ===== ТЕКСТОВЫЙ ЛОГОТИП ===== */
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.15;
+            padding-right: 14px;
+            border-right: 2px solid #e2e8f0;
+        }
+
+        .logo-text .company {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1a202c;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .logo-text .rf {
+            font-size: 10px;
+            font-weight: 600;
+            color: #4299e1;
+            letter-spacing: 2px;
+        }
+
+        /* ===== КАРТИНКА ЛОГОТИПА (закомментировано, но можно использовать) ===== */
+        /*
         .logo-img {
-            height: 48px;
+            height: 50px;
             width: auto;
+            max-width: 180px;
             object-fit: contain;
             display: block;
-            max-height: 60px;
         }
+        */
 
         h1 {
             font-size: 22px;
@@ -559,10 +587,6 @@
             .header-left {
                 flex-wrap: wrap;
             }
-
-            .logo-img {
-                height: 38px;
-            }
         }
 
         @media (max-width: 600px) {
@@ -609,8 +633,12 @@
                 width: 100%;
             }
 
-            .logo-img {
-                height: 32px;
+            .logo-text .company {
+                font-size: 11px;
+            }
+
+            .logo-text .rf {
+                font-size: 8px;
             }
         }
     </style>
@@ -618,10 +646,13 @@
 <body>
 
     <div class="container">
-        <!-- ШАПКА С ЛОГОТИПОМ -->
+        <!-- ШАПКА С ТЕКСТОВЫМ ЛОГОТИПОМ -->
         <div class="header">
             <div class="header-left">
-                <img src="logo.png" alt="Грузовая компания" class="logo-img" />
+                <div class="logo-text">
+                    <span class="company">Грузовая компания</span>
+                    <span class="rf">РФ</span>
+                </div>
                 <h1>🚚 Калькулятор грузоперевозок</h1>
             </div>
             <span class="version">v3.3</span>
