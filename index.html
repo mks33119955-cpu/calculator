@@ -95,12 +95,6 @@
             gap: 16px;
         }
 
-        .row-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 16px;
-        }
-
         .unit-toggle {
             display: flex;
             gap: 10px;
@@ -188,6 +182,15 @@
             background: #f0fff4;
         }
 
+        .result-item.our-truck {
+            border-left-color: #9f7aea;
+            background: #faf5ff;
+        }
+
+        .result-item.our-truck .result-carrier {
+            color: #6b46c1;
+        }
+
         .result-header {
             display: flex;
             justify-content: space-between;
@@ -242,6 +245,16 @@
             color: white;
         }
 
+        .badge.our-badge {
+            background: #9f7aea;
+            color: white;
+        }
+
+        .badge.no-margin-badge {
+            background: #f6ad55;
+            color: white;
+        }
+
         .no-results {
             text-align: center;
             padding: 40px 20px;
@@ -253,7 +266,6 @@
             margin-bottom: 16px;
         }
 
-        /* ===== БЛОК МАРЖИНАЛЬНОСТИ ===== */
         .margin-block {
             background: #f8fafc;
             border-radius: 8px;
@@ -291,6 +303,11 @@
             font-size: 17px;
         }
 
+        .margin-value.price-final {
+            color: #6b46c1;
+            font-size: 17px;
+        }
+
         .margin-value.profit {
             font-weight: 700;
             font-size: 16px;
@@ -303,6 +320,11 @@
             font-size: 12px;
             font-weight: 600;
             color: #2d3748;
+        }
+
+        .margin-badge.final-badge {
+            background: #9f7aea;
+            color: white;
         }
 
         .margin-emoji {
@@ -325,7 +347,6 @@
             transition: width 0.5s ease;
         }
 
-        /* ===== СВОДКА ===== */
         .margin-summary {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -357,7 +378,6 @@
             margin-top: 2px;
         }
 
-        /* ===== ИСТОРИЯ ===== */
         .history {
             margin-top: 30px;
             border-top: 2px solid #edf2f7;
@@ -441,7 +461,11 @@
             font-size: 14px;
         }
 
-        /* ===== НАСТРОЙКА НАЦЕНКИ ===== */
+        .history-item.our-history {
+            background: #faf5ff;
+            border-left: 3px solid #9f7aea;
+        }
+
         .margin-settings {
             display: flex;
             align-items: center;
@@ -476,11 +500,21 @@
             color: #718096;
         }
 
-        @media (max-width: 768px) {
-            .row-3 {
-                grid-template-columns: 1fr;
-            }
+        .margin-settings .reset-btn {
+            background: none;
+            border: none;
+            color: #4299e1;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
 
+        .margin-settings .reset-btn:hover {
+            color: #2b6cb0;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
             .margin-summary {
                 grid-template-columns: 1fr;
                 gap: 8px;
@@ -553,7 +587,7 @@
         <!-- ШАПКА -->
         <div class="header">
             <h1>🚚 Калькулятор грузоперевозок</h1>
-            <span class="version">v3.0</span>
+            <span class="version">v3.2</span>
         </div>
         <p class="subtitle">Расчёт стоимости перевозки с учётом маржинальности</p>
 
@@ -562,7 +596,7 @@
             <label>⚙️ Наценка:</label>
             <input type="number" id="marginPercent" value="43" min="0" max="300" step="0.5" />
             <span class="hint">% (коэффициент ×<span id="marginMultiplierDisplay">1.43</span>)</span>
-            <button id="resetMarginBtn" style="background:none;border:none;color:#4299e1;cursor:pointer;font-weight:600;font-size:13px;">↺ Сбросить</button>
+            <button class="reset-btn" id="resetMarginBtn">↺ Сбросить</button>
         </div>
 
         <!-- ВЫБОР МАРШРУТА -->
@@ -617,7 +651,79 @@
         // 1. БАЗА ДАННЫХ ТАРИФОВ
         // ============================================================
         const tariffsDB = [
+            // =========================================================
+            // 🏠 НАША МАШИНА — ЦЕНА УЖЕ ФИНАЛЬНАЯ (без наценки)
+            // =========================================================
+            {
+                from: "Новосибирск",
+                to: "Чита",
+                carrier: "🏠 Наша машина",
+                kg: { min: 40, upTo500: 40, upTo5000: 40, upTo20000: 40 },
+                m3: { min: 10000, upTo1: 10000, upTo7: 10000, upTo40: 10000 },
+                delivery: "2",
+                type: "🚛 Собственный авто",
+                isOurTruck: true,
+                isFinalPrice: true
+            },
+            {
+                from: "Новосибирск",
+                to: "Хабаровск",
+                carrier: "🏠 Наша машина",
+                kg: { min: 40, upTo500: 40, upTo5000: 40, upTo20000: 40 },
+                m3: { min: 10000, upTo1: 10000, upTo7: 10000, upTo40: 10000 },
+                delivery: "4",
+                type: "🚛 Собственный авто",
+                isOurTruck: true,
+                isFinalPrice: true
+            },
+            {
+                from: "Новосибирск",
+                to: "Владивосток",
+                carrier: "🏠 Наша машина",
+                kg: { min: 40, upTo500: 40, upTo5000: 40, upTo20000: 40 },
+                m3: { min: 10000, upTo1: 10000, upTo7: 10000, upTo40: 10000 },
+                delivery: "5",
+                type: "🚛 Собственный авто",
+                isOurTruck: true,
+                isFinalPrice: true
+            },
+            {
+                from: "Чита",
+                to: "Новосибирск",
+                carrier: "🏠 Наша машина",
+                kg: { min: 40, upTo500: 40, upTo5000: 40, upTo20000: 40 },
+                m3: { min: 10000, upTo1: 10000, upTo7: 10000, upTo40: 10000 },
+                delivery: "2",
+                type: "🚛 Собственный авто",
+                isOurTruck: true,
+                isFinalPrice: true
+            },
+            {
+                from: "Хабаровск",
+                to: "Новосибирск",
+                carrier: "🏠 Наша машина",
+                kg: { min: 40, upTo500: 40, upTo5000: 40, upTo20000: 40 },
+                m3: { min: 10000, upTo1: 10000, upTo7: 10000, upTo40: 10000 },
+                delivery: "4",
+                type: "🚛 Собственный авто",
+                isOurTruck: true,
+                isFinalPrice: true
+            },
+            {
+                from: "Владивосток",
+                to: "Новосибирск",
+                carrier: "🏠 Наша машина",
+                kg: { min: 40, upTo500: 40, upTo5000: 40, upTo20000: 40 },
+                m3: { min: 10000, upTo1: 10000, upTo7: 10000, upTo40: 10000 },
+                delivery: "5",
+                type: "🚛 Собственный авто",
+                isOurTruck: true,
+                isFinalPrice: true
+            },
+
+            // =========================================================
             // ВЛАДИВОСТОК → ПЕТРОПАВЛОВСК-КАМЧАТСКИЙ
+            // =========================================================
             { from: "Владивосток", to: "Петропавловск-Камчатский", carrier: "Баграм",
                 kg: { min: 2300, upTo500: 15 }, m3: { min: 2300, upTo1: 4200 }, delivery: "12-14", type: "Конт, море" },
             { from: "Владивосток", to: "Петропавловск-Камчатский", carrier: "ЕТЛ",
@@ -630,7 +736,9 @@
             { from: "Владивосток", to: "Петропавловск-Камчатский", carrier: "Энни-Транс",
                 kg: { min: 2400, upTo500: 12 }, m3: { min: 2400, upTo1: 4200 }, delivery: "12-14", type: "Конт, море" },
 
+            // =========================================================
             // ВЛАДИВОСТОК → МАГАДАН
+            // =========================================================
             { from: "Владивосток", to: "Магадан", carrier: "Баграм",
                 kg: { min: 2600, upTo500: 15 }, m3: { min: 2600, upTo1: 5100 }, delivery: "12-14", type: "Конт, море" },
             { from: "Владивосток", to: "Магадан", carrier: "ЕТЛ",
@@ -642,7 +750,9 @@
             { from: "Владивосток", to: "Магадан", carrier: "Энни-Транс",
                 kg: { min: 2600, upTo500: 15 }, m3: { min: 2600, upTo1: 5000 }, delivery: "12-14", type: "Конт, море" },
 
+            // =========================================================
             // ВЛАДИВОСТОК → ЮЖНО-САХАЛИНСК
+            // =========================================================
             { from: "Владивосток", to: "Южно-Сахалинск", carrier: "Баграм",
                 kg: { min: 2300, upTo500: 15 }, m3: { min: 2300, upTo1: 4200 }, delivery: "12-14", type: "Конт, море" },
             { from: "Владивосток", to: "Южно-Сахалинск", carrier: "ЕТЛ",
@@ -655,15 +765,21 @@
             { from: "Владивосток", to: "Южно-Сахалинск", carrier: "Энни-Транс",
                 kg: { min: 2200, upTo500: 12 }, m3: { min: 2200, upTo1: 4000 }, delivery: "12-14", type: "Конт, море" },
 
+            // =========================================================
             // ВЛАДИВОСТОК → МОСКВА
+            // =========================================================
             { from: "Владивосток", to: "Москва", carrier: "Транслиния",
                 kg: { min: 0, upTo500: 58 }, m3: { min: 0, upTo1: 11500 }, delivery: "—", type: "Авто" },
 
+            // =========================================================
             // ВЛАДИВОСТОК → НОВОСИБИРСК
+            // =========================================================
             { from: "Владивосток", to: "Новосибирск", carrier: "Транслиния",
                 kg: { min: 0, upTo500: 48 }, m3: { min: 0, upTo1: 9600 }, delivery: "—", type: "Авто" },
 
+            // =========================================================
             // МОСКВА → БЛАГОВЕЩЕНСК
+            // =========================================================
             { from: "Москва", to: "Благовещенск", carrier: "Рейл Континент",
                 kg: { min: 1750, upTo500: 29.5, upTo5000: 26.5, upTo20000: 25 },
                 m3: { min: 1750, upTo1: 7970, upTo7: 7400, upTo40: 6770 }, delivery: "18", type: "ЖД" },
@@ -677,7 +793,9 @@
             { from: "Москва", to: "Благовещенск", carrier: "Транслиния (ЖД)",
                 kg: { min: 3900, upTo500: 25 }, m3: { min: 3900, upTo1: 6600 }, delivery: "23-28", type: "ЖД" },
 
+            // =========================================================
             // МОСКВА → ВЛАДИВОСТОК
+            // =========================================================
             { from: "Москва", to: "Владивосток", carrier: "Трансот",
                 kg: { min: 4080, upTo500: 54 }, m3: { min: 4080, upTo1: 12700 }, delivery: "8-9", type: "ЖД ПБ" },
             { from: "Москва", to: "Владивосток", carrier: "ТрейдТрансГрупп",
@@ -693,7 +811,9 @@
             { from: "Москва", to: "Владивосток", carrier: "Бюро перевозок (Экспресс)",
                 kg: { min: 1200, upTo500: 45 }, m3: { min: 1200, upTo1: 9900 }, delivery: "8-9", type: "Авто" },
 
+            // =========================================================
             // МОСКВА → ИРКУТСК
+            // =========================================================
             { from: "Москва", to: "Иркутск", carrier: "Трансот",
                 kg: { min: 4080, upTo500: 45 }, m3: { min: 4080, upTo1: 9900 }, delivery: "5-6", type: "ЖД ПБ" },
             { from: "Москва", to: "Иркутск", carrier: "Транслиния",
@@ -704,7 +824,9 @@
                 kg: { min: 600, upTo500: 33, upTo5000: 32.5, upTo20000: 32 },
                 m3: { min: 600, upTo1: 7260, upTo7: 7150, upTo40: 7040 }, delivery: "8-9", type: "Авто" },
 
+            // =========================================================
             // МОСКВА → КРАСНОЯРСК
+            // =========================================================
             { from: "Москва", to: "Красноярск", carrier: "Транслиния (ЖД)",
                 kg: { min: 2300, upTo500: 9 }, m3: { min: 2300, upTo1: 3000 }, delivery: "13-15", type: "ЖД" },
             { from: "Москва", to: "Красноярск", carrier: "Транслиния",
@@ -715,7 +837,9 @@
                 kg: { min: 550, upTo500: 30, upTo5000: 29, upTo20000: 28 },
                 m3: { min: 550, upTo1: 6600, upTo7: 6380, upTo40: 6160 }, delivery: "7-8", type: "авто" },
 
+            // =========================================================
             // МОСКВА → НОВОСИБИРСК
+            // =========================================================
             { from: "Москва", to: "Новосибирск", carrier: "Трансот",
                 kg: { min: 4080, upTo500: 30 }, m3: { min: 4080, upTo1: 6000 }, delivery: "—", type: "ЖД ПБ" },
             { from: "Москва", to: "Новосибирск", carrier: "АРПИ",
@@ -741,7 +865,9 @@
                 kg: { min: 550, upTo500: 25, upTo5000: 24, upTo20000: 23 },
                 m3: { min: 550, upTo1: 5500, upTo7: 5280, upTo40: 5060 }, delivery: "6-7", type: "авто" },
 
+            // =========================================================
             // МОСКВА → ХАБАРОВСК
+            // =========================================================
             { from: "Москва", to: "Хабаровск", carrier: "ТрейдТрансГрупп",
                 kg: { min: 3600, upTo500: 18.5, upTo5000: 16.5, upTo20000: 16 },
                 m3: { min: 3600, upTo1: 5300, upTo7: 5100, upTo40: 4800 }, delivery: "20-25", type: "ЖД" },
@@ -755,7 +881,9 @@
                 kg: { min: 1000, upTo500: 42.5, upTo5000: 41.5, upTo20000: 40.5 },
                 m3: { min: 1000, upTo1: 9350, upTo7: 9130, upTo40: 8910 }, delivery: "10-11", type: "Авто" },
 
+            // =========================================================
             // НОВОСИБИРСК → ВЛАДИВОСТОК
+            // =========================================================
             { from: "Новосибирск", to: "Владивосток", carrier: "ТрейдТрансГрупп",
                 kg: { min: 2300, upTo500: 18, upTo5000: 16, upTo20000: 15.5 },
                 m3: { min: 2300, upTo1: 4400, upTo7: 4200, upTo40: 3900 }, delivery: "18-20", type: "ЖД" },
@@ -764,7 +892,9 @@
             { from: "Новосибирск", to: "Владивосток", carrier: "Транслиния (ЖД)",
                 kg: { min: 1800, upTo500: 14 }, m3: { min: 1800, upTo1: 3600 }, delivery: "15-20", type: "ЖД" },
 
+            // =========================================================
             // НОВОСИБИРСК → ХАБАРОВСК
+            // =========================================================
             { from: "Новосибирск", to: "Хабаровск", carrier: "ТрейдТрансГрупп",
                 kg: { min: 2300, upTo500: 18, upTo5000: 16, upTo20000: 15.5 },
                 m3: { min: 2300, upTo1: 4400, upTo7: 4200, upTo40: 3900 }, delivery: "15-18", type: "ЖД" },
@@ -773,7 +903,9 @@
             { from: "Новосибирск", to: "Хабаровск", carrier: "Транслиния (ЖД)",
                 kg: { min: 1800, upTo500: 14 }, m3: { min: 1800, upTo1: 3600 }, delivery: "15-20", type: "ЖД" },
 
+            // =========================================================
             // НОВОСИБИРСК → КОМСОМОЛЬСК-НА-АМУРЕ
+            // =========================================================
             { from: "Новосибирск", to: "Комсомольск-на-Амуре", carrier: "ТрейдТрансГрупп",
                 kg: { min: 3500, upTo500: 24, upTo5000: 22, upTo20000: 21.5 },
                 m3: { min: 3500, upTo1: 6400, upTo7: 6200, upTo40: 5900 }, delivery: "21-25", type: "ЖД" },
@@ -782,11 +914,15 @@
             { from: "Новосибирск", to: "Комсомольск-на-Амуре", carrier: "Транслиния (ЖД)",
                 kg: { min: 2700, upTo500: 19.5 }, m3: { min: 2700, upTo1: 5400 }, delivery: "23-25", type: "ЖД" },
 
+            // =========================================================
             // ХАБАРОВСК → ВЛАДИВОСТОК
+            // =========================================================
             { from: "Хабаровск", to: "Владивосток", carrier: "ЕТЛ",
                 kg: { min: 1000, upTo500: 5 }, m3: { min: 1000, upTo1: 1000 }, delivery: "1", type: "Авто" },
 
+            // =========================================================
             // ХАБАРОВСК → КОМСОМОЛЬСК-НА-АМУРЕ
+            // =========================================================
             { from: "Хабаровск", to: "Комсомольск-на-Амуре", carrier: "ТК Партнер",
                 kg: { min: 750, upTo500: 8.5, upTo5000: 8, upTo20000: 6 },
                 m3: { min: 750, upTo1: 1700, upTo7: 1550, upTo40: 1450 }, delivery: "—", type: "Авто" },
@@ -797,7 +933,9 @@
             { from: "Хабаровск", to: "Комсомольск-на-Амуре", carrier: "Транслиния",
                 kg: { min: 1100, upTo500: 8.8 }, m3: { min: 1100, upTo1: 1450 }, delivery: "2-3", type: "Авто" },
 
+            // =========================================================
             // ХАБАРОВСК → БЛАГОВЕЩЕНСК
+            // =========================================================
             { from: "Хабаровск", to: "Благовещенск", carrier: "Навигатогр ДВ",
                 kg: { min: 2300, upTo500: 11.5 }, m3: { min: 2300, upTo1: 2300 }, delivery: "—", type: "Авто" },
             { from: "Хабаровск", to: "Благовещенск", carrier: "ТК Партнер",
@@ -808,7 +946,9 @@
             { from: "Хабаровск", to: "Благовещенск", carrier: "Транслиния",
                 kg: { min: 1250, upTo500: 10.8 }, m3: { min: 1250, upTo1: 1950 }, delivery: "3-4", type: "Авто" },
 
+            // =========================================================
             // ХАБАРОВСК → БИРОБИДЖАН
+            // =========================================================
             { from: "Хабаровск", to: "Биробиджан", carrier: "ТК Партнер",
                 kg: { min: 850, upTo500: 8, upTo5000: 7.5, upTo20000: 7 },
                 m3: { min: 850, upTo1: 1400, upTo7: 1350, upTo40: 1300 }, delivery: "—", type: "Авто" },
@@ -819,49 +959,73 @@
             { from: "Хабаровск", to: "Биробиджан", carrier: "Транслиния",
                 kg: { min: 950, upTo500: 7.8 }, m3: { min: 950, upTo1: 1250 }, delivery: "3-4", type: "Авто" },
 
+            // =========================================================
             // НОВОСИБИРСК → БИРОБИДЖАН
+            // =========================================================
             { from: "Новосибирск", to: "Биробиджан", carrier: "Транслиния",
                 kg: { min: 3200, upTo500: 37 }, m3: { min: 3200, upTo1: 7400 }, delivery: "13-15", type: "Авто" },
             { from: "Новосибирск", to: "Биробиджан", carrier: "Транслиния (ЖД)",
                 kg: { min: 2600, upTo500: 22 }, m3: { min: 2600, upTo1: 5000 }, delivery: "25-27", type: "ЖД" },
 
+            // =========================================================
             // НОВОСИБИРСК → БЛАГОВЕЩЕНСК
+            // =========================================================
             { from: "Новосибирск", to: "Благовещенск", carrier: "Транслиния",
                 kg: { min: 3700, upTo500: 30 }, m3: { min: 3700, upTo1: 6500 }, delivery: "13-15", type: "Авто" },
             { from: "Новосибирск", to: "Благовещенск", carrier: "Транслиния (ЖД)",
                 kg: { min: 2700, upTo500: 20 }, m3: { min: 2700, upTo1: 5400 }, delivery: "25-27", type: "ЖД" },
 
+            // =========================================================
             // НОВОСИБИРСК → КРАСНОЯРСК
+            // =========================================================
             { from: "Новосибирск", to: "Красноярск", carrier: "Транслиния",
                 kg: { min: 1100, upTo500: 9.8 }, m3: { min: 1100, upTo1: 2050 }, delivery: "1-2", type: "АВТО" },
 
+            // =========================================================
             // НОВОСИБИРСК → ИРКУТСК
+            // =========================================================
             { from: "Новосибирск", to: "Иркутск", carrier: "Транслиния",
                 kg: { min: 1400, upTo500: 15 }, m3: { min: 1400, upTo1: 3760 }, delivery: "3-4", type: "АВТО" },
 
+            // =========================================================
+            // НОВОСИБИРСК → ЧИТА (другие перевозчики)
+            // =========================================================
+            { from: "Новосибирск", to: "Чита", carrier: "Транслиния",
+                kg: { min: 1600, upTo500: 18 }, m3: { min: 1600, upTo1: 4500 }, delivery: "5-7", type: "АВТО" },
+
+            // =========================================================
             // ЕКАТЕРИНБУРГ → НОВОСИБИРСК
+            // =========================================================
             { from: "Екатеринбург", to: "Новосибирск", carrier: "Транслиния",
                 kg: { min: 1900, upTo500: 15 }, m3: { min: 1900, upTo1: 3300 }, delivery: "3-5", type: "АВТО" },
 
+            // =========================================================
             // ЧЕЛЯБИНСК → НОВОСИБИРСК
+            // =========================================================
             { from: "Челябинск", to: "Новосибирск", carrier: "Транслиния",
                 kg: { min: 2200, upTo500: 12 }, m3: { min: 2200, upTo1: 2550 }, delivery: "3-5", type: "АВТО" },
 
+            // =========================================================
             // МОСКВА → УЛАН-УДЭ
+            // =========================================================
             { from: "Москва", to: "Улан-Удэ", carrier: "Трансот",
                 kg: { min: 4080, upTo500: 43 }, m3: { min: 4080, upTo1: 10000 }, delivery: "6-7", type: "ЖД ПБ" },
             { from: "Москва", to: "Улан-Удэ", carrier: "Бюро перевозок",
                 kg: { min: 650, upTo500: 33, upTo5000: 33, upTo20000: 32.5 },
                 m3: { min: 650, upTo1: 7370, upTo7: 7260, upTo40: 7150 }, delivery: "8-9", type: "Авто" },
 
+            // =========================================================
             // МОСКВА → ЧИТА
+            // =========================================================
             { from: "Москва", to: "Чита", carrier: "Трансот",
                 kg: { min: 4080, upTo500: 45 }, m3: { min: 4080, upTo1: 10600 }, delivery: "7-8", type: "ЖД ПБ" },
             { from: "Москва", to: "Чита", carrier: "Бюро перевозок",
                 kg: { min: 650, upTo500: 34, upTo5000: 33.5, upTo20000: 33 },
                 m3: { min: 650, upTo1: 7480, upTo7: 7370, upTo40: 7260 }, delivery: "9-10", type: "Авто" },
 
+            // =========================================================
             // МОСКВА → ПЕТРОПАВЛОВСК-КАМЧАТСКИЙ
+            // =========================================================
             { from: "Москва", to: "Петропавловск-Камчатский", carrier: "ТрейдТрансГрупп",
                 kg: { min: 6200, upTo500: 38.5, upTo5000: 36.5, upTo20000: 36 },
                 m3: { min: 6200, upTo1: 11700, upTo7: 11500, upTo40: 11200 }, delivery: "38-43", type: "ЖД" },
@@ -869,7 +1033,9 @@
                 kg: { min: 1100, upTo500: 43.5, upTo5000: 42.5, upTo20000: 41.5 },
                 m3: { min: 1100, upTo1: 9570, upTo7: 9350, upTo40: 9130 }, delivery: "11-12", type: "авто" },
 
+            // =========================================================
             // МОСКВА → ЮЖНО-САХАЛИНСК
+            // =========================================================
             { from: "Москва", to: "Южно-Сахалинск", carrier: "ТрейдТрансГрупп",
                 kg: { min: 5200, upTo500: 36.5, upTo5000: 34.5, upTo20000: 34 },
                 m3: { min: 5200, upTo1: 8800, upTo7: 8600, upTo40: 8300 }, delivery: "34-39", type: "ЖД" },
@@ -914,7 +1080,9 @@
                     price: Math.round(unitPrice * value),
                     unitPrice: unitPrice,
                     delivery: route.delivery || "—",
-                    type: route.type || "—"
+                    type: route.type || "—",
+                    isOurTruck: route.isOurTruck || false,
+                    isFinalPrice: route.isFinalPrice || false
                 };
             }).filter(r => r !== null);
 
@@ -922,7 +1090,13 @@
                 return { error: "Нет данных для этого объёма" };
             }
 
-            results.sort((a, b) => a.price - b.price);
+            // Сортируем: сначала "Наша машина", потом остальные по цене
+            results.sort((a, b) => {
+                if (a.isOurTruck && !b.isOurTruck) return -1;
+                if (!a.isOurTruck && b.isOurTruck) return 1;
+                return a.price - b.price;
+            });
+
             return results;
         }
 
@@ -934,9 +1108,23 @@
 
             if (results.error) return results;
 
-            const multiplier = 1 + (marginPercent / 100);
-
             return results.map(r => {
+                // ⚠️ Если это "Наша машина" — цена уже финальная, наценку НЕ добавляем
+                if (r.isOurTruck && r.isFinalPrice) {
+                    return {
+                        ...r,
+                        costPrice: r.price,
+                        priceWithMargin: r.price,
+                        marginRub: 0,
+                        marginPercent: 0,
+                        marginMultiplier: 1,
+                        isOurTruck: true,
+                        isFinalPrice: true
+                    };
+                }
+
+                // Для всех остальных перевозчиков — накручиваем наценку
+                const multiplier = 1 + (marginPercent / 100);
                 const priceWithMargin = Math.round(r.price * multiplier);
                 const marginRub = priceWithMargin - r.price;
                 const marginPercentActual = Math.round((marginRub / r.price) * 100);
@@ -947,7 +1135,9 @@
                     priceWithMargin: priceWithMargin,
                     marginRub: marginRub,
                     marginPercent: marginPercentActual,
-                    marginMultiplier: multiplier
+                    marginMultiplier: multiplier,
+                    isOurTruck: false,
+                    isFinalPrice: false
                 };
             });
         }
@@ -1075,19 +1265,23 @@
                 return;
             }
 
-            historyList.innerHTML = history.map((item, index) => `
-                <div class="history-item" data-index="${index}">
-                    <span class="route">${item.from} → ${item.to}</span>
-                    <span class="info">
-                        ${item.value} ${item.unit} · ${item.carrier}
-                        ${item.marginPercent ? ` · +${item.marginPercent}%` : ''}
-                    </span>
-                    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                        <span class="hcost">${(item.costPrice || item.price).toLocaleString()} ₽</span>
-                        <span class="hprice">${(item.priceWithMargin || item.price).toLocaleString()} ₽</span>
+            historyList.innerHTML = history.map((item, index) => {
+                const isOurTruck = item.carrier && item.carrier.includes('Наша машина');
+                return `
+                    <div class="history-item ${isOurTruck ? 'our-history' : ''}" data-index="${index}">
+                        <span class="route">${item.from} → ${item.to}</span>
+                        <span class="info">
+                            ${item.value} ${item.unit} · ${item.carrier}
+                            ${item.marginPercent !== undefined && item.marginPercent > 0 ? ` · +${item.marginPercent}%` : ''}
+                            ${item.isFinalPrice ? ' · 🏠 Финальная цена' : ''}
+                        </span>
+                        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                            ${item.costPrice !== item.priceWithMargin ? `<span class="hcost">${(item.costPrice || item.price).toLocaleString()} ₽</span>` : ''}
+                            <span class="hprice">${(item.priceWithMargin || item.price).toLocaleString()} ₽</span>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
             historyList.querySelectorAll('.history-item').forEach(el => {
                 el.addEventListener('click', function() {
@@ -1154,7 +1348,15 @@
 
             const unitLabel = unit === 'kg' ? 'кг' : 'м³';
             const best = results[0];
-            const avgMargin = Math.round(results.reduce((sum, r) => sum + r.marginPercent, 0) / results.length);
+
+            // Считаем среднюю маржу только для перевозчиков у которых есть маржа
+            const marginResults = results.filter(r => r.marginPercent > 0);
+            const avgMargin = marginResults.length > 0 ?
+                Math.round(marginResults.reduce((sum, r) => sum + r.marginPercent, 0) / marginResults.length) :
+                0;
+
+            // Проверяем, есть ли "Наша машина" в результатах
+            const hasOurTruck = results.some(r => r.isOurTruck);
 
             let html = `
                 <h3 style="margin-bottom:16px;color:#2d3748;">
@@ -1188,18 +1390,31 @@
 
             results.forEach((r, index) => {
                 const isBest = index === 0;
+                const isOurTruck = r.isOurTruck;
+                const isFinalPrice = r.isFinalPrice;
                 const marginInfo = formatMargin(r.marginPercent, r.marginRub);
                 const marginColor = getMarginColor(r.marginPercent);
 
+                let resultClass = 'result-item';
+                if (isBest && !isOurTruck) resultClass += ' best';
+                if (isOurTruck) resultClass += ' our-truck';
+
+                let badgeHtml = '';
+                if (isBest && !isOurTruck) badgeHtml += ' <span class="badge best-badge">⭐ Лучший</span>';
+                if (isOurTruck) badgeHtml += ' <span class="badge our-badge">🏠 Свой транспорт</span>';
+                if (isFinalPrice) badgeHtml += ' <span class="badge no-margin-badge">💰 Финальная цена</span>';
+
+                let priceDisplay = r.priceWithMargin.toLocaleString();
+
                 html += `
-                    <div class="result-item ${isBest ? 'best' : ''}">
+                    <div class="${resultClass}">
                         <div class="result-header">
                             <span class="result-carrier">
                                 ${r.carrier}
-                                ${isBest ? ' <span class="badge best-badge">⭐ Лучший</span>' : ''}
+                                ${badgeHtml}
                             </span>
-                            <span class="result-price ${isBest ? 'best-price' : ''}">
-                                ${r.priceWithMargin.toLocaleString()} ₽
+                            <span class="result-price ${isBest && !isOurTruck ? 'best-price' : ''}">
+                                ${priceDisplay} ₽
                             </span>
                         </div>
 
@@ -1209,9 +1424,12 @@
                                 <span class="margin-value cost">${r.costPrice.toLocaleString()} ₽</span>
                             </div>
                             <div class="margin-row">
-                                <span class="margin-label">💰 Цена с наценкой:</span>
-                                <span class="margin-value price">${r.priceWithMargin.toLocaleString()} ₽</span>
-                                <span class="margin-badge">+${r.marginPercent}%</span>
+                                <span class="margin-label">💰 ${isFinalPrice ? 'Цена (финальная)' : 'Цена с наценкой'}:</span>
+                                <span class="margin-value ${isFinalPrice ? 'price-final' : 'price'}">
+                                    ${r.priceWithMargin.toLocaleString()} ₽
+                                </span>
+                                ${!isFinalPrice ? `<span class="margin-badge">+${r.marginPercent}%</span>` :
+                                `<span class="margin-badge final-badge">🏠 Без наценки</span>`}
                             </div>
                             <div class="margin-row">
                                 <span class="margin-label">📈 Маржа:</span>
@@ -1232,6 +1450,7 @@
                             <span>📊 Тариф: ${r.unitPrice} ₽/${unitLabel}</span>
                             <span>📅 Срок: ${r.delivery} дн.</span>
                             <span>🚛 ${r.type}</span>
+                            ${isOurTruck ? '<span>🏷️ Собственный транспорт</span>' : ''}
                         </div>
                     </div>
                 `;
@@ -1250,7 +1469,8 @@
                 priceWithMargin: best.priceWithMargin,
                 marginPercent: best.marginPercent,
                 marginRub: best.marginRub,
-                price: best.price
+                price: best.price,
+                isFinalPrice: best.isFinalPrice
             });
         });
 
@@ -1262,9 +1482,14 @@
         // Инициализация
         renderHistory();
 
-        console.log('🚚 Калькулятор грузоперевозок v3.0 загружен!');
+        console.log('🚚 Калькулятор грузоперевозок v3.2 загружен!');
         console.log(`📊 Загружено ${tariffsDB.length} тарифов`);
         console.log('🏙️ Доступные города:', cities.join(', '));
+        console.log('🏠 Добавлена "Наша машина" с маршрутами:');
+        console.log('   • Новосибирск → Чита (2 дн.) — 40 ₽/кг, 10 000 ₽/м³');
+        console.log('   • Новосибирск → Хабаровск (4 дн.) — 40 ₽/кг, 10 000 ₽/м³');
+        console.log('   • Новосибирск → Владивосток (5 дн.) — 40 ₽/кг, 10 000 ₽/м³');
+        console.log('💰 Цена "Нашей машины" уже финальная (без наценки)');
         console.log('⚙️ Наценка настраивается в интерфейсе');
     </script>
 
