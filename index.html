@@ -155,7 +155,8 @@
             letter-spacing: -0.2px;
         }
 
-        select, input {
+        select,
+        input {
             width: 100%;
             padding: 14px 16px;
             border: 1.5px solid #cbd5e1;
@@ -177,7 +178,8 @@
             padding-right: 40px;
         }
 
-        select:focus, input:focus {
+        select:focus,
+        input:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15), var(--shadow-sm);
@@ -188,6 +190,18 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
+        }
+
+        .row-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 16px;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
         }
 
         .unit-toggle {
@@ -248,7 +262,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: left 0.5s;
         }
 
@@ -374,7 +388,7 @@
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border: 1px solid rgba(0,0,0,0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .badge.best-badge {
@@ -406,6 +420,12 @@
             background: #3b82f6;
             color: white;
             border-color: #3b82f6;
+        }
+
+        .badge.recommend-badge {
+            background: #8b5cf6;
+            color: white;
+            border-color: #8b5cf6;
         }
 
         .no-results {
@@ -514,7 +534,7 @@
             border-radius: 16px;
             margin-bottom: 24px;
             border: 1px solid var(--border);
-            box-shadow: inset 0 2px 4px rgba(255,255,255,0.5);
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.5);
         }
 
         .margin-summary-item {
@@ -699,6 +719,107 @@
             transform: translateY(-1px);
         }
 
+        /* ===== НОВЫЙ БЛОК ГАБАРИТОВ ===== */
+        .dimensions-block {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .dimensions-block .block-title {
+            font-weight: 700;
+            font-size: 16px;
+            color: #6d28d9;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dimensions-block .block-title .icon {
+            font-size: 20px;
+        }
+
+        .dimensions-result {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .dimensions-result .row-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            flex-wrap: wrap;
+            gap: 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .dimensions-result .row-info:last-child {
+            border-bottom: none;
+        }
+
+        .dimensions-result .label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .dimensions-result .value {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .dimensions-result .value.green {
+            color: var(--success);
+        }
+        .dimensions-result .value.purple {
+            color: #7c3aed;
+        }
+        .dimensions-result .value.orange {
+            color: #f97316;
+        }
+        .dimensions-result .value.red {
+            color: #ef4444;
+        }
+
+        .recommend-box {
+            background: #f0fdf4;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-top: 12px;
+            border-left: 4px solid var(--success);
+        }
+
+        .recommend-box .title {
+            font-weight: 700;
+            font-size: 14px;
+            color: #166534;
+        }
+
+        .recommend-box .desc {
+            font-size: 13px;
+            color: #15803d;
+            margin-top: 4px;
+        }
+
+        .recommend-box.warning {
+            background: #fffbeb;
+            border-left-color: var(--warning);
+        }
+
+        .recommend-box.warning .title {
+            color: #92400e;
+        }
+        .recommend-box.warning .desc {
+            color: #b45309;
+        }
+
         @media (max-width: 768px) {
             .margin-summary {
                 grid-template-columns: 1fr;
@@ -728,6 +849,10 @@
             .header-left {
                 flex-wrap: wrap;
             }
+
+            .row-4 {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         @media (max-width: 600px) {
@@ -743,6 +868,16 @@
             .row {
                 grid-template-columns: 1fr;
                 gap: 16px;
+            }
+
+            .row-4 {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .row-2 {
+                grid-template-columns: 1fr;
+                gap: 12px;
             }
 
             h1 {
@@ -793,23 +928,26 @@
             .logo .company {
                 font-size: 13px;
             }
-
             .logo .rf {
                 font-size: 10px;
             }
-
             .logo .full {
                 font-size: 9px;
             }
-            
+
             .result-details {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 8px;
             }
-            
             .result-details span {
                 width: 100%;
+            }
+
+            .dimensions-result .row-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 2px;
             }
         }
     </style>
@@ -826,7 +964,7 @@
                 </div>
                 <h1>🚚 Калькулятор грузоперевозок</h1>
             </div>
-            <span class="version">v3.5</span>
+            <span class="version">v3.6</span>
         </div>
         <p class="subtitle">Расчёт стоимости перевозки с учётом маржинальности</p>
 
@@ -850,6 +988,62 @@
                     <option value="">Сначала выберите "Откуда"</option>
                 </select>
             </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- НОВЫЙ БЛОК: ГАБАРИТЫ ГРУЗА                               -->
+        <!-- ========================================================= -->
+        <div class="dimensions-block">
+            <div class="block-title">
+                <span class="icon">📐</span> Габариты груза
+                <span style="font-size:12px;font-weight:400;color:#8b5cf6;margin-left:8px;">(для расчёта объемного веса)</span>
+            </div>
+
+            <div class="row-4">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-size:13px;">Длина (м)</label>
+                    <input type="number" id="dimLength" placeholder="2.0" min="0.01" step="0.01" value="1.0" />
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-size:13px;">Ширина (м)</label>
+                    <input type="number" id="dimWidth" placeholder="1.0" min="0.01" step="0.01" value="1.0" />
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-size:13px;">Высота (м)</label>
+                    <input type="number" id="dimHeight" placeholder="1.0" min="0.01" step="0.01" value="1.0" />
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-size:13px;">Вес (кг)</label>
+                    <input type="number" id="dimWeight" placeholder="150" min="0.1" step="0.1" value="150" />
+                </div>
+            </div>
+
+            <div id="dimensionsResult" class="dimensions-result" style="display:none;">
+                <div class="row-info">
+                    <span class="label">📦 Объём:</span>
+                    <span class="value purple" id="dimVolume">0.00 м³</span>
+                </div>
+                <div class="row-info">
+                    <span class="label">⚖️ Объёмный вес (×250):</span>
+                    <span class="value orange" id="dimVolWeight">0 кг</span>
+                </div>
+                <div class="row-info">
+                    <span class="label">🏋️ Физический вес:</span>
+                    <span class="value" id="dimPhysicalWeight">0 кг</span>
+                </div>
+                <div class="row-info" style="border-bottom:2px solid #e2e8f0;padding-bottom:10px;">
+                    <span class="label">📈 Для расчёта используем:</span>
+                    <span class="value green" id="dimUseForCalc">—</span>
+                </div>
+                <div id="dimRecommendBox" class="recommend-box">
+                    <div class="title" id="dimRecommendTitle">💡 Рекомендация</div>
+                    <div class="desc" id="dimRecommendDesc">Заполните габариты для расчёта</div>
+                </div>
+            </div>
+
+            <button id="calcDimensionsBtn" style="margin-top:16px;padding:10px 24px;background:#8b5cf6;color:white;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;transition:all 0.2s;font-family:inherit;width:100%;">
+                📐 Рассчитать габариты
+            </button>
         </div>
 
         <div class="form-group">
@@ -880,7 +1074,7 @@
 
     <script>
         // ============================================================
-        // БАЗА ДАННЫХ ТАРИФОВ (ОБНОВЛЁННАЯ v3.5)
+        // БАЗА ДАННЫХ ТАРИФОВ (ОБНОВЛЁННАЯ v3.6)
         // ============================================================
         const tariffsDB = [
             // =========================================================
@@ -2658,7 +2852,69 @@
         }
 
         // ============================================================
-        // 5. ИНТЕРФЕЙС
+        // 5. ГАБАРИТЫ ГРУЗА
+        // ============================================================
+        function calculateDimensions() {
+            const length = parseFloat(document.getElementById('dimLength').value) || 0;
+            const width = parseFloat(document.getElementById('dimWidth').value) || 0;
+            const height = parseFloat(document.getElementById('dimHeight').value) || 0;
+            const weight = parseFloat(document.getElementById('dimWeight').value) || 0;
+
+            const volume = length * width * height;
+            const volWeight = volume * 250;
+
+            const resultBlock = document.getElementById('dimensionsResult');
+            resultBlock.style.display = 'block';
+
+            document.getElementById('dimVolume').textContent = volume.toFixed(2) + ' м³';
+            document.getElementById('dimVolWeight').textContent = volWeight.toFixed(0) + ' кг';
+            document.getElementById('dimPhysicalWeight').textContent = weight.toFixed(0) + ' кг';
+
+            // Определяем, что используем для расчёта
+            let useForCalc = '';
+            let recommendTitle = '';
+            let recommendDesc = '';
+            let isWarning = false;
+
+            if (volWeight > weight && volWeight > 0 && weight > 0) {
+                useForCalc = '⚖️ Объёмный вес (' + volWeight.toFixed(0) + ' кг)';
+                recommendTitle = '💡 Рекомендация: считать по ОБЪЁМУ (м³)';
+                recommendDesc = 'Объёмный вес (' + volWeight.toFixed(0) + ' кг) превышает физический (' + weight.toFixed(0) +
+                    ' кг). Для компании выгоднее считать по объёму.';
+                isWarning = false;
+            } else if (weight >= volWeight && weight > 0 && volWeight > 0) {
+                useForCalc = '🏋️ Физический вес (' + weight.toFixed(0) + ' кг)';
+                recommendTitle = '💡 Рекомендация: считать по ВЕСУ (кг)';
+                recommendDesc = 'Физический вес (' + weight.toFixed(0) + ' кг) превышает объёмный (' + volWeight.toFixed(0) +
+                    ' кг). Для компании выгоднее считать по весу.';
+                isWarning = false;
+            } else if (weight > 0 && volWeight === 0) {
+                useForCalc = '🏋️ Физический вес (' + weight.toFixed(0) + ' кг)';
+                recommendTitle = 'ℹ️ Не хватает габаритов';
+                recommendDesc = 'Заполните длину, ширину и высоту для расчёта объёмного веса.';
+                isWarning = true;
+            } else if (volWeight > 0 && weight === 0) {
+                useForCalc = '⚖️ Объёмный вес (' + volWeight.toFixed(0) + ' кг)';
+                recommendTitle = 'ℹ️ Укажите вес груза';
+                recommendDesc = 'Введите физический вес для сравнения с объёмным.';
+                isWarning = true;
+            } else {
+                useForCalc = '—';
+                recommendTitle = '📐 Заполните все поля';
+                recommendDesc = 'Введите длину, ширину, высоту и вес для расчёта.';
+                isWarning = true;
+            }
+
+            document.getElementById('dimUseForCalc').textContent = useForCalc;
+
+            const recommendBox = document.getElementById('dimRecommendBox');
+            recommendBox.className = 'recommend-box' + (isWarning ? ' warning' : '');
+            document.getElementById('dimRecommendTitle').textContent = recommendTitle;
+            document.getElementById('dimRecommendDesc').textContent = recommendDesc;
+        }
+
+        // ============================================================
+        // 6. ИНТЕРФЕЙС
         // ============================================================
         const fromSelect = document.getElementById('fromCity');
         const toSelect = document.getElementById('toCity');
@@ -2671,6 +2927,7 @@
         const marginPercentInput = document.getElementById('marginPercent');
         const marginMultiplierDisplay = document.getElementById('marginMultiplierDisplay');
         const resetMarginBtn = document.getElementById('resetMarginBtn');
+        const calcDimensionsBtn = document.getElementById('calcDimensionsBtn');
 
         const cities = [...new Set(tariffsDB.map(t => t.from))].sort();
 
@@ -2723,8 +2980,27 @@
             marginMultiplierDisplay.textContent = '1.43';
         });
 
+        // Кнопка "Рассчитать габариты"
+        calcDimensionsBtn.addEventListener('click', function() {
+            calculateDimensions();
+        });
+
+        // Автоматический расчёт габаритов при изменении полей
+        document.querySelectorAll('#dimLength, #dimWidth, #dimHeight, #dimWeight').forEach(input => {
+            input.addEventListener('input', function() {
+                // Проверяем, что все поля заполнены
+                const length = parseFloat(document.getElementById('dimLength').value);
+                const width = parseFloat(document.getElementById('dimWidth').value);
+                const height = parseFloat(document.getElementById('dimHeight').value);
+                const weight = parseFloat(document.getElementById('dimWeight').value);
+                if (length > 0 && width > 0 && height > 0 && weight > 0) {
+                    calculateDimensions();
+                }
+            });
+        });
+
         // ============================================================
-        // 6. ИСТОРИЯ
+        // 7. ИСТОРИЯ
         // ============================================================
         function getHistory() {
             try {
@@ -2798,7 +3074,7 @@
         clearHistoryBtn.addEventListener('click', clearHistory);
 
         // ============================================================
-        // 7. ОСНОВНОЙ РАСЧЁТ
+        // 8. ОСНОВНОЙ РАСЧЁТ
         // ============================================================
         calcBtn.addEventListener('click', function() {
             const from = fromSelect.value;
@@ -2978,9 +3254,10 @@
 
         renderHistory();
 
-        console.log('🚚 Калькулятор грузоперевозок v3.5 загружен!');
+        console.log('🚚 Калькулятор грузоперевозок v3.6 загружен!');
         console.log(`📊 Загружено ${tariffsDB.length} тарифов`);
         console.log('🏙️ Доступные города:', cities.join(', '));
+        console.log('📐 Добавлен блок расчёта габаритов и объёмного веса (коэффициент 250)');
     </script>
 
 </body>
