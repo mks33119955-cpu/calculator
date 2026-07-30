@@ -26,6 +26,7 @@
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             --shadow-glow: 0 10px 40px -10px rgba(79, 70, 229, 0.4);
         }
 
@@ -707,73 +708,199 @@
             transform: translateY(-1px);
         }
 
-        /* ===== НОВЫЙ УПРОЩЁННЫЙ БЛОК ГАБАРИТОВ ===== */
-        .dimensions-block {
-            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 24px;
-            border: 1px solid rgba(139, 92, 246, 0.2);
+        /* ===== КНОПКА ОТКРЫТИЯ МОДАЛКИ ===== */
+        .open-modal-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.3);
+            width: 100%;
+            margin-top: 8px;
         }
 
-        .dimensions-block .block-title {
-            font-weight: 700;
-            font-size: 16px;
-            color: #6d28d9;
-            margin-bottom: 16px;
+        .open-modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(139, 92, 246, 0.4);
+        }
+
+        .open-modal-btn:active {
+            transform: translateY(0);
+        }
+
+        /* ===== МОДАЛЬНОЕ ОКНО ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: modalOverlayIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes modalOverlayIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            max-width: 520px;
+            width: 95%;
+            padding: 32px;
+            box-shadow: var(--shadow-xl);
+            animation: modalContentIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes modalContentIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header .title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .dimensions-block .block-title .icon {
-            font-size: 20px;
+        .modal-header .title .icon {
+            font-size: 24px;
         }
 
-        .dimensions-result {
-            background: white;
+        .modal-close {
+            background: #f1f5f9;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+        }
+
+        .modal-close:hover {
+            background: #e2e8f0;
+            transform: rotate(90deg);
+        }
+
+        .modal-body .form-group {
+            margin-bottom: 16px;
+        }
+
+        .modal-body .form-group label {
+            font-size: 13px;
+        }
+
+        .modal-body .form-group input {
+            padding: 12px 14px;
+            font-size: 15px;
+        }
+
+        .modal-compare-btn {
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .modal-compare-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .modal-compare-btn:active {
+            transform: translateY(0);
+        }
+
+        .modal-result {
+            margin-top: 16px;
+            background: #f8fafc;
             border-radius: 12px;
             padding: 16px;
-            margin-top: 16px;
             border: 1px solid #e2e8f0;
         }
 
-        .dimensions-result .row-info {
+        .modal-result .row-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 0;
+            padding: 4px 0;
             flex-wrap: wrap;
             gap: 8px;
             border-bottom: 1px solid #f1f5f9;
         }
 
-        .dimensions-result .row-info:last-child {
+        .modal-result .row-info:last-child {
             border-bottom: none;
         }
 
-        .dimensions-result .label {
+        .modal-result .label {
             font-size: 14px;
             color: var(--text-secondary);
             font-weight: 500;
         }
 
-        .dimensions-result .value {
+        .modal-result .value {
             font-weight: 700;
-            font-size: 16px;
+            font-size: 15px;
         }
 
-        .dimensions-result .value.green {
+        .modal-result .value.green {
             color: var(--success);
         }
-        .dimensions-result .value.purple {
+        .modal-result .value.purple {
             color: #7c3aed;
         }
-        .dimensions-result .value.orange {
+        .modal-result .value.orange {
             color: #f97316;
         }
 
-        .recommend-box {
+        .modal-recommend {
             background: #f0fdf4;
             border-radius: 10px;
             padding: 12px 16px;
@@ -781,53 +908,28 @@
             border-left: 4px solid var(--success);
         }
 
-        .recommend-box .title {
+        .modal-recommend .title {
             font-weight: 700;
             font-size: 14px;
             color: #166534;
         }
 
-        .recommend-box .desc {
+        .modal-recommend .desc {
             font-size: 13px;
             color: #15803d;
             margin-top: 4px;
         }
 
-        .recommend-box.warning {
+        .modal-recommend.warning {
             background: #fffbeb;
             border-left-color: var(--warning);
         }
 
-        .recommend-box.warning .title {
+        .modal-recommend.warning .title {
             color: #92400e;
         }
-        .recommend-box.warning .desc {
+        .modal-recommend.warning .desc {
             color: #b45309;
-        }
-
-        .btn-compare {
-            padding: 12px 24px;
-            background: #8b5cf6;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 15px;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-            margin-top: 12px;
-        }
-
-        .btn-compare:hover {
-            background: #7c3aed;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-        }
-
-        .btn-compare:active {
-            transform: translateY(0);
         }
 
         @media (max-width: 768px) {
@@ -860,8 +962,16 @@
                 flex-wrap: wrap;
             }
 
-            .row-2 {
-                grid-template-columns: 1fr;
+            .modal-content {
+                padding: 24px;
+                width: 98%;
+                max-width: 100%;
+                border-radius: 20px;
+                margin: 10px;
+            }
+
+            .modal-header .title {
+                font-size: 18px;
             }
         }
 
@@ -944,10 +1054,21 @@
                 width: 100%;
             }
 
-            .dimensions-result .row-info {
+            .modal-content {
+                padding: 16px;
+                border-radius: 16px;
+                margin: 8px;
+            }
+
+            .modal-result .row-info {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 2px;
+            }
+
+            .open-modal-btn {
+                font-size: 14px;
+                padding: 12px 16px;
             }
         }
     </style>
@@ -964,7 +1085,7 @@
                 </div>
                 <h1>🚚 Калькулятор грузоперевозок</h1>
             </div>
-            <span class="version">v3.6</span>
+            <span class="version">v3.7</span>
         </div>
         <p class="subtitle">Расчёт стоимости перевозки с учётом маржинальности</p>
 
@@ -991,43 +1112,57 @@
         </div>
 
         <!-- ========================================================= -->
-        <!-- УПРОЩЁННЫЙ БЛОК: ОБЪЁМ И ВЕС                              -->
+        <!-- КНОПКА ОТКРЫТИЯ МОДАЛЬНОГО ОКНА                           -->
         <!-- ========================================================= -->
-        <div class="dimensions-block">
-            <div class="block-title">
-                <span class="icon">📐</span> Сравнение: объём vs вес
-                <span style="font-size:12px;font-weight:400;color:#8b5cf6;margin-left:8px;">(коэффициент объёмного веса: 250)</span>
-            </div>
+        <button class="open-modal-btn" id="openModalBtn">
+            📐 Сравнить объём и вес
+            <span style="font-size:14px;opacity:0.7;">(коэф. 250)</span>
+        </button>
 
-            <div class="row-2">
-                <div class="form-group" style="margin-bottom:0;">
-                    <label style="font-size:13px;">📦 Объём (м³)</label>
-                    <input type="number" id="dimVolume" placeholder="2.0" min="0.01" step="0.01" value="2.0" />
+        <!-- ========================================================= -->
+        <!-- МОДАЛЬНОЕ ОКНО: СРАВНЕНИЕ ОБЪЁМА И ВЕСА                   -->
+        <!-- ========================================================= -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="title">
+                        <span class="icon">📐</span> Сравнение: объём vs вес
+                        <span style="font-size:13px;font-weight:400;color:#8b5cf6;margin-left:8px;">коэф. 250</span>
+                    </div>
+                    <button class="modal-close" id="closeModalBtn">✕</button>
                 </div>
-                <div class="form-group" style="margin-bottom:0;">
-                    <label style="font-size:13px;">🏋️ Вес (кг)</label>
-                    <input type="number" id="dimWeight" placeholder="150" min="0.1" step="0.1" value="150" />
-                </div>
-            </div>
+                <div class="modal-body">
+                    <div class="row-2">
+                        <div class="form-group">
+                            <label>📦 Объём (м³)</label>
+                            <input type="number" id="modalDimVolume" placeholder="2.0" min="0.01" step="0.01" value="2.0" />
+                        </div>
+                        <div class="form-group">
+                            <label>🏋️ Вес (кг)</label>
+                            <input type="number" id="modalDimWeight" placeholder="150" min="0.1" step="0.1" value="150" />
+                        </div>
+                    </div>
 
-            <button class="btn-compare" id="compareBtn">📊 Сравнить</button>
+                    <button class="modal-compare-btn" id="modalCompareBtn">📊 Сравнить</button>
 
-            <div id="dimensionsResult" class="dimensions-result" style="display:none;">
-                <div class="row-info">
-                    <span class="label">⚖️ Объёмный вес (м³ × 250):</span>
-                    <span class="value orange" id="dimVolWeight">0 кг</span>
-                </div>
-                <div class="row-info">
-                    <span class="label">🏋️ Физический вес:</span>
-                    <span class="value" id="dimPhysicalWeight">0 кг</span>
-                </div>
-                <div class="row-info" style="border-bottom:2px solid #e2e8f0;padding-bottom:10px;">
-                    <span class="label">📈 Для расчёта используем:</span>
-                    <span class="value green" id="dimUseForCalc">—</span>
-                </div>
-                <div id="dimRecommendBox" class="recommend-box">
-                    <div class="title" id="dimRecommendTitle">💡 Рекомендация</div>
-                    <div class="desc" id="dimRecommendDesc">Введите объём и вес для сравнения</div>
+                    <div class="modal-result" id="modalResult" style="display:none;">
+                        <div class="row-info">
+                            <span class="label">⚖️ Объёмный вес (м³ × 250):</span>
+                            <span class="value orange" id="modalVolWeight">0 кг</span>
+                        </div>
+                        <div class="row-info">
+                            <span class="label">🏋️ Физический вес:</span>
+                            <span class="value" id="modalPhysicalWeight">0 кг</span>
+                        </div>
+                        <div class="row-info" style="border-bottom:2px solid #e2e8f0;padding-bottom:10px;">
+                            <span class="label">📈 Для расчёта используем:</span>
+                            <span class="value green" id="modalUseForCalc">—</span>
+                        </div>
+                        <div class="modal-recommend" id="modalRecommend">
+                            <div class="title" id="modalRecommendTitle">💡 Рекомендация</div>
+                            <div class="desc" id="modalRecommendDesc">Введите объём и вес для сравнения</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1060,7 +1195,7 @@
 
     <script>
         // ============================================================
-        // БАЗА ДАННЫХ ТАРИФОВ (v3.6)
+        // БАЗА ДАННЫХ ТАРИФОВ
         // ============================================================
         const tariffsDB = [
             // =========================================================
@@ -2818,8 +2953,7 @@
         }
 
         // ============================================================
-        // 4. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-        // ============================================================
+        // 4. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ        // ============================================================
         function getMarginColor(percent) {
             if (percent >= 50) return '#10b981';
             if (percent >= 30) return '#f59e0b';
@@ -2838,19 +2972,19 @@
         }
 
         // ============================================================
-        // 5. УПРОЩЁННОЕ СРАВНЕНИЕ ОБЪЁМА И ВЕСА
+        // 5. МОДАЛЬНОЕ ОКНО — СРАВНЕНИЕ ОБЪЁМА И ВЕСА
         // ============================================================
         function compareVolumeAndWeight() {
-            const volume = parseFloat(document.getElementById('dimVolume').value) || 0;
-            const weight = parseFloat(document.getElementById('dimWeight').value) || 0;
+            const volume = parseFloat(document.getElementById('modalDimVolume').value) || 0;
+            const weight = parseFloat(document.getElementById('modalDimWeight').value) || 0;
 
             const volWeight = volume * 250;
 
-            const resultBlock = document.getElementById('dimensionsResult');
+            const resultBlock = document.getElementById('modalResult');
             resultBlock.style.display = 'block';
 
-            document.getElementById('dimVolWeight').textContent = volWeight.toFixed(0) + ' кг';
-            document.getElementById('dimPhysicalWeight').textContent = weight.toFixed(0) + ' кг';
+            document.getElementById('modalVolWeight').textContent = volWeight.toFixed(0) + ' кг';
+            document.getElementById('modalPhysicalWeight').textContent = weight.toFixed(0) + ' кг';
 
             let useForCalc = '';
             let recommendTitle = '';
@@ -2886,12 +3020,12 @@
                 isWarning = true;
             }
 
-            document.getElementById('dimUseForCalc').textContent = useForCalc;
+            document.getElementById('modalUseForCalc').textContent = useForCalc;
 
-            const recommendBox = document.getElementById('dimRecommendBox');
-            recommendBox.className = 'recommend-box' + (isWarning ? ' warning' : '');
-            document.getElementById('dimRecommendTitle').textContent = recommendTitle;
-            document.getElementById('dimRecommendDesc').textContent = recommendDesc;
+            const recommendBox = document.getElementById('modalRecommend');
+            recommendBox.className = 'modal-recommend' + (isWarning ? ' warning' : '');
+            document.getElementById('modalRecommendTitle').textContent = recommendTitle;
+            document.getElementById('modalRecommendDesc').textContent = recommendDesc;
         }
 
         // ============================================================
@@ -2908,7 +3042,12 @@
         const marginPercentInput = document.getElementById('marginPercent');
         const marginMultiplierDisplay = document.getElementById('marginMultiplierDisplay');
         const resetMarginBtn = document.getElementById('resetMarginBtn');
-        const compareBtn = document.getElementById('compareBtn');
+
+        // Модальное окно
+        const modalOverlay = document.getElementById('modalOverlay');
+        const openModalBtn = document.getElementById('openModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalCompareBtn = document.getElementById('modalCompareBtn');
 
         const cities = [...new Set(tariffsDB.map(t => t.from))].sort();
 
@@ -2961,16 +3100,43 @@
             marginMultiplierDisplay.textContent = '1.43';
         });
 
-        // Кнопка "Сравнить"
-        compareBtn.addEventListener('click', function() {
+        // ===== МОДАЛЬНОЕ ОКНО: ОТКРЫТИЕ / ЗАКРЫТИЕ =====
+        openModalBtn.addEventListener('click', function() {
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            // Автоматически рассчитываем при открытии
+            setTimeout(compareVolumeAndWeight, 100);
+        });
+
+        closeModalBtn.addEventListener('click', function() {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // ===== МОДАЛЬНОЕ ОКНО: КНОПКА "СРАВНИТЬ" =====
+        modalCompareBtn.addEventListener('click', function() {
             compareVolumeAndWeight();
         });
 
-        // Автоматическое сравнение при изменении полей
-        document.querySelectorAll('#dimVolume, #dimWeight').forEach(input => {
+        // Автоматическое сравнение при изменении полей в модалке
+        document.querySelectorAll('#modalDimVolume, #modalDimWeight').forEach(input => {
             input.addEventListener('input', function() {
-                const volume = parseFloat(document.getElementById('dimVolume').value);
-                const weight = parseFloat(document.getElementById('dimWeight').value);
+                const volume = parseFloat(document.getElementById('modalDimVolume').value);
+                const weight = parseFloat(document.getElementById('modalDimWeight').value);
                 if (volume > 0 && weight > 0) {
                     compareVolumeAndWeight();
                 }
@@ -3232,10 +3398,10 @@
 
         renderHistory();
 
-        console.log('🚚 Калькулятор грузоперевозок v3.6 загружен!');
+        console.log('🚚 Калькулятор грузоперевозок v3.7 загружен!');
         console.log(`📊 Загружено ${tariffsDB.length} тарифов`);
         console.log('🏙️ Доступные города:', cities.join(', '));
-        console.log('📐 Упрощённый блок: объём (м³) и вес (кг) с коэффициентом 250');
+        console.log('📐 Модальное окно для сравнения объёма и веса (коэффициент 250)');
     </script>
 
 </body>
