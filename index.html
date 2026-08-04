@@ -10,24 +10,16 @@
     <style>
         :root {
             --primary: #4f46e5;
-            --primary-hover: #4338ca;
             --success: #10b981;
-            --success-bg: #ecfdf5;
             --warning: #f59e0b;
-            --warning-bg: #fffbeb;
-            --danger: #ef4444;
-            --bg-gradient-start: #f8fafc;
-            --bg-gradient-end: #e2e8f0;
-            --card-bg: rgba(255, 255, 255, 0.85);
             --text-primary: #0f172a;
             --text-secondary: #475569;
             --text-muted: #94a3b8;
             --border: rgba(226, 232, 240, 0.8);
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            --shadow-glow: 0 10px 40px -10px rgba(79, 70, 229, 0.4);
         }
 
         * {
@@ -50,7 +42,7 @@
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background: var(--card-bg);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.6);
@@ -245,34 +237,18 @@
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             letter-spacing: 0.3px;
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3), 0 2px 4px -1px rgba(79, 70, 229, 0.2);
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
             position: relative;
             overflow: hidden;
         }
 
-        .calc-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
         .calc-btn:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-glow);
-        }
-
-        .calc-btn:hover::before {
-            left: 100%;
+            box-shadow: 0 10px 40px -10px rgba(79, 70, 229, 0.4);
         }
 
         .calc-btn:active {
             transform: translateY(0);
-            box-shadow: 0 2px 4px -1px rgba(79, 70, 229, 0.3);
         }
 
         .results {
@@ -296,26 +272,19 @@
             box-shadow: var(--shadow-sm);
         }
 
-        .result-item:nth-child(2) { animation-delay: 0.05s; }
-        .result-item:nth-child(3) { animation-delay: 0.1s; }
-        .result-item:nth-child(4) { animation-delay: 0.15s; }
-
         .result-item:hover {
             transform: translateY(-4px) translateX(4px);
             box-shadow: var(--shadow-md);
-            border-color: #94a3b8;
         }
 
         .result-item.best {
             border-left-color: var(--success);
-            background: linear-gradient(to right, var(--success-bg), #ffffff);
-            border-color: rgba(16, 185, 129, 0.3);
+            background: #ecfdf5;
         }
 
         .result-item.our-truck {
             border-left-color: #8b5cf6;
-            background: linear-gradient(to right, #f5f3ff, #ffffff);
-            border-color: rgba(139, 92, 246, 0.3);
+            background: #f5f3ff;
         }
 
         .result-item.our-truck .result-carrier {
@@ -390,37 +359,21 @@
             background: var(--success);
             color: white;
             border-color: var(--success);
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
         }
 
         .badge.our-badge {
             background: #8b5cf6;
             color: white;
-            border-color: #8b5cf6;
-        }
-
-        .badge.no-margin-badge {
-            background: var(--warning);
-            color: white;
-            border-color: var(--warning);
         }
 
         .badge.min-badge {
             background: #f97316;
             color: white;
-            border-color: #f97316;
         }
 
         .badge.note-badge {
             background: #3b82f6;
             color: white;
-            border-color: #3b82f6;
-        }
-
-        .badge.teustat-badge {
-            background: #8b5cf6;
-            color: white;
-            border-color: #8b5cf6;
         }
 
         .no-results {
@@ -529,7 +482,6 @@
             border-radius: 16px;
             margin-bottom: 24px;
             border: 1px solid var(--border);
-            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.5);
         }
 
         .margin-summary-item {
@@ -590,8 +542,6 @@
 
         .clear-history:hover {
             background: #fee2e2;
-            border-color: #fca5a5;
-            transform: translateY(-1px);
         }
 
         .history-item {
@@ -612,8 +562,6 @@
 
         .history-item:hover {
             background: #f8fafc;
-            border-color: #cbd5e1;
-            transform: translateX(4px);
         }
 
         .history-item .route {
@@ -634,13 +582,6 @@
             font-size: 15px;
         }
 
-        .history-item .hcost {
-            color: var(--text-muted);
-            font-size: 13px;
-            text-decoration: line-through;
-            font-weight: 500;
-        }
-
         .history-empty {
             color: var(--text-muted);
             text-align: center;
@@ -650,12 +591,6 @@
             background: #f8fafc;
             border-radius: 12px;
             border: 2px dashed #e2e8f0;
-        }
-
-        .history-item.our-history {
-            background: #faf5ff;
-            border-left: 3px solid #8b5cf6;
-            border-color: rgba(139, 92, 246, 0.2);
         }
 
         .margin-settings {
@@ -711,7 +646,6 @@
 
         .margin-settings .reset-btn:hover {
             background: #c7d2fe;
-            transform: translateY(-1px);
         }
 
         /* ===== КНОПКИ ДЕЙСТВИЙ ===== */
@@ -742,18 +676,16 @@
         .action-btn.calc {
             background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             color: white;
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
         }
 
         .action-btn.calc:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-glow);
+            box-shadow: 0 10px 40px -10px rgba(79, 70, 229, 0.4);
         }
 
         .action-btn.compare {
             background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
             color: white;
-            box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.3);
         }
 
         .action-btn.compare:hover {
@@ -764,7 +696,6 @@
         .action-btn.teustat {
             background: linear-gradient(135deg, #059669 0%, #047857 100%);
             color: white;
-            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
         }
 
         .action-btn.teustat:hover {
@@ -780,7 +711,7 @@
             font-size: 18px;
         }
 
-        /* ===== МОДАЛЬНОЕ ОКНО TEUSTAT ===== */
+        /* ===== МОДАЛЬНЫЕ ОКНА ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -819,7 +750,7 @@
         }
 
         .modal-content.teustat-modal {
-            max-width: 850px;
+            max-width: 700px;
         }
 
         @keyframes modalContentIn {
@@ -884,20 +815,92 @@
             font-size: 15px;
         }
 
-        .teustat-iframe-wrapper {
-            position: relative;
-            width: 100%;
-            height: 500px;
+        .modal-compare-btn {
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            color: white;
+            border: none;
             border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            background: #f8fafc;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
         }
 
-        .teustat-iframe-wrapper iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        .modal-compare-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .modal-result {
+            margin-top: 16px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .modal-result .row-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            flex-wrap: wrap;
+            gap: 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .modal-result .row-info:last-child {
+            border-bottom: none;
+        }
+
+        .modal-result .label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .modal-result .value {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .modal-result .value.green { color: var(--success); }
+        .modal-result .value.purple { color: #7c3aed; }
+        .modal-result .value.orange { color: #f97316; }
+
+        .modal-recommend {
+            background: #f0fdf4;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-top: 12px;
+            border-left: 4px solid var(--success);
+        }
+
+        .modal-recommend .title {
+            font-weight: 700;
+            font-size: 14px;
+            color: #166534;
+        }
+
+        .modal-recommend .desc {
+            font-size: 13px;
+            color: #15803d;
+            margin-top: 4px;
+        }
+
+        .modal-recommend.warning {
+            background: #fffbeb;
+            border-left-color: var(--warning);
+        }
+
+        .modal-recommend.warning .title {
+            color: #92400e;
+        }
+        .modal-recommend.warning .desc {
+            color: #b45309;
         }
 
         .teustat-info {
@@ -935,16 +938,93 @@
             color: #064e3b;
         }
 
+        /* ===== БЛОК TEUSTAT В МОДАЛКЕ ===== */
+        .teustat-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 48px 32px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .teustat-block .big-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+        }
+
+        .teustat-block h3 {
+            color: #0f172a;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .teustat-block p {
+            color: #475569;
+            max-width: 450px;
+            margin-bottom: 24px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .teustat-block .open-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 36px;
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+        }
+
+        .teustat-block .open-link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(16, 185, 129, 0.4);
+        }
+
+        .teustat-block .hint {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 16px;
+        }
+
         @media (max-width: 768px) {
+            .action-buttons {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .modal-content {
+                padding: 24px;
+                margin: 10px;
+            }
+
+            .row {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .row-2 {
+                grid-template-columns: 1fr;
+            }
+
             .margin-summary {
                 grid-template-columns: 1fr;
-                gap: 12px;
+                gap: 8px;
             }
 
             .margin-summary-item {
                 flex-direction: row;
                 justify-content: space-between;
-                width: 100%;
                 padding: 8px 0;
                 border-bottom: 1px solid #e2e8f0;
             }
@@ -953,42 +1033,29 @@
                 border-bottom: none;
             }
 
-            .margin-summary-item .label {
-                font-size: 13px;
-            }
-
-            .margin-summary-item .value {
-                font-size: 18px;
-            }
-
             .header-left {
                 flex-wrap: wrap;
             }
 
-            .modal-content {
-                padding: 24px;
-                width: 98%;
-                max-width: 100%;
-                border-radius: 20px;
-                margin: 10px;
+            .teustat-block {
+                padding: 32px 20px;
             }
 
-            .modal-header .title {
+            .teustat-block .big-icon {
+                font-size: 40px;
+            }
+
+            .teustat-block h3 {
                 font-size: 18px;
             }
 
-            .action-buttons {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-
-            .action-btn {
-                padding: 12px 14px;
+            .teustat-block p {
                 font-size: 14px;
             }
 
-            .teustat-iframe-wrapper {
-                height: 400px;
+            .teustat-block .open-link-btn {
+                padding: 12px 24px;
+                font-size: 14px;
             }
         }
 
@@ -1000,11 +1067,6 @@
             .container {
                 padding: 20px;
                 border-radius: 20px;
-            }
-
-            .row {
-                grid-template-columns: 1fr;
-                gap: 16px;
             }
 
             h1 {
@@ -1044,40 +1106,29 @@
 
             .margin-settings .reset-btn {
                 margin-left: 0;
-                width: 100%;
             }
 
             .logo {
                 padding-right: 16px;
-                border-right: 2px solid var(--border);
             }
 
-            .logo .company {
-                font-size: 13px;
-            }
-            .logo .rf {
-                font-size: 10px;
-            }
-            .logo .full {
-                font-size: 9px;
-            }
+            .logo .company { font-size: 13px; }
+            .logo .rf { font-size: 10px; }
+            .logo .full { font-size: 9px; }
 
             .result-details {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 8px;
             }
+
             .result-details span {
                 width: 100%;
             }
 
-            .teustat-iframe-wrapper {
-                height: 350px;
-            }
-
-            .teustat-info {
-                flex-direction: column;
-                gap: 8px;
+            .modal-content {
+                padding: 16px;
+                border-radius: 16px;
             }
         }
     </style>
@@ -1208,7 +1259,7 @@
     </div>
 
     <!-- ========================================================= -->
-    <!-- МОДАЛЬНОЕ ОКНО: TEUSTAT                                   -->
+    <!-- МОДАЛЬНОЕ ОКНО: TEUSTAT (БЕЗ IFRAME)                      -->
     <!-- ========================================================= -->
     <div class="modal-overlay" id="teustatOverlay">
         <div class="modal-content teustat-modal">
@@ -1220,22 +1271,24 @@
                 <button class="modal-close" id="closeTeustatBtn">✕</button>
             </div>
             <div class="modal-body">
-                <div class="teustat-iframe-wrapper">
-                    <iframe 
-                        src="https://teustat.com/" 
-                        title="TEUSTAT — Рыночные ставки"
-                        loading="lazy"
-                        allow="geolocation"
-                    ></iframe>
+                <div class="teustat-block">
+                    <span class="big-icon">🔒</span>
+                    <h3>TEUSTAT не поддерживает встраивание</h3>
+                    <p>
+                        Сайт <strong>teustat.com</strong> запрещает отображение внутри iframe по соображениям безопасности.<br>
+                        Откройте его в новой вкладке для просмотра актуальных ставок.
+                    </p>
+                    <a href="https://teustat.com/" target="_blank" class="open-link-btn">
+                        <span>🔗</span> Открыть TEUSTAT
+                    </a>
+                    <span class="hint">Откроется в новой вкладке, вы не потеряете текущий расчёт</span>
                 </div>
 
                 <div class="teustat-info">
                     <span class="icon">💡</span>
                     <div class="text">
                         <strong>TEUSTAT</strong> — агрегатор тарифов на контейнерные перевозки и сборные грузы.
-                        Данные обновляются ежедневно. 
-                        <br>
-                        <a href="https://teustat.com/" target="_blank">Открыть TEUSTAT в новой вкладке →</a>
+                        Данные обновляются ежедневно. Используйте для сверки рыночных ставок.
                     </div>
                 </div>
             </div>
@@ -1244,10 +1297,9 @@
 
     <script>
         // ============================================================
-        // БАЗА ДАННЫХ ТАРИФОВ (СОКРАЩЁННАЯ ВЕРСИЯ)
+        // БАЗА ДАННЫХ ТАРИФОВ
         // ============================================================
         const tariffsDB = [
-            // 🏠 НАША МАШИНА
             {
                 from: "Новосибирск",
                 to: "Чита",
@@ -1287,7 +1339,6 @@
                 isFinalPrice: true,
                 note: ""
             },
-            // ВЛАДИВОСТОК → ПЕТРОПАВЛОВСК-КАМЧАТСКИЙ
             {
                 from: "Владивосток",
                 to: "Петропавловск-Камчатский",
@@ -1310,7 +1361,6 @@
                 type: "Конт, море",
                 note: ""
             },
-            // МОСКВА → НОВОСИБИРСК
             {
                 from: "Москва",
                 to: "Новосибирск",
@@ -1334,18 +1384,6 @@
                 note: ""
             },
             {
-                from: "Москва",
-                to: "Новосибирск",
-                carrier: "Бюро перевозок",
-                kg: { upTo500: 25, upTo5000: 24, upTo20000: 23 },
-                m3: { upTo1: 5500, upTo7: 5280, upTo40: 5060 },
-                minSum: 550,
-                delivery: "6-7",
-                type: "авто",
-                note: ""
-            },
-            // НОВОСИБИРСК → МОСКВА
-            {
                 from: "Новосибирск",
                 to: "Москва",
                 carrier: "Шерл",
@@ -1356,18 +1394,6 @@
                 type: "Авто",
                 note: ""
             },
-            {
-                from: "Новосибирск",
-                to: "Москва",
-                carrier: "Фастранс",
-                kg: { upTo500: 16.7, upTo5000: 15.3, upTo20000: 14.2 },
-                m3: { upTo1: 4360, upTo7: 4000, upTo40: 3690 },
-                minSum: 700,
-                delivery: "5-6",
-                type: "Авто",
-                note: ""
-            },
-            // МОСКВА → ВЛАДИВОСТОК
             {
                 from: "Москва",
                 to: "Владивосток",
@@ -1974,7 +2000,7 @@
         console.log(`📊 Загружено ${tariffsDB.length} тарифов`);
         console.log('🏙️ Доступные города:', cities.join(', '));
         console.log('📐 Модальное окно для сравнения объёма и веса (коэффициент 250)');
-        console.log('📊 Добавлена кнопка TEUSTAT — агрегатор рыночных ставок');
+        console.log('📊 Добавлена кнопка TEUSTAT — открывается в новой вкладке');
     </script>
 
 </body>
