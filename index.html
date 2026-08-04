@@ -2,26 +2,50 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>🚚 Калькулятор грузоперевозок</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        /* ============================================================
+           ROOT VARIABLES
+           ============================================================ */
         :root {
             --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             --success: #10b981;
+            --success-light: #d1fae5;
             --warning: #f59e0b;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --text-muted: #94a3b8;
-            --border: rgba(226, 232, 240, 0.8);
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-lg: 24px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
         * {
             margin: 0;
             padding: 0;
@@ -31,61 +55,67 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 50%, #f0f9ff 100%);
+            background: linear-gradient(160deg, #eef2ff 0%, #e0e7ff 30%, #f0f9ff 70%, #ecfdf5 100%);
             background-attachment: fixed;
             padding: 20px;
             min-height: 100vh;
-            color: var(--text-primary);
-            line-height: 1.5;
+            color: var(--gray-900);
+            line-height: 1.6;
         }
 
-        .container {
-            max-width: 900px;
+        /* ============================================================
+           CONTAINER
+           ============================================================ */
+        .app {
+            max-width: 920px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 24px;
+            border-radius: var(--radius-lg);
             padding: 32px;
-            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
-            animation: containerFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @keyframes containerFadeIn {
-            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
+        /* ============================================================
+           HEADER
+           ============================================================ */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 12px;
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
         }
 
         .logo {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            line-height: 1.2;
-            padding-right: 20px;
-            border-right: 2px solid var(--border);
+            line-height: 1.15;
+            padding-right: 18px;
+            border-right: 2px solid var(--gray-200);
         }
 
         .logo .company {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 800;
-            color: var(--text-primary);
-            letter-spacing: 1px;
+            color: var(--gray-900);
+            letter-spacing: 1.2px;
             text-transform: uppercase;
             background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
             -webkit-background-clip: text;
@@ -93,72 +123,79 @@
         }
 
         .logo .rf {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             color: var(--primary);
-            letter-spacing: 2px;
-            margin-top: 2px;
+            letter-spacing: 3px;
+            margin-top: 1px;
         }
 
         .logo .full {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
-            color: var(--text-muted);
-            letter-spacing: 0.5px;
+            color: var(--gray-400);
+            letter-spacing: 0.8px;
             text-transform: uppercase;
-            margin-top: 4px;
+            margin-top: 3px;
         }
 
-        h1 {
-            font-size: 24px;
+        .header-title {
+            font-size: 22px;
             font-weight: 800;
-            color: var(--text-primary);
+            color: var(--gray-900);
             letter-spacing: -0.5px;
         }
+        .header-title span {
+            color: var(--primary);
+        }
 
-        .version {
-            font-size: 12px;
+        .version-badge {
+            font-size: 11px;
             font-weight: 600;
-            color: var(--text-secondary);
-            background: rgba(241, 245, 249, 0.8);
-            padding: 6px 14px;
+            color: var(--gray-500);
+            background: var(--gray-100);
+            padding: 4px 14px;
             border-radius: 20px;
-            border: 1px solid var(--border);
+            border: 1px solid var(--gray-200);
             white-space: nowrap;
         }
 
         .subtitle {
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-            font-size: 15px;
+            color: var(--gray-500);
+            margin-bottom: 28px;
+            font-size: 14px;
             font-weight: 500;
-            padding-left: 4px;
+            padding-left: 2px;
         }
 
+        /* ============================================================
+           FORM ELEMENTS
+           ============================================================ */
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
-        label {
+        .form-group label {
             display: block;
             font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-            font-size: 14px;
+            color: var(--gray-700);
+            margin-bottom: 6px;
+            font-size: 13px;
             letter-spacing: -0.2px;
         }
 
         select,
-        input {
+        input[type="number"],
+        input[type="text"] {
             width: 100%;
-            padding: 14px 16px;
-            border: 1.5px solid #cbd5e1;
-            border-radius: 14px;
-            font-size: 16px;
+            padding: 13px 16px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
             font-family: inherit;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: var(--transition);
             background: #ffffff;
-            color: var(--text-primary);
+            color: var(--gray-900);
             -webkit-appearance: none;
             appearance: none;
             box-shadow: var(--shadow-sm);
@@ -167,127 +204,220 @@
         select {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 16px center;
-            padding-right: 40px;
+            background-position: right 14px center;
+            padding-right: 44px;
         }
 
         select:focus,
         input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15), var(--shadow-sm);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
             transform: translateY(-1px);
         }
 
         .row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 18px;
         }
 
-        .row-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
+        /* ============================================================
+           UNIT TOGGLE
+           ============================================================ */
         .unit-toggle {
             display: flex;
             gap: 4px;
-            background: #e2e8f0;
+            background: var(--gray-100);
             padding: 4px;
-            border-radius: 14px;
-            margin-bottom: 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
             position: relative;
+            border: 1px solid var(--gray-200);
         }
 
         .unit-btn {
             flex: 1;
-            padding: 12px;
+            padding: 10px 16px;
             border: none;
-            border-radius: 10px;
+            border-radius: 9px;
             background: transparent;
             cursor: pointer;
             font-weight: 600;
-            font-size: 15px;
+            font-size: 14px;
             font-family: inherit;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            color: var(--text-secondary);
+            transition: var(--transition);
+            color: var(--gray-500);
             position: relative;
             z-index: 1;
         }
 
         .unit-btn.active {
             background: #ffffff;
-            color: var(--text-primary);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
-            transform: scale(1.02);
+            color: var(--gray-900);
+            box-shadow: var(--shadow);
         }
 
-        .calc-btn {
+        .unit-btn:hover:not(.active) {
+            color: var(--gray-700);
+        }
+
+        /* ============================================================
+           BUTTONS
+           ============================================================ */
+        .btn-primary {
             width: 100%;
-            padding: 16px 24px;
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            padding: 15px 24px;
+            background: var(--primary-gradient);
             color: white;
             border: none;
-            border-radius: 16px;
-            font-size: 17px;
+            border-radius: var(--radius-sm);
+            font-size: 16px;
             font-weight: 700;
             font-family: inherit;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            letter-spacing: 0.3px;
+            transition: var(--transition);
             box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
             position: relative;
             overflow: hidden;
+            letter-spacing: 0.3px;
         }
 
-        .calc-btn:hover {
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 40px -10px rgba(79, 70, 229, 0.4);
+            box-shadow: 0 10px 40px -10px rgba(79, 70, 229, 0.5);
         }
 
-        .calc-btn:active {
-            transform: translateY(0);
+        .btn-primary:active {
+            transform: translateY(0) scale(0.99);
         }
 
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-primary:hover::after {
+            left: 100%;
+        }
+
+        /* ============================================================
+           MARGIN SETTINGS
+           ============================================================ */
+        .margin-settings {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: var(--gray-50);
+            padding: 12px 18px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--gray-200);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .margin-settings label {
+            margin-bottom: 0;
+            font-weight: 700;
+            color: var(--gray-700);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .margin-settings input {
+            width: 80px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            text-align: center;
+            border: 1.5px solid var(--gray-200);
+            background: white;
+        }
+
+        .margin-settings input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        }
+
+        .margin-settings .hint {
+            font-size: 13px;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .btn-reset {
+            background: var(--gray-200);
+            border: none;
+            color: var(--gray-600);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            font-family: inherit;
+            padding: 6px 14px;
+            border-radius: 8px;
+            transition: var(--transition);
+            margin-left: auto;
+        }
+
+        .btn-reset:hover {
+            background: var(--gray-300);
+            transform: translateY(-1px);
+        }
+
+        /* ============================================================
+           RESULTS
+           ============================================================ */
         .results {
-            margin-top: 32px;
+            margin-top: 28px;
         }
 
-        @keyframes slideUp {
+        @keyframes slideIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .result-item {
+        .result-card {
             background: #ffffff;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
-            border-left: 4px solid #cbd5e1;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            margin-bottom: 14px;
+            border: 1px solid var(--gray-200);
+            border-left: 4px solid var(--gray-300);
+            transition: var(--transition);
+            animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
             box-shadow: var(--shadow-sm);
         }
 
-        .result-item:hover {
-            transform: translateY(-4px) translateX(4px);
+        .result-card:nth-child(2) { animation-delay: 0.05s; }
+        .result-card:nth-child(3) { animation-delay: 0.1s; }
+        .result-card:nth-child(4) { animation-delay: 0.15s; }
+
+        .result-card:hover {
+            transform: translateY(-3px) translateX(4px);
             box-shadow: var(--shadow-md);
+            border-color: var(--gray-300);
         }
 
-        .result-item.best {
+        .result-card.best {
             border-left-color: var(--success);
-            background: #ecfdf5;
+            background: linear-gradient(to right, var(--success-light), #ffffff);
+            border-color: rgba(16, 185, 129, 0.25);
         }
 
-        .result-item.our-truck {
+        .result-card.our-truck {
             border-left-color: #8b5cf6;
-            background: #f5f3ff;
+            background: linear-gradient(to right, #f5f3ff, #ffffff);
+            border-color: rgba(139, 92, 246, 0.2);
         }
 
-        .result-item.our-truck .result-carrier {
+        .result-card.our-truck .carrier-name {
             color: #7c3aed;
         }
 
@@ -295,423 +425,324 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
         }
 
-        .result-carrier {
+        .carrier-name {
             font-weight: 700;
-            font-size: 17px;
-            color: var(--text-primary);
+            font-size: 16px;
+            color: var(--gray-900);
             display: flex;
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
         }
 
-        .result-price {
+        .price-tag {
             font-weight: 800;
-            font-size: 22px;
-            color: #1e40af;
+            font-size: 21px;
+            color: var(--primary-dark);
             letter-spacing: -0.5px;
         }
 
-        .result-price.best-price {
+        .price-tag.best-price {
             color: var(--success);
         }
 
-        .result-details {
-            display: flex;
-            gap: 12px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            flex-wrap: wrap;
-            margin-top: 12px;
-            align-items: center;
-            padding-top: 12px;
-            border-top: 1px dashed #e2e8f0;
-        }
-
-        .result-details span {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: #f8fafc;
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-weight: 500;
-        }
-
+        /* ===== BADGES ===== */
         .badge {
-            background: #f1f5f9;
-            padding: 4px 12px;
+            padding: 3px 12px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
-            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            border: 1px solid transparent;
         }
 
-        .badge.best-badge {
+        .badge-best {
             background: var(--success);
             color: white;
-            border-color: var(--success);
         }
 
-        .badge.our-badge {
+        .badge-our {
             background: #8b5cf6;
             color: white;
         }
 
-        .badge.min-badge {
+        .badge-final {
+            background: var(--warning);
+            color: white;
+        }
+
+        .badge-min {
             background: #f97316;
             color: white;
         }
 
-        .badge.note-badge {
+        .badge-note {
             background: #3b82f6;
             color: white;
         }
 
-        .no-results {
-            text-align: center;
-            padding: 48px 20px;
-            color: var(--text-secondary);
-            background: #f8fafc;
-            border-radius: 16px;
-            border: 2px dashed #cbd5e1;
-        }
-
-        .no-results .emoji {
-            font-size: 48px;
-            margin-bottom: 16px;
-            display: block;
-        }
-
+        /* ===== MARGIN BLOCK ===== */
         .margin-block {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 16px;
-            margin: 12px 0;
-            border: 1px solid #e2e8f0;
+            background: var(--gray-50);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            margin: 10px 0;
+            border: 1px solid var(--gray-200);
         }
 
         .margin-row {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 6px 0;
+            gap: 10px;
+            padding: 3px 0;
             flex-wrap: wrap;
         }
 
         .margin-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-            font-weight: 600;
-            min-width: 140px;
+            font-size: 12px;
+            color: var(--gray-500);
+            font-weight: 500;
+            min-width: 120px;
         }
 
         .margin-value {
             font-weight: 700;
-            font-size: 15px;
-            font-variant-numeric: tabular-nums;
+            font-size: 14px;
         }
 
         .margin-value.cost {
-            color: var(--text-secondary);
+            color: var(--gray-500);
         }
 
-        .margin-value.price {
-            color: #1e40af;
-            font-size: 17px;
+        .margin-value.sale {
+            color: var(--primary-dark);
+            font-size: 16px;
         }
 
-        .margin-value.price-final {
+        .margin-value.sale-final {
             color: #7c3aed;
-            font-size: 17px;
+            font-size: 16px;
         }
 
         .margin-value.profit {
             font-weight: 800;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .margin-badge {
-            background: #e2e8f0;
-            padding: 3px 10px;
-            border-radius: 8px;
-            font-size: 11px;
+            background: var(--gray-200);
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-size: 10px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: var(--gray-700);
         }
 
-        .margin-badge.final-badge {
+        .margin-badge-final {
             background: #8b5cf6;
             color: white;
         }
 
-        .margin-emoji {
-            font-size: 16px;
-            margin-left: 4px;
-        }
-
         .margin-progress {
             width: 100%;
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 3px;
-            margin-top: 8px;
+            height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            margin-top: 6px;
             overflow: hidden;
         }
 
         .margin-progress-bar {
             height: 100%;
-            border-radius: 3px;
+            border-radius: 2px;
             transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .margin-summary {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            padding: 20px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-radius: 16px;
-            margin-bottom: 24px;
-            border: 1px solid var(--border);
+        /* ===== RESULT DETAILS ===== */
+        .result-details {
+            display: flex;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--gray-500);
+            flex-wrap: wrap;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--gray-200);
         }
 
-        .margin-summary-item {
+        .result-details span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--gray-50);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .result-details .highlight {
+            color: #f97316;
+            font-weight: 600;
+        }
+
+        .result-details .note-text {
+            color: #3b82f6;
+            font-weight: 600;
+        }
+
+        /* ============================================================
+           SUMMARY
+           ============================================================ */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, var(--gray-50) 0%, #f1f5f9 100%);
+            border-radius: var(--radius);
+            margin-bottom: 22px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .summary-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
         }
 
-        .margin-summary-item .label {
-            font-size: 11px;
-            color: var(--text-muted);
+        .summary-item .label {
+            font-size: 10px;
+            color: var(--gray-400);
             text-transform: uppercase;
             letter-spacing: 0.8px;
             font-weight: 700;
         }
 
-        .margin-summary-item .value {
-            font-size: 20px;
+        .summary-item .value {
+            font-size: 18px;
             font-weight: 800;
-            margin-top: 6px;
-            letter-spacing: -0.5px;
+            margin-top: 4px;
+            letter-spacing: -0.3px;
         }
 
+        .summary-item .value.green {
+            color: var(--success);
+        }
+
+        /* ============================================================
+           HISTORY
+           ============================================================ */
         .history {
-            margin-top: 40px;
-            border-top: 2px solid #e2e8f0;
-            padding-top: 24px;
+            margin-top: 36px;
+            border-top: 2px solid var(--gray-200);
+            padding-top: 22px;
         }
 
         .history-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
         }
 
         .history-header h3 {
-            color: var(--text-primary);
-            font-size: 18px;
+            color: var(--gray-800);
+            font-size: 16px;
             font-weight: 700;
         }
 
-        .clear-history {
-            background: #fef2f2;
+        .btn-clear {
+            background: var(--danger-light);
             border: 1px solid #fecaca;
-            color: #ef4444;
+            color: var(--danger);
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             font-family: inherit;
-            padding: 6px 14px;
+            padding: 5px 14px;
             border-radius: 8px;
-            transition: all 0.2s;
+            transition: var(--transition);
         }
 
-        .clear-history:hover {
+        .btn-clear:hover {
             background: #fee2e2;
+            border-color: #fca5a5;
         }
 
         .history-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 16px;
+            padding: 12px 16px;
             background: #ffffff;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            font-size: 14px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 7px;
+            font-size: 13px;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: var(--transition);
             flex-wrap: wrap;
-            gap: 8px;
-            border: 1px solid var(--border);
+            gap: 6px;
+            border: 1px solid var(--gray-200);
         }
 
         .history-item:hover {
-            background: #f8fafc;
+            background: var(--gray-50);
+            border-color: var(--gray-300);
+            transform: translateX(4px);
         }
 
         .history-item .route {
-            color: var(--text-primary);
-            font-weight: 700;
-            font-size: 15px;
+            color: var(--gray-800);
+            font-weight: 600;
+            font-size: 14px;
         }
 
         .history-item .info {
-            color: var(--text-secondary);
-            font-size: 13px;
+            color: var(--gray-500);
+            font-size: 12px;
             font-weight: 500;
         }
 
         .history-item .hprice {
             color: var(--primary);
-            font-weight: 800;
-            font-size: 15px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .history-item .hcost {
+            color: var(--gray-400);
+            font-size: 12px;
+            text-decoration: line-through;
         }
 
         .history-empty {
-            color: var(--text-muted);
+            color: var(--gray-400);
             text-align: center;
-            padding: 32px;
-            font-size: 15px;
+            padding: 28px;
+            font-size: 14px;
             font-weight: 500;
-            background: #f8fafc;
-            border-radius: 12px;
-            border: 2px dashed #e2e8f0;
+            background: var(--gray-50);
+            border-radius: var(--radius-sm);
+            border: 2px dashed var(--gray-200);
         }
 
-        .margin-settings {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            padding: 16px 20px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-            box-shadow: var(--shadow-sm);
+        .history-item.our-history {
+            background: #faf5ff;
+            border-left: 3px solid #8b5cf6;
         }
 
-        .margin-settings label {
-            margin-bottom: 0;
-            font-weight: 700;
-            color: var(--text-primary);
-            font-size: 14px;
-            white-space: nowrap;
-        }
-
-        .margin-settings input {
-            width: 90px;
-            padding: 10px 12px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 700;
-            text-align: center;
-            border-color: #cbd5e1;
-        }
-
-        .margin-settings .hint {
-            font-size: 14px;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .margin-settings .reset-btn {
-            background: #e0e7ff;
-            border: none;
-            color: var(--primary);
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 13px;
-            font-family: inherit;
-            padding: 8px 16px;
-            border-radius: 8px;
-            transition: all 0.2s;
-            margin-left: auto;
-        }
-
-        .margin-settings .reset-btn:hover {
-            background: #c7d2fe;
-        }
-
-        /* ===== КНОПКИ ДЕЙСТВИЙ ===== */
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .action-btn {
-            padding: 14px 16px;
-            border: none;
-            border-radius: 14px;
-            font-size: 14px;
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .action-btn.calc {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            color: white;
-        }
-
-        .action-btn.calc:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 40px -10px rgba(79, 70, 229, 0.4);
-        }
-
-        .action-btn.compare {
-            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
-            color: white;
-        }
-
-        .action-btn.compare:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px -5px rgba(139, 92, 246, 0.4);
-        }
-
-        .action-btn.teustat {
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
-            color: white;
-        }
-
-        .action-btn.teustat:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px -5px rgba(16, 185, 129, 0.4);
-        }
-
-        .action-btn:active {
-            transform: translateY(0) scale(0.98);
-        }
-
-        .action-btn .icon {
-            font-size: 18px;
-        }
-
-        /* ===== МОДАЛЬНЫЕ ОКНА ===== */
+        /* ============================================================
+           MODAL (Volume vs Weight)
+           ============================================================ */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -719,41 +750,37 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            animation: modalOverlayIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: modalFade 0.3s ease;
         }
 
         .modal-overlay.active {
             display: flex;
         }
 
-        @keyframes modalOverlayIn {
+        @keyframes modalFade {
             from { opacity: 0; }
             to { opacity: 1; }
         }
 
-        .modal-content {
+        .modal {
             background: white;
-            border-radius: 24px;
-            max-width: 650px;
+            border-radius: var(--radius-lg);
+            max-width: 520px;
             width: 95%;
-            padding: 32px;
+            padding: 28px 32px;
             box-shadow: var(--shadow-xl);
-            animation: modalContentIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: modalSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             max-height: 90vh;
             overflow-y: auto;
         }
 
-        .modal-content.teustat-modal {
-            max-width: 700px;
-        }
-
-        @keyframes modalContentIn {
+        @keyframes modalSlide {
             from { opacity: 0; transform: scale(0.95) translateY(20px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
@@ -762,109 +789,105 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 12px;
+            margin-bottom: 18px;
         }
 
-        .modal-header .title {
-            font-size: 20px;
+        .modal-title {
+            font-size: 19px;
             font-weight: 800;
-            color: var(--text-primary);
+            color: var(--gray-900);
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .modal-header .title .icon {
-            font-size: 24px;
+        .modal-title .icon {
+            font-size: 22px;
         }
 
         .modal-close {
-            background: #f1f5f9;
+            background: var(--gray-100);
             border: none;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
+            width: 36px;
+            height: 36px;
+            font-size: 18px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-secondary);
-            flex-shrink: 0;
+            color: var(--gray-500);
         }
 
         .modal-close:hover {
-            background: #e2e8f0;
+            background: var(--gray-200);
             transform: rotate(90deg);
         }
 
         .modal-body .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .modal-body .form-group label {
-            font-size: 13px;
+            font-size: 12px;
         }
 
-        .modal-body .form-group input,
-        .modal-body .form-group select {
-            padding: 12px 14px;
-            font-size: 15px;
+        .modal-body .form-group input {
+            padding: 11px 14px;
+            font-size: 14px;
         }
 
         .modal-compare-btn {
-            padding: 14px 24px;
-            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            padding: 13px 24px;
+            background: var(--primary-gradient);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 15px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
             font-weight: 700;
             font-family: inherit;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition);
             width: 100%;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.25);
         }
 
         .modal-compare-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            box-shadow: 0 8px 25px -5px rgba(79, 70, 229, 0.35);
         }
 
         .modal-result {
-            margin-top: 16px;
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 16px;
-            border: 1px solid #e2e8f0;
+            margin-top: 14px;
+            background: var(--gray-50);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            border: 1px solid var(--gray-200);
         }
 
-        .modal-result .row-info {
+        .modal-result .row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 4px 0;
+            padding: 3px 0;
             flex-wrap: wrap;
-            gap: 8px;
-            border-bottom: 1px solid #f1f5f9;
+            gap: 6px;
+            border-bottom: 1px solid var(--gray-200);
         }
 
-        .modal-result .row-info:last-child {
+        .modal-result .row:last-child {
             border-bottom: none;
         }
 
         .modal-result .label {
-            font-size: 14px;
-            color: var(--text-secondary);
+            font-size: 13px;
+            color: var(--gray-500);
             font-weight: 500;
         }
 
         .modal-result .value {
             font-weight: 700;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         .modal-result .value.green { color: var(--success); }
@@ -872,27 +895,27 @@
         .modal-result .value.orange { color: #f97316; }
 
         .modal-recommend {
-            background: #f0fdf4;
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-top: 12px;
+            margin-top: 10px;
+            padding: 10px 14px;
+            border-radius: 8px;
             border-left: 4px solid var(--success);
+            background: var(--success-light);
         }
 
         .modal-recommend .title {
             font-weight: 700;
-            font-size: 14px;
-            color: #166534;
+            font-size: 13px;
+            color: #065f46;
         }
 
         .modal-recommend .desc {
-            font-size: 13px;
-            color: #15803d;
-            margin-top: 4px;
+            font-size: 12px;
+            color: #047857;
+            margin-top: 2px;
         }
 
         .modal-recommend.warning {
-            background: #fffbeb;
+            background: var(--warning-light);
             border-left-color: var(--warning);
         }
 
@@ -903,159 +926,127 @@
             color: #b45309;
         }
 
-        .teustat-info {
-            background: #f0fdf4;
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 16px;
-            border: 1px solid #bbf7d0;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
+        /* ============================================================
+           ACTION BUTTONS
+           ============================================================ */
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 22px;
         }
 
-        .teustat-info .icon {
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .teustat-info .text {
-            font-size: 14px;
-            color: #166534;
-        }
-
-        .teustat-info .text strong {
-            color: #064e3b;
-        }
-
-        .teustat-info .text a {
-            color: #047857;
+        .actions .btn-secondary {
+            padding: 12px 16px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            background: white;
+            font-size: 13px;
             font-weight: 600;
-            text-decoration: underline;
-        }
-
-        .teustat-info .text a:hover {
-            color: #064e3b;
-        }
-
-        /* ===== БЛОК TEUSTAT В МОДАЛКЕ ===== */
-        .teustat-block {
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 48px 32px;
-            text-align: center;
-            border: 1px solid #e2e8f0;
+            gap: 8px;
+            color: var(--gray-700);
         }
 
-        .teustat-block .big-icon {
-            font-size: 56px;
-            margin-bottom: 16px;
-        }
-
-        .teustat-block h3 {
-            color: #0f172a;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .teustat-block p {
-            color: #475569;
-            max-width: 450px;
-            margin-bottom: 24px;
-            font-size: 15px;
-            line-height: 1.6;
-        }
-
-        .teustat-block .open-link-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 14px 36px;
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
-            color: white;
-            border-radius: 14px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 16px;
-            transition: all 0.2s;
-            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
-        }
-
-        .teustat-block .open-link-btn:hover {
+        .actions .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px -5px rgba(16, 185, 129, 0.4);
+            box-shadow: var(--shadow);
         }
 
-        .teustat-block .hint {
-            color: #94a3b8;
-            font-size: 13px;
-            margin-top: 16px;
+        .actions .btn-secondary:active {
+            transform: translateY(0) scale(0.98);
         }
 
+        .actions .btn-secondary .icon {
+            font-size: 16px;
+        }
+
+        .actions .btn-secondary.primary-action {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.25);
+        }
+
+        .actions .btn-secondary.primary-action:hover {
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 8px 25px -5px rgba(79, 70, 229, 0.35);
+        }
+
+        /* ============================================================
+           NO RESULTS
+           ============================================================ */
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-500);
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            border: 2px dashed var(--gray-200);
+        }
+
+        .no-results .emoji {
+            font-size: 44px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
         @media (max-width: 768px) {
-            .action-buttons {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-
-            .modal-content {
-                padding: 24px;
-                margin: 10px;
+            .app {
+                padding: 22px;
+                border-radius: 20px;
             }
 
             .row {
                 grid-template-columns: 1fr;
-                gap: 16px;
+                gap: 14px;
             }
 
-            .row-2 {
-                grid-template-columns: 1fr;
-            }
-
-            .margin-summary {
+            .summary {
                 grid-template-columns: 1fr;
                 gap: 8px;
             }
 
-            .margin-summary-item {
+            .summary-item {
                 flex-direction: row;
                 justify-content: space-between;
-                padding: 8px 0;
-                border-bottom: 1px solid #e2e8f0;
+                padding: 6px 0;
+                border-bottom: 1px solid var(--gray-200);
+            }
+            .summary-item:last-child {
+                border-bottom: none;
             }
 
-            .margin-summary-item:last-child {
-                border-bottom: none;
+            .actions {
+                grid-template-columns: 1fr;
             }
 
             .header-left {
                 flex-wrap: wrap;
             }
 
-            .teustat-block {
-                padding: 32px 20px;
+            .header-title {
+                font-size: 19px;
             }
 
-            .teustat-block .big-icon {
-                font-size: 40px;
+            .modal {
+                padding: 22px;
             }
 
-            .teustat-block h3 {
-                font-size: 18px;
-            }
-
-            .teustat-block p {
-                font-size: 14px;
-            }
-
-            .teustat-block .open-link-btn {
-                padding: 12px 24px;
-                font-size: 14px;
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
             }
         }
 
@@ -1064,69 +1055,54 @@
                 padding: 12px;
             }
 
-            .container {
-                padding: 20px;
-                border-radius: 20px;
+            .app {
+                padding: 16px;
+                border-radius: 18px;
             }
 
-            h1 {
-                font-size: 20px;
+            .header-title {
+                font-size: 17px;
             }
 
-            .result-header {
-                flex-direction: column;
-                align-items: flex-start;
+            .logo .company {
+                font-size: 12px;
             }
-
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
+            .logo .rf {
+                font-size: 9px;
             }
-
-            .margin-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 4px;
-            }
-
-            .margin-label {
-                min-width: auto;
+            .logo .full {
+                font-size: 8px;
             }
 
             .margin-settings {
                 flex-direction: column;
                 align-items: stretch;
-                gap: 12px;
+                gap: 10px;
             }
 
             .margin-settings input {
                 width: 100%;
             }
 
-            .margin-settings .reset-btn {
+            .margin-settings .btn-reset {
                 margin-left: 0;
+                width: 100%;
             }
 
-            .logo {
-                padding-right: 16px;
+            .price-tag {
+                font-size: 19px;
             }
-
-            .logo .company { font-size: 13px; }
-            .logo .rf { font-size: 10px; }
-            .logo .full { font-size: 9px; }
 
             .result-details {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
+                align-items: stretch;
+                gap: 6px;
             }
-
             .result-details span {
                 width: 100%;
             }
 
-            .modal-content {
+            .modal {
                 padding: 16px;
                 border-radius: 16px;
             }
@@ -1135,27 +1111,34 @@
 </head>
 <body>
 
-    <div class="container">
-        <div class="header">
+    <!-- ============================================================
+    APP
+    ============================================================ -->
+    <div class="app">
+
+        <!-- HEADER -->
+        <header class="header">
             <div class="header-left">
                 <div class="logo">
                     <span class="company">ГРУЗОВАЯ КОМПАНИЯ</span>
                     <span class="rf">РФ</span>
                     <span class="full">ТРАНСПОРТНАЯ ГРУЗОВАЯ КОМПАНИЯ</span>
                 </div>
-                <h1>🚚 Калькулятор грузоперевозок</h1>
+                <div class="header-title">🚚 Калькулятор</div>
             </div>
-            <span class="version">v3.8</span>
-        </div>
+            <span class="version-badge">v4.0</span>
+        </header>
         <p class="subtitle">Расчёт стоимости перевозки с учётом маржинальности</p>
 
+        <!-- MARGIN SETTINGS -->
         <div class="margin-settings">
-            <label>⚙️ Наценка:</label>
+            <label>⚙️ Наценка</label>
             <input type="number" id="marginPercent" value="43" min="0" max="300" step="0.5" />
-            <span class="hint">% (коэффициент ×<span id="marginMultiplierDisplay">1.43</span>)</span>
-            <button class="reset-btn" id="resetMarginBtn">↺ Сбросить</button>
+            <span class="hint">×<span id="marginMultiplierDisplay">1.43</span></span>
+            <button class="btn-reset" id="resetMarginBtn">↺ Сбросить</button>
         </div>
 
+        <!-- ROUTE SELECT -->
         <div class="row">
             <div class="form-group">
                 <label>📍 Откуда</label>
@@ -1171,21 +1154,17 @@
             </div>
         </div>
 
-        <!-- ========================================================= -->
-        <!-- КНОПКИ ДЕЙСТВИЙ                                          -->
-        <!-- ========================================================= -->
-        <div class="action-buttons">
-            <button class="action-btn calc" id="calcBtn">
+        <!-- ACTIONS -->
+        <div class="actions">
+            <button class="btn-secondary primary-action" id="calcBtn">
                 <span class="icon">🧮</span> Рассчитать
             </button>
-            <button class="action-btn compare" id="openModalBtn">
-                <span class="icon">📐</span> Сравнить
-            </button>
-            <button class="action-btn teustat" id="openTeustatBtn">
-                <span class="icon">📊</span> TEUSTAT
+            <button class="btn-secondary" id="openModalBtn">
+                <span class="icon">📐</span> Сравнить объём/вес
             </button>
         </div>
 
+        <!-- UNIT TOGGLE -->
         <div class="form-group">
             <label>Единица измерения</label>
             <div class="unit-toggle">
@@ -1194,36 +1173,40 @@
             </div>
         </div>
 
+        <!-- VALUE INPUT -->
         <div class="form-group">
             <label id="valueLabel">Вес (кг)</label>
             <input type="number" id="valueInput" placeholder="Например: 150" min="0.1" step="0.1" />
         </div>
 
+        <!-- RESULTS -->
         <div id="resultsContainer" class="results"></div>
 
+        <!-- HISTORY -->
         <div class="history" id="historyContainer">
             <div class="history-header">
                 <h3>📋 История расчётов</h3>
-                <button class="clear-history" id="clearHistory">Очистить</button>
+                <button class="btn-clear" id="clearHistory">Очистить</button>
             </div>
             <div id="historyList"></div>
         </div>
+
     </div>
 
-    <!-- ========================================================= -->
-    <!-- МОДАЛЬНОЕ ОКНО: СРАВНЕНИЕ ОБЪЁМА И ВЕСА                   -->
-    <!-- ========================================================= -->
+    <!-- ============================================================
+    MODAL: COMPARE VOLUME & WEIGHT
+    ============================================================ -->
     <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-content">
+        <div class="modal">
             <div class="modal-header">
-                <div class="title">
-                    <span class="icon">📐</span> Сравнение: объём vs вес
-                    <span style="font-size:13px;font-weight:400;color:#8b5cf6;margin-left:8px;">коэф. 250</span>
+                <div class="modal-title">
+                    <span class="icon">📐</span> Сравнение
+                    <span style="font-size:12px;font-weight:400;color:var(--gray-400);">объём vs вес</span>
                 </div>
                 <button class="modal-close" id="closeModalBtn">✕</button>
             </div>
             <div class="modal-body">
-                <div class="row-2">
+                <div class="row">
                     <div class="form-group">
                         <label>📦 Объём (м³)</label>
                         <input type="number" id="modalDimVolume" placeholder="2.0" min="0.01" step="0.01" value="2.0" />
@@ -1237,16 +1220,16 @@
                 <button class="modal-compare-btn" id="modalCompareBtn">📊 Сравнить</button>
 
                 <div class="modal-result" id="modalResult" style="display:none;">
-                    <div class="row-info">
-                        <span class="label">⚖️ Объёмный вес (м³ × 250):</span>
+                    <div class="row">
+                        <span class="label">⚖️ Объёмный вес (×250):</span>
                         <span class="value orange" id="modalVolWeight">0 кг</span>
                     </div>
-                    <div class="row-info">
+                    <div class="row">
                         <span class="label">🏋️ Физический вес:</span>
                         <span class="value" id="modalPhysicalWeight">0 кг</span>
                     </div>
-                    <div class="row-info" style="border-bottom:2px solid #e2e8f0;padding-bottom:10px;">
-                        <span class="label">📈 Для расчёта используем:</span>
+                    <div class="row" style="border-bottom:2px solid var(--gray-200);padding-bottom:8px;">
+                        <span class="label">📈 Используем:</span>
                         <span class="value green" id="modalUseForCalc">—</span>
                     </div>
                     <div class="modal-recommend" id="modalRecommend">
@@ -1258,48 +1241,12 @@
         </div>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- МОДАЛЬНОЕ ОКНО: TEUSTAT (БЕЗ IFRAME)                      -->
-    <!-- ========================================================= -->
-    <div class="modal-overlay" id="teustatOverlay">
-        <div class="modal-content teustat-modal">
-            <div class="modal-header">
-                <div class="title">
-                    <span class="icon">📊</span> TEUSTAT — Рыночные ставки
-                    <span style="font-size:13px;font-weight:400;color:#059669;margin-left:8px;">ежедневное обновление</span>
-                </div>
-                <button class="modal-close" id="closeTeustatBtn">✕</button>
-            </div>
-            <div class="modal-body">
-                <div class="teustat-block">
-                    <span class="big-icon">🔒</span>
-                    <h3>TEUSTAT не поддерживает встраивание</h3>
-                    <p>
-                        Сайт <strong>teustat.com</strong> запрещает отображение внутри iframe по соображениям безопасности.<br>
-                        Откройте его в новой вкладке для просмотра актуальных ставок.
-                    </p>
-                    <a href="https://teustat.com/" target="_blank" class="open-link-btn">
-                        <span>🔗</span> Открыть TEUSTAT
-                    </a>
-                    <span class="hint">Откроется в новой вкладке, вы не потеряете текущий расчёт</span>
-                </div>
-
-                <div class="teustat-info">
-                    <span class="icon">💡</span>
-                    <div class="text">
-                        <strong>TEUSTAT</strong> — агрегатор тарифов на контейнерные перевозки и сборные грузы.
-                        Данные обновляются ежедневно. Используйте для сверки рыночных ставок.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         // ============================================================
-        // БАЗА ДАННЫХ ТАРИФОВ
+        // 1. ТАРИФЫ
         // ============================================================
         const tariffsDB = [
+            // НАША МАШИНА
             {
                 from: "Новосибирск",
                 to: "Чита",
@@ -1339,6 +1286,7 @@
                 isFinalPrice: true,
                 note: ""
             },
+            // ВЛАДИВОСТОК → ПЕТРОПАВЛОВСК-КАМЧАТСКИЙ
             {
                 from: "Владивосток",
                 to: "Петропавловск-Камчатский",
@@ -1361,6 +1309,7 @@
                 type: "Конт, море",
                 note: ""
             },
+            // МОСКВА → НОВОСИБИРСК
             {
                 from: "Москва",
                 to: "Новосибирск",
@@ -1383,17 +1332,7 @@
                 type: "Авто",
                 note: ""
             },
-            {
-                from: "Новосибирск",
-                to: "Москва",
-                carrier: "Шерл",
-                kg: { upTo500: 15.4, upTo5000: 14.5, upTo20000: 13.5 },
-                m3: { upTo1: 3850, upTo7: 3750, upTo40: 3550 },
-                minSum: 2000,
-                delivery: "5-6",
-                type: "Авто",
-                note: ""
-            },
+            // МОСКВА → ВЛАДИВОСТОК
             {
                 from: "Москва",
                 to: "Владивосток",
@@ -1416,45 +1355,56 @@
                 type: "авто",
                 note: ""
             },
+            // НОВОСИБИРСК → МОСКВА
+            {
+                from: "Новосибирск",
+                to: "Москва",
+                carrier: "Шерл",
+                kg: { upTo500: 15.4, upTo5000: 14.5, upTo20000: 13.5 },
+                m3: { upTo1: 3850, upTo7: 3750, upTo40: 3550 },
+                minSum: 2000,
+                delivery: "5-6",
+                type: "Авто",
+                note: ""
+            },
         ];
 
         // ============================================================
-        // 2. ЛОГИКА РАСЧЁТА
+        // 2. ОСНОВНЫЕ ФУНКЦИИ
         // ============================================================
+
+        function getUnitPrice(route, value, unit) {
+            let price = 0;
+            if (unit === 'kg') {
+                const kg = route.kg;
+                if (value <= 500) price = kg.upTo500 || kg.upTo5000 || kg.upTo20000 || 0;
+                else if (value <= 5000) price = kg.upTo5000 || kg.upTo20000 || kg.upTo500 || 0;
+                else if (value <= 20000) price = kg.upTo20000 || kg.upTo5000 || kg.upTo500 || 0;
+                else price = kg.upTo20000 || kg.upTo5000 || kg.upTo500 || 0;
+            } else {
+                const m3 = route.m3;
+                if (value <= 1) price = m3.upTo1 || m3.upTo7 || m3.upTo40 || 0;
+                else if (value <= 7) price = m3.upTo7 || m3.upTo40 || m3.upTo1 || 0;
+                else if (value <= 40) price = m3.upTo40 || m3.upTo7 || m3.upTo1 || 0;
+                else price = m3.upTo40 || m3.upTo7 || m3.upTo1 || 0;
+            }
+            return price;
+        }
+
         function calculatePrice(from, to, value, unit) {
             const routes = tariffsDB.filter(t => t.from === from && t.to === to);
-
-            if (routes.length === 0) {
-                return { error: "Маршрут не найден" };
-            }
+            if (routes.length === 0) return { error: "Маршрут не найден" };
 
             const results = routes.map(route => {
-                let unitPrice;
-
-                if (unit === 'kg') {
-                    const kg = route.kg;
-                    if (value <= 500) unitPrice = kg.upTo500 || kg.upTo5000 || kg.upTo20000 || 0;
-                    else if (value <= 5000) unitPrice = kg.upTo5000 || kg.upTo20000 || kg.upTo500 || 0;
-                    else if (value <= 20000) unitPrice = kg.upTo20000 || kg.upTo5000 || kg.upTo500 || 0;
-                    else unitPrice = kg.upTo20000 || kg.upTo5000 || kg.upTo500 || 0;
-                } else {
-                    const m3 = route.m3;
-                    if (value <= 1) unitPrice = m3.upTo1 || m3.upTo7 || m3.upTo40 || 0;
-                    else if (value <= 7) unitPrice = m3.upTo7 || m3.upTo40 || m3.upTo1 || 0;
-                    else if (value <= 40) unitPrice = m3.upTo40 || m3.upTo7 || m3.upTo1 || 0;
-                    else unitPrice = m3.upTo40 || m3.upTo7 || m3.upTo1 || 0;
-                }
-
-                if (unitPrice === undefined || unitPrice === null || unitPrice === 0) {
-                    return null;
-                }
+                const unitPrice = getUnitPrice(route, value, unit);
+                if (unitPrice === 0) return null;
 
                 const minSum = route.minSum || 0;
-                const calculatedPrice = Math.round(unitPrice * value);
-                let finalPrice = calculatedPrice;
+                const calculated = Math.round(unitPrice * value);
+                let finalPrice = calculated;
                 let usedMinSum = false;
 
-                if (minSum > 0 && calculatedPrice < minSum) {
+                if (minSum > 0 && calculated < minSum) {
                     finalPrice = minSum;
                     usedMinSum = true;
                 }
@@ -1462,7 +1412,7 @@
                 return {
                     carrier: route.carrier,
                     price: finalPrice,
-                    calculatedPrice: calculatedPrice,
+                    calculatedPrice: calculated,
                     unitPrice: unitPrice,
                     minSum: minSum,
                     usedMinSum: usedMinSum,
@@ -1474,9 +1424,7 @@
                 };
             }).filter(r => r !== null);
 
-            if (results.length === 0) {
-                return { error: "Нет данных для этого объёма" };
-            }
+            if (results.length === 0) return { error: "Нет данных для этого объёма" };
 
             results.sort((a, b) => {
                 if (a.isOurTruck && !b.isOurTruck) return -1;
@@ -1487,26 +1435,13 @@
             return results;
         }
 
-        // ============================================================
-        // 3. РАСЧЁТ С МАРЖОЙ
-        // ============================================================
         function calculateWithMargin(from, to, value, unit, marginPercent) {
             const results = calculatePrice(from, to, value, unit);
-
             if (results.error) return results;
 
             return results.map(r => {
                 if (r.isOurTruck && r.isFinalPrice) {
-                    return {
-                        ...r,
-                        costPrice: r.price,
-                        priceWithMargin: r.price,
-                        marginRub: 0,
-                        marginPercent: 0,
-                        marginMultiplier: 1,
-                        isOurTruck: true,
-                        isFinalPrice: true
-                    };
+                    return { ...r, costPrice: r.price, priceWithMargin: r.price, marginRub: 0, marginPercent: 0 };
                 }
 
                 const multiplier = 1 + (marginPercent / 100);
@@ -1519,41 +1454,31 @@
                     costPrice: r.price,
                     priceWithMargin: priceWithMargin,
                     marginRub: marginRub,
-                    marginPercent: marginPercentActual,
-                    marginMultiplier: multiplier,
-                    isOurTruck: false,
-                    isFinalPrice: false
+                    marginPercent: marginPercentActual
                 };
             });
         }
 
-        // ============================================================
-        // 4. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-        // ============================================================
-        function getMarginColor(percent) {
-            if (percent >= 50) return '#10b981';
-            if (percent >= 30) return '#f59e0b';
-            if (percent >= 15) return '#f97316';
+        function getMarginColor(p) {
+            if (p >= 50) return '#10b981';
+            if (p >= 30) return '#f59e0b';
+            if (p >= 15) return '#f97316';
             return '#ef4444';
         }
 
-        function formatMargin(percent, rub) {
-            const color = getMarginColor(percent);
-            const emoji = percent >= 50 ? '🟢' : percent >= 30 ? '🟡' : percent >= 15 ? '🟠' : '🔴';
-            return {
-                text: `${rub.toLocaleString()} ₽ (${percent}%)`,
-                color: color,
-                emoji: emoji
-            };
+        function formatMargin(p, rub) {
+            const c = getMarginColor(p);
+            const e = p >= 50 ? '🟢' : p >= 30 ? '🟡' : p >= 15 ? '🟠' : '🔴';
+            return { text: `${rub.toLocaleString()} ₽ (${p}%)`, color: c, emoji: e };
         }
 
         // ============================================================
-        // 5. МОДАЛЬНОЕ ОКНО — СРАВНЕНИЕ ОБЪЁМА И ВЕСА
+        // 3. МОДАЛЬНОЕ ОКНО
         // ============================================================
-        function compareVolumeAndWeight() {
+
+        function compareVolumeWeight() {
             const volume = parseFloat(document.getElementById('modalDimVolume').value) || 0;
             const weight = parseFloat(document.getElementById('modalDimWeight').value) || 0;
-
             const volWeight = volume * 250;
 
             const resultBlock = document.getElementById('modalResult');
@@ -1562,104 +1487,138 @@
             document.getElementById('modalVolWeight').textContent = volWeight.toFixed(0) + ' кг';
             document.getElementById('modalPhysicalWeight').textContent = weight.toFixed(0) + ' кг';
 
-            let useForCalc = '';
-            let recommendTitle = '';
-            let recommendDesc = '';
-            let isWarning = false;
+            let useForCalc = '', title = '', desc = '', warn = false;
 
             if (volWeight > weight && volWeight > 0 && weight > 0) {
                 useForCalc = '⚖️ Объёмный вес (' + volWeight.toFixed(0) + ' кг)';
-                recommendTitle = '💡 Рекомендация: считать по ОБЪЁМУ (м³)';
-                recommendDesc = 'Объёмный вес (' + volWeight.toFixed(0) + ' кг) превышает физический (' + weight.toFixed(0) +
-                    ' кг). Для компании выгоднее считать по объёму.';
-                isWarning = false;
+                title = '💡 Считать по ОБЪЁМУ (м³)';
+                desc = 'Объёмный вес (' + volWeight.toFixed(0) + ' кг) > физического (' + weight.toFixed(0) + ' кг). Для компании выгоднее считать по объёму.';
             } else if (weight >= volWeight && weight > 0 && volWeight > 0) {
                 useForCalc = '🏋️ Физический вес (' + weight.toFixed(0) + ' кг)';
-                recommendTitle = '💡 Рекомендация: считать по ВЕСУ (кг)';
-                recommendDesc = 'Физический вес (' + weight.toFixed(0) + ' кг) превышает объёмный (' + volWeight.toFixed(0) +
-                    ' кг). Для компании выгоднее считать по весу.';
-                isWarning = false;
+                title = '💡 Считать по ВЕСУ (кг)';
+                desc = 'Физический вес (' + weight.toFixed(0) + ' кг) > объёмного (' + volWeight.toFixed(0) + ' кг). Для компании выгоднее считать по весу.';
             } else if (weight > 0 && volWeight === 0) {
                 useForCalc = '🏋️ Физический вес (' + weight.toFixed(0) + ' кг)';
-                recommendTitle = 'ℹ️ Не указан объём';
-                recommendDesc = 'Введите объём для расчёта объёмного веса.';
-                isWarning = true;
+                title = 'ℹ️ Нет объёма';
+                desc = 'Введите объём для расчёта объёмного веса.';
+                warn = true;
             } else if (volWeight > 0 && weight === 0) {
                 useForCalc = '⚖️ Объёмный вес (' + volWeight.toFixed(0) + ' кг)';
-                recommendTitle = 'ℹ️ Не указан вес';
-                recommendDesc = 'Введите физический вес для сравнения с объёмным.';
-                isWarning = true;
+                title = 'ℹ️ Нет веса';
+                desc = 'Введите физический вес для сравнения.';
+                warn = true;
             } else {
                 useForCalc = '—';
-                recommendTitle = '📐 Введите данные';
-                recommendDesc = 'Укажите объём и вес для сравнения.';
-                isWarning = true;
+                title = '📐 Введите данные';
+                desc = 'Укажите объём и вес для сравнения.';
+                warn = true;
             }
 
             document.getElementById('modalUseForCalc').textContent = useForCalc;
 
-            const recommendBox = document.getElementById('modalRecommend');
-            recommendBox.className = 'modal-recommend' + (isWarning ? ' warning' : '');
-            document.getElementById('modalRecommendTitle').textContent = recommendTitle;
-            document.getElementById('modalRecommendDesc').textContent = recommendDesc;
+            const box = document.getElementById('modalRecommend');
+            box.className = 'modal-recommend' + (warn ? ' warning' : '');
+            document.getElementById('modalRecommendTitle').textContent = title;
+            document.getElementById('modalRecommendDesc').textContent = desc;
         }
 
         // ============================================================
-        // 6. ИНТЕРФЕЙС
+        // 4. ИСТОРИЯ
         // ============================================================
+
+        function getHistory() {
+            try { return JSON.parse(localStorage.getItem('calcHistory')) || []; } catch { return []; }
+        }
+
+        function saveHistory(entry) {
+            const h = getHistory();
+            h.unshift({ ...entry, timestamp: new Date().toLocaleString('ru-RU') });
+            if (h.length > 50) h.pop();
+            localStorage.setItem('calcHistory', JSON.stringify(h));
+            renderHistory();
+        }
+
+        function clearHistory() {
+            localStorage.removeItem('calcHistory');
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const h = getHistory();
+            const list = document.getElementById('historyList');
+            if (h.length === 0) {
+                list.innerHTML = '<div class="history-empty">История расчётов пуста</div>';
+                return;
+            }
+            list.innerHTML = h.map((item, i) => {
+                const isOur = item.carrier && item.carrier.includes('Наша машина');
+                return `
+                    <div class="history-item ${isOur ? 'our-history' : ''}" data-index="${i}">
+                        <span class="route">${item.from} → ${item.to}</span>
+                        <span class="info">${item.value} ${item.unit} · ${item.carrier}${item.marginPercent ? ' · +'+item.marginPercent+'%' : ''}</span>
+                        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                            ${item.costPrice !== item.priceWithMargin ? `<span class="hcost">${(item.costPrice || item.price).toLocaleString()} ₽</span>` : ''}
+                            <span class="hprice">${(item.priceWithMargin || item.price).toLocaleString()} ₽</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            list.querySelectorAll('.history-item').forEach(el => {
+                el.addEventListener('click', function() {
+                    const item = getHistory()[parseInt(this.dataset.index)];
+                    if (item) {
+                        document.getElementById('fromCity').value = item.from;
+                        document.getElementById('fromCity').dispatchEvent(new Event('change'));
+                        setTimeout(() => { document.getElementById('toCity').value = item.to; }, 100);
+                        document.querySelector(`.unit-btn[data-unit="${item.unit}"]`)?.click();
+                        document.getElementById('valueInput').value = item.value;
+                        setTimeout(() => document.getElementById('calcBtn').click(), 200);
+                    }
+                });
+            });
+        }
+
+        // ============================================================
+        // 5. ИНТЕРФЕЙС
+        // ============================================================
+
         const fromSelect = document.getElementById('fromCity');
         const toSelect = document.getElementById('toCity');
         const valueInput = document.getElementById('valueInput');
         const valueLabel = document.getElementById('valueLabel');
         const calcBtn = document.getElementById('calcBtn');
         const resultsContainer = document.getElementById('resultsContainer');
-        const historyList = document.getElementById('historyList');
-        const clearHistoryBtn = document.getElementById('clearHistory');
         const marginPercentInput = document.getElementById('marginPercent');
         const marginMultiplierDisplay = document.getElementById('marginMultiplierDisplay');
         const resetMarginBtn = document.getElementById('resetMarginBtn');
+        const clearHistoryBtn = document.getElementById('clearHistory');
 
-        // Модальное окно сравнения
-        const modalOverlay = document.getElementById('modalOverlay');
-        const openModalBtn = document.getElementById('openModalBtn');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const modalCompareBtn = document.getElementById('modalCompareBtn');
-
-        // Модальное окно TEUSTAT
-        const teustatOverlay = document.getElementById('teustatOverlay');
-        const openTeustatBtn = document.getElementById('openTeustatBtn');
-        const closeTeustatBtn = document.getElementById('closeTeustatBtn');
-
+        // Города
         const cities = [...new Set(tariffsDB.map(t => t.from))].sort();
-
-        cities.forEach(city => {
-            const option = document.createElement('option');
-            option.value = city;
-            option.textContent = city;
-            fromSelect.appendChild(option);
+        cities.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.textContent = c;
+            fromSelect.appendChild(opt);
         });
 
         fromSelect.addEventListener('change', function() {
             const from = this.value;
             toSelect.innerHTML = '<option value="">Выберите город</option>';
             toSelect.disabled = true;
-
             if (!from) return;
-
-            const destinations = [...new Set(
-                tariffsDB.filter(t => t.from === from).map(t => t.to)
-            )].sort();
-
-            destinations.forEach(city => {
-                const option = document.createElement('option');
-                option.value = city;
-                option.textContent = city;
-                toSelect.appendChild(option);
+            const dest = [...new Set(tariffsDB.filter(t => t.from === from).map(t => t.to))].sort();
+            dest.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                toSelect.appendChild(opt);
             });
-
             toSelect.disabled = false;
         });
 
+        // Единицы
         document.querySelectorAll('.unit-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
@@ -1670,154 +1629,61 @@
             });
         });
 
+        // Наценка
         marginPercentInput.addEventListener('input', function() {
             const val = parseFloat(this.value) || 0;
-            const multiplier = 1 + (val / 100);
-            marginMultiplierDisplay.textContent = multiplier.toFixed(2);
+            marginMultiplierDisplay.textContent = (1 + val / 100).toFixed(2);
         });
-
         resetMarginBtn.addEventListener('click', function() {
             marginPercentInput.value = '43';
             marginMultiplierDisplay.textContent = '1.43';
         });
 
-        // ===== МОДАЛЬНОЕ ОКНО СРАВНЕНИЯ =====
-        openModalBtn.addEventListener('click', function() {
+        // Модалка
+        const modalOverlay = document.getElementById('modalOverlay');
+        document.getElementById('openModalBtn').addEventListener('click', function() {
             modalOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
-            setTimeout(compareVolumeAndWeight, 100);
+            setTimeout(compareVolumeWeight, 150);
         });
-
-        closeModalBtn.addEventListener('click', function() {
+        document.getElementById('closeModalBtn').addEventListener('click', function() {
             modalOverlay.classList.remove('active');
             document.body.style.overflow = '';
         });
-
         modalOverlay.addEventListener('click', function(e) {
             if (e.target === modalOverlay) {
                 modalOverlay.classList.remove('active');
                 document.body.style.overflow = '';
             }
         });
-
-        modalCompareBtn.addEventListener('click', function() {
-            compareVolumeAndWeight();
-        });
-
-        document.querySelectorAll('#modalDimVolume, #modalDimWeight').forEach(input => {
-            input.addEventListener('input', function() {
-                const volume = parseFloat(document.getElementById('modalDimVolume').value);
-                const weight = parseFloat(document.getElementById('modalDimWeight').value);
-                if (volume > 0 && weight > 0) {
-                    compareVolumeAndWeight();
-                }
+        document.getElementById('modalCompareBtn').addEventListener('click', compareVolumeWeight);
+        document.querySelectorAll('#modalDimVolume, #modalDimWeight').forEach(inp => {
+            inp.addEventListener('input', function() {
+                const v = parseFloat(document.getElementById('modalDimVolume').value);
+                const w = parseFloat(document.getElementById('modalDimWeight').value);
+                if (v > 0 && w > 0) compareVolumeWeight();
             });
         });
-
-        // ===== МОДАЛЬНОЕ ОКНО TEUSTAT =====
-        openTeustatBtn.addEventListener('click', function() {
-            teustatOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-
-        closeTeustatBtn.addEventListener('click', function() {
-            teustatOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        teustatOverlay.addEventListener('click', function(e) {
-            if (e.target === teustatOverlay) {
-                teustatOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        });
-
-        // ===== ЗАКРЫТИЕ МОДАЛОК ПО ESC =====
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 modalOverlay.classList.remove('active');
-                teustatOverlay.classList.remove('active');
                 document.body.style.overflow = '';
             }
         });
 
-        // ============================================================
-        // 7. ИСТОРИЯ
-        // ============================================================
-        function getHistory() {
-            try {
-                return JSON.parse(localStorage.getItem('calcHistory')) || [];
-            } catch {
-                return [];
-            }
-        }
-
-        function saveHistory(entry) {
-            const history = getHistory();
-            history.unshift({
-                ...entry,
-                timestamp: new Date().toLocaleString('ru-RU')
-            });
-            if (history.length > 50) history.pop();
-            localStorage.setItem('calcHistory', JSON.stringify(history));
-            renderHistory();
-        }
-
-        function clearHistory() {
-            localStorage.removeItem('calcHistory');
-            renderHistory();
-        }
-
-        function renderHistory() {
-            const history = getHistory();
-            if (history.length === 0) {
-                historyList.innerHTML = '<div class="history-empty">История расчётов пуста</div>';
-                return;
-            }
-
-            historyList.innerHTML = history.map((item, index) => {
-                const isOurTruck = item.carrier && item.carrier.includes('Наша машина');
-                return `
-                    <div class="history-item ${isOurTruck ? 'our-history' : ''}" data-index="${index}">
-                        <span class="route">${item.from} → ${item.to}</span>
-                        <span class="info">
-                            ${item.value} ${item.unit} · ${item.carrier}
-                            ${item.marginPercent !== undefined && item.marginPercent > 0 ? ` · +${item.marginPercent}%` : ''}
-                            ${item.isFinalPrice ? ' · 🏠 Финальная цена' : ''}
-                            ${item.usedMinSum ? ' · ⚠️ Минималка' : ''}
-                        </span>
-                        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                            ${item.costPrice !== item.priceWithMargin ? `<span class="hcost">${(item.costPrice || item.price).toLocaleString()} ₽</span>` : ''}
-                            <span class="hprice">${(item.priceWithMargin || item.price).toLocaleString()} ₽</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            historyList.querySelectorAll('.history-item').forEach(el => {
-                el.addEventListener('click', function() {
-                    const idx = parseInt(this.dataset.index);
-                    const item = getHistory()[idx];
-                    if (item) {
-                        fromSelect.value = item.from;
-                        fromSelect.dispatchEvent(new Event('change'));
-                        setTimeout(() => {
-                            toSelect.value = item.to;
-                        }, 100);
-                        const unitBtn = document.querySelector(`.unit-btn[data-unit="${item.unit}"]`);
-                        if (unitBtn) unitBtn.click();
-                        valueInput.value = item.value;
-                        setTimeout(() => calcBtn.click(), 200);
-                    }
-                });
-            });
-        }
-
+        // История
         clearHistoryBtn.addEventListener('click', clearHistory);
+        renderHistory();
+
+        // Enter
+        valueInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calcBtn.click();
+        });
 
         // ============================================================
-        // 8. ОСНОВНОЙ РАСЧЁТ
+        // 6. ОСНОВНОЙ РАСЧЁТ
         // ============================================================
+
         calcBtn.addEventListener('click', function() {
             const from = fromSelect.value;
             const to = toSelect.value;
@@ -1826,34 +1692,17 @@
             const marginPercent = parseFloat(marginPercentInput.value) || 0;
 
             if (!from || !to) {
-                resultsContainer.innerHTML = `
-                    <div class="no-results">
-                        <span class="emoji">⚠️</span>
-                        <p>Выберите маршрут</p>
-                    </div>
-                `;
+                resultsContainer.innerHTML = `<div class="no-results"><span class="emoji">⚠️</span><p>Выберите маршрут</p></div>`;
                 return;
             }
-
             if (!value || value <= 0) {
-                resultsContainer.innerHTML = `
-                    <div class="no-results">
-                        <span class="emoji">⚠️</span>
-                        <p>Введите корректное значение</p>
-                    </div>
-                `;
+                resultsContainer.innerHTML = `<div class="no-results"><span class="emoji">⚠️</span><p>Введите корректное значение</p></div>`;
                 return;
             }
 
             const results = calculateWithMargin(from, to, value, unit, marginPercent);
-
             if (results.error) {
-                resultsContainer.innerHTML = `
-                    <div class="no-results">
-                        <span class="emoji">😕</span>
-                        <p>${results.error}</p>
-                    </div>
-                `;
+                resultsContainer.innerHTML = `<div class="no-results"><span class="emoji">😕</span><p>${results.error}</p></div>`;
                 return;
             }
 
@@ -1862,110 +1711,85 @@
 
             const marginResults = results.filter(r => r.marginPercent > 0);
             const avgMargin = marginResults.length > 0 ?
-                Math.round(marginResults.reduce((sum, r) => sum + r.marginPercent, 0) / marginResults.length) :
-                0;
+                Math.round(marginResults.reduce((s, r) => s + r.marginPercent, 0) / marginResults.length) : 0;
 
             let html = `
-                <h3 style="margin-bottom:20px;color:var(--text-primary);font-weight:700;font-size:18px;">
-                    ✅ Найдено ${results.length} вариантов
-                    <span style="font-size:14px;font-weight:500;color:var(--text-secondary);margin-left:12px;">
-                        Наценка: +${marginPercent}% (×${(1 + marginPercent/100).toFixed(2)})
+                <h3 style="margin-bottom:18px;font-size:17px;font-weight:700;color:var(--gray-800);">
+                    ✅ ${results.length} вариантов
+                    <span style="font-size:13px;font-weight:500;color:var(--gray-500);margin-left:10px;">
+                        Наценка: +${marginPercent}% (×${(1+marginPercent/100).toFixed(2)})
                     </span>
                 </h3>
-
-                <div class="margin-summary">
-                    <div class="margin-summary-item">
+                <div class="summary">
+                    <div class="summary-item">
                         <span class="label">🏆 Лучший</span>
-                        <span class="value" style="color:var(--success);">
-                            ${best.priceWithMargin.toLocaleString()} ₽
-                        </span>
+                        <span class="value green">${best.priceWithMargin.toLocaleString()} ₽</span>
                     </div>
-                    <div class="margin-summary-item">
+                    <div class="summary-item">
                         <span class="label">📈 Средняя маржа</span>
-                        <span class="value" style="color: ${getMarginColor(avgMargin)};">
-                            ${avgMargin}%
-                        </span>
+                        <span class="value" style="color:${getMarginColor(avgMargin)};">${avgMargin}%</span>
                     </div>
-                    <div class="margin-summary-item">
+                    <div class="summary-item">
                         <span class="label">💰 Маржа лучшего</span>
-                        <span class="value" style="color:var(--success);">
-                            ${best.marginRub.toLocaleString()} ₽
-                        </span>
+                        <span class="value green">${best.marginRub.toLocaleString()} ₽</span>
                     </div>
                 </div>
             `;
 
-            results.forEach((r, index) => {
-                const isBest = index === 0;
-                const isOurTruck = r.isOurTruck;
-                const isFinalPrice = r.isFinalPrice;
-                const usedMinSum = r.usedMinSum;
+            results.forEach((r, i) => {
+                const isBest = i === 0;
+                const isOur = r.isOurTruck;
+                const isFinal = r.isFinalPrice;
+                const usedMin = r.usedMinSum;
                 const marginInfo = formatMargin(r.marginPercent, r.marginRub);
                 const marginColor = getMarginColor(r.marginPercent);
                 const hasNote = r.note && r.note.length > 0;
 
-                let resultClass = 'result-item';
-                if (isBest && !isOurTruck) resultClass += ' best';
-                if (isOurTruck) resultClass += ' our-truck';
+                let cls = 'result-card';
+                if (isBest && !isOur) cls += ' best';
+                if (isOur) cls += ' our-truck';
 
-                let badgeHtml = '';
-                if (isBest && !isOurTruck) badgeHtml += ' <span class="badge best-badge">⭐ Лучший</span>';
-                if (isOurTruck) badgeHtml += ' <span class="badge our-badge">🏠 Свой транспорт</span>';
-                if (isFinalPrice) badgeHtml += ' <span class="badge no-margin-badge">💰 Финальная цена</span>';
-                if (usedMinSum) badgeHtml += ' <span class="badge min-badge">⚠️ Мин. сумма</span>';
-                if (hasNote) badgeHtml += ' <span class="badge note-badge">📌</span>';
-
-                let priceDisplay = r.priceWithMargin.toLocaleString();
+                let badges = '';
+                if (isBest && !isOur) badges += ' <span class="badge badge-best">⭐ Лучший</span>';
+                if (isOur) badges += ' <span class="badge badge-our">🏠 Свой транспорт</span>';
+                if (isFinal) badges += ' <span class="badge badge-final">💰 Финальная цена</span>';
+                if (usedMin) badges += ' <span class="badge badge-min">⚠️ Мин. сумма</span>';
+                if (hasNote) badges += ' <span class="badge badge-note">📌</span>';
 
                 html += `
-                    <div class="${resultClass}">
+                    <div class="${cls}">
                         <div class="result-header">
-                            <span class="result-carrier">
-                                ${r.carrier}
-                                ${badgeHtml}
-                            </span>
-                            <span class="result-price ${isBest && !isOurTruck ? 'best-price' : ''}">
-                                ${priceDisplay} ₽
-                            </span>
+                            <span class="carrier-name">${r.carrier} ${badges}</span>
+                            <span class="price-tag ${isBest && !isOur ? 'best-price' : ''}">${r.priceWithMargin.toLocaleString()} ₽</span>
                         </div>
-
                         <div class="margin-block">
                             <div class="margin-row">
-                                <span class="margin-label">📦 Себестоимость:</span>
+                                <span class="margin-label">📦 Себестоимость</span>
                                 <span class="margin-value cost">${r.costPrice.toLocaleString()} ₽</span>
                             </div>
                             <div class="margin-row">
-                                <span class="margin-label">💰 ${isFinalPrice ? 'Цена (финальная)' : 'Цена с наценкой'}:</span>
-                                <span class="margin-value ${isFinalPrice ? 'price-final' : 'price'}">
-                                    ${r.priceWithMargin.toLocaleString()} ₽
-                                </span>
-                                ${!isFinalPrice ? `<span class="margin-badge">+${r.marginPercent}%</span>` :
-                                `<span class="margin-badge final-badge">🏠 Без наценки</span>`}
-                                ${usedMinSum ? `<span class="margin-badge" style="background:#f97316;color:white;">Мин. сумма ${r.minSum.toLocaleString()} ₽</span>` : ''}
+                                <span class="margin-label">💰 ${isFinal ? 'Цена (финальная)' : 'Цена с наценкой'}</span>
+                                <span class="margin-value ${isFinal ? 'sale-final' : 'sale'}">${r.priceWithMargin.toLocaleString()} ₽</span>
+                                ${!isFinal ? `<span class="margin-badge">+${r.marginPercent}%</span>` : `<span class="margin-badge margin-badge-final">🏠 Без наценки</span>`}
+                                ${usedMin ? `<span class="margin-badge" style="background:#f97316;color:white;">Мин. сумма ${r.minSum.toLocaleString()} ₽</span>` : ''}
                             </div>
                             <div class="margin-row">
-                                <span class="margin-label">📈 Маржа:</span>
-                                <span class="margin-value profit" style="color: ${marginColor}">
-                                    ${marginInfo.text}
-                                </span>
-                                <span class="margin-emoji">${marginInfo.emoji}</span>
+                                <span class="margin-label">📈 Маржа</span>
+                                <span class="margin-value profit" style="color:${marginColor}">${marginInfo.text}</span>
+                                <span>${marginInfo.emoji}</span>
                             </div>
                             <div class="margin-progress">
-                                <div class="margin-progress-bar" 
-                                     style="width: ${Math.min(r.marginPercent, 100)}%; 
-                                            background: ${marginColor};">
-                                </div>
+                                <div class="margin-progress-bar" style="width:${Math.min(r.marginPercent,100)}%;background:${marginColor};"></div>
                             </div>
                         </div>
-
                         <div class="result-details">
-                            <span>📊 Тариф: ${r.unitPrice} ₽/${unitLabel}</span>
+                            <span>📊 ${r.unitPrice} ₽/${unitLabel}</span>
                             ${r.minSum > 0 ? `<span>💰 Мин. сумма: ${r.minSum.toLocaleString()} ₽</span>` : ''}
-                            ${r.usedMinSum ? `<span style="color:#f97316;font-weight:600;">⚠️ Применена минимальная сумма</span>` : ''}
-                            <span>📅 Срок: ${r.delivery} дн.</span>
+                            ${usedMin ? `<span class="highlight">⚠️ Применена минимальная сумма</span>` : ''}
+                            <span>📅 ${r.delivery} дн.</span>
                             <span>🚛 ${r.type}</span>
-                            ${isOurTruck ? '<span>🏷️ Собственный транспорт</span>' : ''}
-                            ${hasNote ? `<span style="color:#3b82f6;font-weight:600;">📌 ${r.note}</span>` : ''}
+                            ${isOur ? '<span>🏷️ Собственный транспорт</span>' : ''}
+                            ${hasNote ? `<span class="note-text">📌 ${r.note}</span>` : ''}
                         </div>
                     </div>
                 `;
@@ -1974,10 +1798,7 @@
             resultsContainer.innerHTML = html;
 
             saveHistory({
-                from,
-                to,
-                unit,
-                value,
+                from, to, unit, value,
                 carrier: best.carrier,
                 costPrice: best.costPrice,
                 priceWithMargin: best.priceWithMargin,
@@ -1990,17 +1811,10 @@
             });
         });
 
-        valueInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') calcBtn.click();
-        });
-
-        renderHistory();
-
-        console.log('🚚 Калькулятор грузоперевозок v3.8 загружен!');
+        console.log('🚚 Калькулятор v4.0 загружен!');
         console.log(`📊 Загружено ${tariffsDB.length} тарифов`);
         console.log('🏙️ Доступные города:', cities.join(', '));
-        console.log('📐 Модальное окно для сравнения объёма и веса (коэффициент 250)');
-        console.log('📊 Добавлена кнопка TEUSTAT — открывается в новой вкладке');
+        console.log('✨ Обновлённый современный дизайн');
     </script>
 
 </body>
