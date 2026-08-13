@@ -281,7 +281,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
             transition: left 0.6s;
         }
 
@@ -397,16 +397,6 @@
             color: #7c3aed;
         }
 
-        .result-card.arpi-price {
-            border-left-color: #059669;
-            background: linear-gradient(to right, #ecfdf5, #ffffff);
-            border-color: rgba(5, 150, 105, 0.2);
-        }
-
-        .result-card.arpi-price .carrier-name {
-            color: #047857;
-        }
-
         .result-header {
             display: flex;
             justify-content: space-between;
@@ -469,11 +459,6 @@
 
         .badge-note {
             background: #3b82f6;
-            color: white;
-        }
-
-        .badge-arpi {
-            background: #059669;
             color: white;
         }
 
@@ -1006,6 +991,7 @@
 
     <div class="app">
 
+        <!-- HEADER -->
         <header class="header">
             <div class="header-left">
                 <div class="logo">
@@ -1015,10 +1001,11 @@
                 </div>
                 <div class="header-title">🚚 Калькулятор</div>
             </div>
-            <span class="version-badge">v4.1</span>
+            <span class="version-badge">v4.2</span>
         </header>
         <p class="subtitle">Расчёт стоимости перевозки с учётом маржинальности</p>
 
+        <!-- MARGIN SETTINGS -->
         <div class="margin-settings">
             <label>⚙️ Наценка</label>
             <input type="number" id="marginPercent" value="43" min="0" max="300" step="0.5" />
@@ -1026,6 +1013,7 @@
             <button class="btn-reset" id="resetMarginBtn">↺ Сбросить</button>
         </div>
 
+        <!-- ROUTE SELECT -->
         <div class="row">
             <div class="form-group">
                 <label>📍 Откуда</label>
@@ -1041,15 +1029,7 @@
             </div>
         </div>
 
-        <div class="actions">
-            <button class="btn-secondary primary-action" id="calcBtn">
-                <span class="icon">🧮</span> Рассчитать
-            </button>
-            <button class="btn-secondary" id="openModalBtn">
-                <span class="icon">📐</span> Сравнить объём/вес
-            </button>
-        </div>
-
+        <!-- UNIT TOGGLE -->
         <div class="form-group">
             <label>Единица измерения</label>
             <div class="unit-toggle">
@@ -1058,13 +1038,19 @@
             </div>
         </div>
 
+        <!-- VALUE INPUT -->
         <div class="form-group">
             <label id="valueLabel">Вес (кг)</label>
             <input type="number" id="valueInput" placeholder="Например: 150" min="0.1" step="0.1" />
         </div>
 
+        <!-- CALCULATE BUTTON -->
+        <button class="btn-primary" id="calcBtn">🧮 Рассчитать стоимость</button>
+
+        <!-- RESULTS -->
         <div id="resultsContainer" class="results"></div>
 
+        <!-- HISTORY -->
         <div class="history" id="historyContainer">
             <div class="history-header">
                 <h3>📋 История расчётов</h3>
@@ -1125,1006 +1111,13 @@
 
     <script>
         // ============================================================
-        // 1. БАЗА ДАННЫХ ТАРИФОВ
+        // 1. БАЗА ДАННЫХ ТАРИФОВ (БЕЗ АРПИ)
         // ============================================================
 
-        // ----- НАШИ ЦЕНЫ АРПИ АВТО (только кг, цена уже финальная) -----
-        const arpiPrices = [
-            // Абакан
-            { from: "Абакан", to: "Абакан", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Абакан", to: "Алейск", price: 51.49, minSum: 793, delivery: "5" },
-            { from: "Абакан", to: "Екатеринбург", price: 47.65, minSum: 793, delivery: "4" },
-            { from: "Абакан", to: "Кемерово", price: 43.04, minSum: 793, delivery: "3" },
-            { from: "Абакан", to: "Красноярск", price: 19.21, minSum: 793, delivery: "1" },
-            { from: "Абакан", to: "Москва", price: 51.49, minSum: 1830, delivery: "5" },
-            { from: "Абакан", to: "Москва (МО,за МКАД)", price: 51.49, minSum: 1830, delivery: "5" },
-            { from: "Абакан", to: "Новокузнецк", price: 43.81, minSum: 793, delivery: "3" },
-            { from: "Абакан", to: "Новосибирск", price: 32.28, minSum: 793, delivery: "3" },
-            { from: "Абакан", to: "Омск", price: 44.58, minSum: 793, delivery: "3" },
-            { from: "Абакан", to: "Рубцовск", price: 60.72, minSum: 793, delivery: "5" },
-            { from: "Абакан", to: "Санкт-Петербург", price: 79.93, minSum: 1830, delivery: "6" },
-            { from: "Абакан", to: "Сургут", price: 76.09, minSum: 1830, delivery: "5" },
-
-            // Алейск
-            { from: "Алейск", to: "Алейск", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Анжеро-Судженск
-            { from: "Анжеро-Судженск", to: "Алейск", price: 41.51, minSum: 793, delivery: "3" },
-            { from: "Анжеро-Судженск", to: "Анжеро-Судженск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Анжеро-Судженск", to: "Барнаул", price: 33.05, minSum: 793, delivery: "3" },
-            { from: "Анжеро-Судженск", to: "Кемерово", price: 13.07, minSum: 793, delivery: "1" },
-            { from: "Анжеро-Судженск", to: "Новосибирск", price: 22.28, minSum: 793, delivery: "1" },
-            { from: "Анжеро-Судженск", to: "Рубцовск", price: 50.72, minSum: 793, delivery: "3" },
-
-            // Архангельск
-            { from: "Архангельск", to: "Алейск", price: 113.75, minSum: 793, delivery: "7" },
-            { from: "Архангельск", to: "Архангельск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Архангельск", to: "Москва", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Архангельск", to: "Новосибирск", price: 94.54, minSum: 793, delivery: "5" },
-            { from: "Архангельск", to: "Рубцовск", price: 122.98, minSum: 793, delivery: "7" },
-
-            // Барнаул
-            { from: "Барнаул", to: "Абакан", price: 55.34, minSum: 793, delivery: "3" },
-            { from: "Барнаул", to: "Алейск", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Барнаул", to: "Анжеро-Судженск", price: 34.58, minSum: 793, delivery: "3" },
-            { from: "Барнаул", to: "Барнаул", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Барнаул", to: "Белово", price: 22.28, minSum: 793, delivery: "2" },
-            { from: "Барнаул", to: "Бийск", price: 11.53, minSum: 793, delivery: "1" },
-            { from: "Барнаул", to: "Владивосток", price: 47.65, minSum: 3050, delivery: "8" },
-            { from: "Барнаул", to: "Воронеж", price: 49.19, minSum: 793, delivery: "6" },
-            { from: "Барнаул", to: "Екатеринбург", price: 23.83, minSum: 793, delivery: "4" },
-            { from: "Барнаул", to: "Иркутск", price: 51.49, minSum: 793, delivery: "4" },
-            { from: "Барнаул", to: "Казань", price: 51.49, minSum: 793, delivery: "7" },
-            { from: "Барнаул", to: "Кемерово", price: 18.44, minSum: 793, delivery: "2" },
-            { from: "Барнаул", to: "Киселевск", price: 22.28, minSum: 793, delivery: "2" },
-            { from: "Барнаул", to: "Краснодар", price: 57.65, minSum: 793, delivery: "8" },
-            { from: "Барнаул", to: "Красноярск", price: 23.83, minSum: 793, delivery: "2" },
-            { from: "Барнаул", to: "Ленинск-Кузнецкий", price: 22.28, minSum: 793, delivery: "2" },
-            { from: "Барнаул", to: "Междуреченск", price: 30.74, minSum: 793, delivery: "2" },
-            { from: "Барнаул", to: "Москва", price: 27.67, minSum: 793, delivery: "5" },
-            { from: "Барнаул", to: "Москва (МО,за МКАД)", price: 27.67, minSum: 793, delivery: "5" },
-            { from: "Барнаул", to: "Нижний Новгород", price: 48.42, minSum: 793, delivery: "7" },
-            { from: "Барнаул", to: "Новокузнецк", price: 19.98, minSum: 793, delivery: "2" },
-            { from: "Барнаул", to: "Новосибирск", price: 7.69, minSum: 793, delivery: "1" },
-            { from: "Барнаул", to: "Омск", price: 19.98, minSum: 793, delivery: "2" },
-            { from: "Барнаул", to: "Пермь", price: 83.77, minSum: 2541.67, delivery: "8" },
-            { from: "Барнаул", to: "Полысаево", price: 22.28, minSum: 793, delivery: "2" },
-            { from: "Барнаул", to: "Прокопьевск", price: 22.28, minSum: 793, delivery: "2" },
-            { from: "Барнаул", to: "Ростов-на-Дону", price: 56.88, minSum: 793, delivery: "7" },
-            { from: "Барнаул", to: "Рубцовск", price: 17.68, minSum: 793, delivery: "1" },
-            { from: "Барнаул", to: "Самара", price: 56.11, minSum: 793, delivery: "7" },
-            { from: "Барнаул", to: "Санкт-Петербург", price: 56.11, minSum: 793, delivery: "6" },
-            { from: "Барнаул", to: "Саратов", price: 56.88, minSum: 793, delivery: "8" },
-            { from: "Барнаул", to: "Томск", price: 19.21, minSum: 793, delivery: "2" },
-            { from: "Барнаул", to: "Хабаровск", price: 76.86, minSum: 3050, delivery: "8" },
-            { from: "Барнаул", to: "Челябинск", price: 29.98, minSum: 793, delivery: "4" },
-            { from: "Барнаул", to: "Ярославль", price: 53.81, minSum: 793, delivery: "6" },
-
-            // Белово
-            { from: "Белово", to: "Алейск", price: 28.44, minSum: 793, delivery: "3" },
-            { from: "Белово", to: "Белово", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Белово", to: "Кемерово", price: 19.98, minSum: 793, delivery: "2" },
-            { from: "Белово", to: "Москва", price: 29.21, minSum: 793, delivery: "5" },
-            { from: "Белово", to: "Москва (МО,за МКАД)", price: 29.21, minSum: 793, delivery: "5" },
-            { from: "Белово", to: "Новосибирск", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Белово", to: "Рубцовск", price: 37.66, minSum: 793, delivery: "3" },
-            { from: "Белово", to: "Санкт-Петербург", price: 57.65, minSum: 793, delivery: "6" },
-            { from: "Белово", to: "Томск", price: 19.98, minSum: 793, delivery: "2" },
-            { from: "Белово", to: "Тюмень", price: 24.60, minSum: 793, delivery: "3" },
-
-            // Бердск
-            { from: "Бердск", to: "Бердск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Бердск", to: "Томск", price: 12.30, minSum: 793, delivery: "2" },
-
-            // Бийск
-            { from: "Бийск", to: "Алейск", price: 28.44, minSum: 793, delivery: "3" },
-            { from: "Бийск", to: "Бийск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Бийск", to: "Москва", price: 29.98, minSum: 1220, delivery: "5" },
-            { from: "Бийск", to: "Москва (МО,за МКАД)", price: 29.98, minSum: 1220, delivery: "6" },
-            { from: "Бийск", to: "Новосибирск", price: 10.00, minSum: 793, delivery: "1" },
-            { from: "Бийск", to: "Рубцовск", price: 36.89, minSum: 793, delivery: "3" },
-            { from: "Бийск", to: "Санкт-Петербург", price: 58.42, minSum: 1220, delivery: "6" },
-            { from: "Бийск", to: "Томск", price: 20.75, minSum: 793, delivery: "2" },
-
-            // Великие Луки
-            { from: "Великие Луки", to: "Алейск", price: 119.90, minSum: 793, delivery: "7" },
-            { from: "Великие Луки", to: "Великие Луки", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Великие Луки", to: "Москва", price: 55.34, minSum: 793, delivery: "2" },
-            { from: "Великие Луки", to: "Новосибирск", price: 99.92, minSum: 793, delivery: "5" },
-            { from: "Великие Луки", to: "Рубцовск", price: 128.35, minSum: 793, delivery: "7" },
-
-            // Великий Новгород
-            { from: "Великий Новгород", to: "Алейск", price: 101.46, minSum: 793, delivery: "7" },
-            { from: "Великий Новгород", to: "Великий Новгород", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Великий Новгород", to: "Москва", price: 36.89, minSum: 793, delivery: "2" },
-            { from: "Великий Новгород", to: "Новосибирск", price: 81.47, minSum: 793, delivery: "5" },
-            { from: "Великий Новгород", to: "Рубцовск", price: 109.91, minSum: 793, delivery: "7" },
-
-            // Владивосток
-            { from: "Владивосток", to: "Алейск", price: 73.02, minSum: 3050, delivery: "10" },
-            { from: "Владивосток", to: "Барнаул", price: 63.79, minSum: 3050, delivery: "9" },
-            { from: "Владивосток", to: "Владивосток", price: 1460.34, minSum: 1159, delivery: "1" },
-            { from: "Владивосток", to: "Иркутск", price: 58.42, minSum: 3050, delivery: "12" },
-            { from: "Владивосток", to: "Кемерово", price: 69.95, minSum: 3050, delivery: "9" },
-            { from: "Владивосток", to: "Красноярск", price: 68.40, minSum: 3050, delivery: "9" },
-            { from: "Владивосток", to: "Москва", price: 92.23, minSum: 5490, delivery: "9" },
-            { from: "Владивосток", to: "Новокузнецк", price: 65.33, minSum: 3050, delivery: "9" },
-            { from: "Владивосток", to: "Новосибирск", price: 53.03, minSum: 3050, delivery: "8" },
-            { from: "Владивосток", to: "Омск", price: 65.33, minSum: 3050, delivery: "9" },
-            { from: "Владивосток", to: "Рубцовск", price: 81.47, minSum: 3050, delivery: "10" },
-            { from: "Владивосток", to: "Санкт-Петербург", price: 120.67, minSum: 5490, delivery: "9" },
-            { from: "Владивосток", to: "Томск", price: 69.18, minSum: 3050, delivery: "9" },
-
-            // Вологда
-            { from: "Вологда", to: "Алейск", price: 97.61, minSum: 793, delivery: "7" },
-            { from: "Вологда", to: "Вологда", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Вологда", to: "Москва", price: 33.05, minSum: 793, delivery: "2" },
-            { from: "Вологда", to: "Новосибирск", price: 77.63, minSum: 793, delivery: "5" },
-            { from: "Вологда", to: "Рубцовск", price: 106.07, minSum: 793, delivery: "7" },
-
-            // Волхов
-            { from: "Волхов", to: "Алейск", price: 113.75, minSum: 793, delivery: "7" },
-            { from: "Волхов", to: "Волхов", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Волхов", to: "Москва", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Волхов", to: "Новосибирск", price: 94.54, minSum: 793, delivery: "5" },
-            { from: "Волхов", to: "Рубцовск", price: 122.98, minSum: 793, delivery: "7" },
-
-            // Воронеж
-            { from: "Воронеж", to: "Воронеж", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Выборг
-            { from: "Выборг", to: "Алейск", price: 113.75, minSum: 793, delivery: "7" },
-            { from: "Выборг", to: "Выборг", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Выборг", to: "Москва", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Выборг", to: "Новосибирск", price: 94.54, minSum: 793, delivery: "5" },
-            { from: "Выборг", to: "Рубцовск", price: 122.98, minSum: 793, delivery: "7" },
-
-            // Горно-Алтайск
-            { from: "Горно-Алтайск", to: "Алейск", price: 28.44, minSum: 793, delivery: "2" },
-            { from: "Горно-Алтайск", to: "Горно-Алтайск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Горно-Алтайск", to: "Москва", price: 29.98, minSum: 793, delivery: "4" },
-            { from: "Горно-Алтайск", to: "Москва (МО,за МКАД)", price: 29.98, minSum: 793, delivery: "4" },
-            { from: "Горно-Алтайск", to: "Новосибирск", price: 10.00, minSum: 793, delivery: "1" },
-            { from: "Горно-Алтайск", to: "Рубцовск", price: 37.66, minSum: 793, delivery: "2" },
-
-            // Гурьевск
-            { from: "Гурьевск", to: "Алейск", price: 29.98, minSum: 793, delivery: "3" },
-            { from: "Гурьевск", to: "Гурьевск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Гурьевск", to: "Новосибирск", price: 10.00, minSum: 793, delivery: "1" },
-            { from: "Гурьевск", to: "Рубцовск", price: 38.44, minSum: 793, delivery: "3" },
-
-            // Екатеринбург
-            { from: "Екатеринбург", to: "Абакан", price: 69.95, minSum: 793, delivery: "4" },
-            { from: "Екатеринбург", to: "Алейск", price: 41.51, minSum: 793, delivery: "4" },
-            { from: "Екатеринбург", to: "Барнаул", price: 33.05, minSum: 793, delivery: "3" },
-            { from: "Екатеринбург", to: "Воронеж", price: 35.35, minSum: 793, delivery: "4" },
-            { from: "Екатеринбург", to: "Екатеринбург", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Екатеринбург", to: "Иркутск", price: 65.33, minSum: 793, delivery: "5" },
-            { from: "Екатеринбург", to: "Казань", price: 37.66, minSum: 793, delivery: "5" },
-            { from: "Екатеринбург", to: "Кемерово", price: 33.05, minSum: 793, delivery: "3" },
-            { from: "Екатеринбург", to: "Краснодар", price: 47.65, minSum: 793, delivery: "6" },
-            { from: "Екатеринбург", to: "Красноярск", price: 37.66, minSum: 793, delivery: "3" },
-            { from: "Екатеринбург", to: "Москва", price: 13.84, minSum: 793, delivery: "2" },
-            { from: "Екатеринбург", to: "Москва (МО,за МКАД)", price: 13.84, minSum: 793, delivery: "2" },
-            { from: "Екатеринбург", to: "Нижний Новгород", price: 34.58, minSum: 793, delivery: "5" },
-            { from: "Екатеринбург", to: "Новоалтайск", price: 33.05, minSum: 793, delivery: "3" },
-            { from: "Екатеринбург", to: "Новокузнецк", price: 33.82, minSum: 793, delivery: "3" },
-            { from: "Екатеринбург", to: "Новосибирск", price: 22.28, minSum: 793, delivery: "2" },
-            { from: "Екатеринбург", to: "Омск", price: 18.44, minSum: 793, delivery: "2" },
-            { from: "Екатеринбург", to: "Пермь", price: 56.11, minSum: 793, delivery: "6" },
-            { from: "Екатеринбург", to: "Прокопьевск", price: 36.12, minSum: 793, delivery: "3" },
-            { from: "Екатеринбург", to: "Ростов-на-Дону", price: 43.04, minSum: 793, delivery: "6" },
-            { from: "Екатеринбург", to: "Рубцовск", price: 50.72, minSum: 793, delivery: "4" },
-            { from: "Екатеринбург", to: "Самара", price: 42.28, minSum: 793, delivery: "5" },
-            { from: "Екатеринбург", to: "Санкт-Петербург", price: 42.28, minSum: 793, delivery: "3" },
-            { from: "Екатеринбург", to: "Саратов", price: 43.81, minSum: 793, delivery: "6" },
-            { from: "Екатеринбург", to: "Северск", price: 39.20, minSum: 793, delivery: "3" },
-            { from: "Екатеринбург", to: "Сургут", price: 36.12, minSum: 1830, delivery: "4" },
-            { from: "Екатеринбург", to: "Томск", price: 33.05, minSum: 793, delivery: "3" },
-            { from: "Екатеринбург", to: "Тюмень", price: 14.60, minSum: 793, delivery: "1" },
-            { from: "Екатеринбург", to: "Уфа", price: 43.04, minSum: 793, delivery: "6" },
-            { from: "Екатеринбург", to: "Хабаровск", price: 90.70, minSum: 3050, delivery: "10" },
-            { from: "Екатеринбург", to: "Челябинск", price: 14.60, minSum: 793, delivery: "1" },
-            { from: "Екатеринбург", to: "Чита", price: 71.48, minSum: 3050, delivery: "7" },
-            { from: "Екатеринбург", to: "Ярославль", price: 39.97, minSum: 793, delivery: "4" },
-
-            // Иркутск
-            { from: "Иркутск", to: "Алейск", price: 46.12, minSum: 793, delivery: "7" },
-            { from: "Иркутск", to: "Владивосток", price: 63.79, minSum: 3050, delivery: "6" },
-            { from: "Иркутск", to: "Иркутск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Иркутск", to: "Кемерово", price: 26.90, minSum: 793, delivery: "6" },
-            { from: "Иркутск", to: "Красноярск", price: 13.07, minSum: 793, delivery: "2" },
-            { from: "Иркутск", to: "Москва", price: 46.12, minSum: 793, delivery: "5" },
-            { from: "Иркутск", to: "Москва (МО,за МКАД)", price: 46.12, minSum: 793, delivery: "5" },
-            { from: "Иркутск", to: "Новосибирск", price: 26.14, minSum: 793, delivery: "5" },
-            { from: "Иркутск", to: "Омск", price: 38.44, minSum: 793, delivery: "7" },
-            { from: "Иркутск", to: "Рубцовск", price: 54.58, minSum: 793, delivery: "7" },
-            { from: "Иркутск", to: "Санкт-Петербург", price: 74.56, minSum: 793, delivery: "7" },
-            { from: "Иркутск", to: "Томск", price: 36.89, minSum: 793, delivery: "6" },
-            { from: "Иркутск", to: "Улан-Удэ", price: 19.21, minSum: 1525, delivery: "1" },
-
-            // Искитим
-            { from: "Искитим", to: "Алейск", price: 24.60, minSum: 793, delivery: "3" },
-            { from: "Искитим", to: "Искитим", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Искитим", to: "Кемерово", price: 19.21, minSum: 793, delivery: "2" },
-            { from: "Искитим", to: "Новокузнецк", price: 19.98, minSum: 793, delivery: "2" },
-            { from: "Искитим", to: "Новосибирск", price: 8.46, minSum: 793, delivery: "1" },
-            { from: "Искитим", to: "Рубцовск", price: 32.28, minSum: 793, delivery: "3" },
-            { from: "Искитим", to: "Томск", price: 19.21, minSum: 793, delivery: "2" },
-
-            // Казань
-            { from: "Казань", to: "Казань", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Кемерово
-            { from: "Кемерово", to: "Абакан", price: 56.11, minSum: 1525, delivery: "4" },
-            { from: "Кемерово", to: "Алейск", price: 28.44, minSum: 793, delivery: "3" },
-            { from: "Кемерово", to: "Анжеро-Судженск", price: 13.84, minSum: 793, delivery: "1" },
-            { from: "Кемерово", to: "Барнаул", price: 19.98, minSum: 793, delivery: "2" },
-            { from: "Кемерово", to: "Белово", price: 18.44, minSum: 793, delivery: "3" },
-            { from: "Кемерово", to: "Владивосток", price: 48.42, minSum: 3050, delivery: "10" },
-            { from: "Кемерово", to: "Воронеж", price: 43.04, minSum: 793, delivery: "6" },
-            { from: "Кемерово", to: "Гурьевск", price: 21.52, minSum: 793, delivery: "2" },
-            { from: "Кемерово", to: "Екатеринбург", price: 24.60, minSum: 793, delivery: "3" },
-            { from: "Кемерово", to: "Иркутск", price: 52.26, minSum: 793, delivery: "4" },
-            { from: "Кемерово", to: "Казань", price: 52.26, minSum: 793, delivery: "7" },
-            { from: "Кемерово", to: "Кемерово", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Кемерово", to: "Киселевск", price: 20.75, minSum: 793, delivery: "2" },
-            { from: "Кемерово", to: "Краснодар", price: 62.26, minSum: 793, delivery: "8" },
-            { from: "Кемерово", to: "Красноярск", price: 24.60, minSum: 793, delivery: "2" },
-            { from: "Кемерово", to: "Ленинск-Кузнецкий", price: 18.44, minSum: 793, delivery: "2" },
-            { from: "Кемерово", to: "Междуреченск", price: 26.14, minSum: 793, delivery: "2" },
-            { from: "Кемерово", to: "Москва", price: 28.44, minSum: 793, delivery: "4" },
-            { from: "Кемерово", to: "Москва (МО,за МКАД)", price: 28.44, minSum: 793, delivery: "4" },
-            { from: "Кемерово", to: "Мыски", price: 26.14, minSum: 793, delivery: "2" },
-            { from: "Кемерово", to: "Нижний Новгород", price: 49.19, minSum: 793, delivery: "6" },
-            { from: "Кемерово", to: "Новокузнецк", price: 20.75, minSum: 793, delivery: "2" },
-            { from: "Кемерово", to: "Новосибирск", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Кемерово", to: "Омск", price: 21.52, minSum: 793, delivery: "2" },
-            { from: "Кемерово", to: "Пермь", price: 78.40, minSum: 2541.67, delivery: "8" },
-            { from: "Кемерово", to: "Прокопьевск", price: 20.75, minSum: 793, delivery: "2" },
-            { from: "Кемерово", to: "Промышленная ПГТ", price: 6.91, minSum: 793, delivery: "1" },
-            { from: "Кемерово", to: "Ростов-на-Дону", price: 57.65, minSum: 793, delivery: "7" },
-            { from: "Кемерово", to: "Рубцовск", price: 37.66, minSum: 793, delivery: "3" },
-            { from: "Кемерово", to: "Самара", price: 56.88, minSum: 793, delivery: "7" },
-            { from: "Кемерово", to: "Санкт-Петербург", price: 56.88, minSum: 793, delivery: "5" },
-            { from: "Кемерово", to: "Саратов", price: 58.42, minSum: 793, delivery: "8" },
-            { from: "Кемерово", to: "Сургут", price: 49.96, minSum: 1830, delivery: "4" },
-            { from: "Кемерово", to: "Тайга", price: 10.76, minSum: 793, delivery: "1" },
-            { from: "Кемерово", to: "Томск", price: 19.98, minSum: 793, delivery: "2" },
-            { from: "Кемерово", to: "Тюмень", price: 24.60, minSum: 793, delivery: "3" },
-            { from: "Кемерово", to: "Улан-Удэ", price: 58.42, minSum: 3050, delivery: "5" },
-            { from: "Кемерово", to: "Уфа", price: 63.79, minSum: 793, delivery: "8" },
-            { from: "Кемерово", to: "Челябинск", price: 31.51, minSum: 793, delivery: "4" },
-            { from: "Кемерово", to: "Юрга", price: 13.07, minSum: 793, delivery: "2" },
-            { from: "Кемерово", to: "Ярославль", price: 54.58, minSum: 793, delivery: "6" },
-
-            // Кингисепп
-            { from: "Кингисепп", to: "Алейск", price: 114.52, minSum: 793, delivery: "7" },
-            { from: "Кингисепп", to: "Кингисепп", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Кингисепп", to: "Москва", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Кингисепп", to: "Новосибирск", price: 94.54, minSum: 793, delivery: "5" },
-            { from: "Кингисепп", to: "Рубцовск", price: 122.98, minSum: 793, delivery: "7" },
-
-            // Кириши
-            { from: "Кириши", to: "Алейск", price: 114.52, minSum: 793, delivery: "7" },
-            { from: "Кириши", to: "Кириши", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Кириши", to: "Москва", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Кириши", to: "Новосибирск", price: 94.54, minSum: 793, delivery: "5" },
-            { from: "Кириши", to: "Рубцовск", price: 122.98, minSum: 793, delivery: "7" },
-
-            // Киселевск
-            { from: "Киселевск", to: "Алейск", price: 29.98, minSum: 793, delivery: "3" },
-            { from: "Киселевск", to: "Киселевск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Киселевск", to: "Новосибирск", price: 10.00, minSum: 793, delivery: "1" },
-            { from: "Киселевск", to: "Рубцовск", price: 38.44, minSum: 793, delivery: "3" },
-
-            // Краснодар
-            { from: "Краснодар", to: "Алейск", price: 82.24, minSum: 793, delivery: "8" },
-            { from: "Краснодар", to: "Краснодар", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Краснодар", to: "Москва", price: 17.68, minSum: 793, delivery: "3" },
-            { from: "Краснодар", to: "Новосибирск", price: 62.26, minSum: 793, delivery: "6" },
-            { from: "Краснодар", to: "Рубцовск", price: 90.70, minSum: 793, delivery: "8" },
-
-            // Красноярск
-            { from: "Красноярск", to: "Абакан", price: 32.28, minSum: 793, delivery: "1" },
-            { from: "Красноярск", to: "Алейск", price: 32.28, minSum: 793, delivery: "3" },
-            { from: "Красноярск", to: "Анжеро-Судженск", price: 39.97, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Ачинск", price: 20.75, minSum: 793, delivery: "1" },
-            { from: "Красноярск", to: "Барнаул", price: 23.83, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Белово", price: 26.90, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Бердск", price: 23.06, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Бийск", price: 30.74, minSum: 793, delivery: "3" },
-            { from: "Красноярск", to: "Владивосток", price: 71.48, minSum: 3050, delivery: "8" },
-            { from: "Красноярск", to: "Воронеж", price: 53.81, minSum: 793, delivery: "6" },
-            { from: "Красноярск", to: "Гурьевск", price: 31.51, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Екатеринбург", price: 28.44, minSum: 793, delivery: "4" },
-            { from: "Красноярск", to: "Иркутск", price: 27.67, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Казань", price: 56.11, minSum: 793, delivery: "8" },
-            { from: "Красноярск", to: "Кемерово", price: 23.83, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Киселевск", price: 26.90, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Краснодар", price: 62.26, minSum: 793, delivery: "8" },
-            { from: "Красноярск", to: "Красноярск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Красноярск", to: "Ленинск-Кузнецкий", price: 26.90, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Междуреченск", price: 35.35, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Москва", price: 33.05, minSum: 793, delivery: "4" },
-            { from: "Красноярск", to: "Москва (МО,за МКАД)", price: 33.05, minSum: 793, delivery: "4" },
-            { from: "Красноярск", to: "Мыски", price: 35.35, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Нижний Новгород", price: 53.81, minSum: 793, delivery: "6" },
-            { from: "Красноярск", to: "Новокузнецк", price: 24.60, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Новосибирск", price: 13.07, minSum: 793, delivery: "1" },
-            { from: "Красноярск", to: "Омск", price: 25.37, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Осинники", price: 27.67, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Пермь", price: 82.24, minSum: 2541.67, delivery: "9" },
-            { from: "Красноярск", to: "Полысаево", price: 26.90, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Прокопьевск", price: 26.90, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Ростов-на-Дону", price: 62.26, minSum: 793, delivery: "8" },
-            { from: "Красноярск", to: "Рубцовск", price: 41.51, minSum: 793, delivery: "3" },
-            { from: "Красноярск", to: "Самара", price: 60.72, minSum: 793, delivery: "7" },
-            { from: "Красноярск", to: "Санкт-Петербург", price: 61.49, minSum: 793, delivery: "5" },
-            { from: "Красноярск", to: "Саратов", price: 62.26, minSum: 793, delivery: "8" },
-            { from: "Красноярск", to: "Саяногорск", price: 32.28, minSum: 793, delivery: "1" },
-            { from: "Красноярск", to: "Сургут", price: 49.96, minSum: 1830, delivery: "4" },
-            { from: "Красноярск", to: "Тайга", price: 38.44, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Томилино", price: 33.05, minSum: 793, delivery: "4" },
-            { from: "Красноярск", to: "Томск", price: 23.83, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Топки", price: 26.14, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Тюмень", price: 28.44, minSum: 793, delivery: "4" },
-            { from: "Красноярск", to: "Уфа", price: 67.63, minSum: 793, delivery: "8" },
-            { from: "Красноярск", to: "Хабаровск", price: 81.47, minSum: 3050, delivery: "7" },
-            { from: "Красноярск", to: "Челябинск", price: 35.35, minSum: 793, delivery: "5" },
-            { from: "Красноярск", to: "Чита", price: 62.26, minSum: 3050, delivery: "6" },
-            { from: "Красноярск", to: "Юрга", price: 23.83, minSum: 793, delivery: "2" },
-            { from: "Красноярск", to: "Ярославль", price: 58.42, minSum: 793, delivery: "6" },
-
-            // Курган
-            { from: "Курган", to: "Курган", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Курган", to: "Тюмень", price: 11.53, minSum: 793, delivery: "1" },
-
-            // Ленинск-Кузнецкий
-            { from: "Ленинск-Кузнецкий", to: "Алейск", price: 29.21, minSum: 793, delivery: "3" },
-            { from: "Ленинск-Кузнецкий", to: "Барнаул", price: 19.98, minSum: 793, delivery: "2" },
-            { from: "Ленинск-Кузнецкий", to: "Белово", price: 7.69, minSum: 793, delivery: "1" },
-            { from: "Ленинск-Кузнецкий", to: "Кемерово", price: 8.46, minSum: 793, delivery: "2" },
-            { from: "Ленинск-Кузнецкий", to: "Киселевск", price: 8.46, minSum: 793, delivery: "2" },
-            { from: "Ленинск-Кузнецкий", to: "Красноярск", price: 24.60, minSum: 793, delivery: "2" },
-            { from: "Ленинск-Кузнецкий", to: "Ленинск-Кузнецкий", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Ленинск-Кузнецкий", to: "Москва", price: 29.21, minSum: 793, delivery: "4" },
-            { from: "Ленинск-Кузнецкий", to: "Москва (МО,за МКАД)", price: 29.21, minSum: 793, delivery: "4" },
-            { from: "Ленинск-Кузнецкий", to: "Новокузнецк", price: 10.00, minSum: 793, delivery: "2" },
-            { from: "Ленинск-Кузнецкий", to: "Новосибирск", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Ленинск-Кузнецкий", to: "Омск", price: 21.52, minSum: 793, delivery: "2" },
-            { from: "Ленинск-Кузнецкий", to: "Рубцовск", price: 37.66, minSum: 793, delivery: "3" },
-            { from: "Ленинск-Кузнецкий", to: "Санкт-Петербург", price: 57.65, minSum: 793, delivery: "5" },
-            { from: "Ленинск-Кузнецкий", to: "Сургут", price: 46.88, minSum: 1830, delivery: "4" },
-            { from: "Ленинск-Кузнецкий", to: "Томск", price: 19.98, minSum: 793, delivery: "2" },
-            { from: "Ленинск-Кузнецкий", to: "Тюмень", price: 24.60, minSum: 793, delivery: "3" },
-            { from: "Ленинск-Кузнецкий", to: "Улан-Удэ", price: 59.18, minSum: 3050, delivery: "5" },
-            { from: "Ленинск-Кузнецкий", to: "Челябинск", price: 31.51, minSum: 793, delivery: "4" },
-
-            // Линево
-            { from: "Линево", to: "Алейск", price: 29.21, minSum: 793, delivery: "3" },
-            { from: "Линево", to: "Линево", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Линево", to: "Новосибирск", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Линево", to: "Рубцовск", price: 39.20, minSum: 793, delivery: "3" },
-
-            // Луга
-            { from: "Луга", to: "Алейск", price: 114.52, minSum: 793, delivery: "7" },
-            { from: "Луга", to: "Луга", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Луга", to: "Москва", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Луга", to: "Новосибирск", price: 94.54, minSum: 793, delivery: "5" },
-            { from: "Луга", to: "Рубцовск", price: 122.98, minSum: 793, delivery: "7" },
-
-            // Мариинск
-            { from: "Мариинск", to: "Алейск", price: 33.05, minSum: 793, delivery: "3" },
-            { from: "Мариинск", to: "Новосибирск", price: 13.07, minSum: 793, delivery: "1" },
-            { from: "Мариинск", to: "Рубцовск", price: 46.88, minSum: 793, delivery: "3" },
-
-            // Междуреченск
-            { from: "Междуреченск", to: "Алейск", price: 38.44, minSum: 793, delivery: "4" },
-            { from: "Междуреченск", to: "Междуреченск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Междуреченск", to: "Новокузнецк", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Междуреченск", to: "Новосибирск", price: 18.44, minSum: 793, delivery: "2" },
-            { from: "Междуреченск", to: "Рубцовск", price: 46.88, minSum: 793, delivery: "4" },
-
-            // Москва
-            { from: "Москва", to: "Абакан", price: 92.23, minSum: 1525, delivery: "5" },
-            { from: "Москва", to: "Алейск", price: 63.79, minSum: 793, delivery: "5" },
-            { from: "Москва", to: "Анжеро-Судженск", price: 71.48, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Архангельск", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Ачинск", price: 76.86, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Барнаул", price: 55.34, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Белово", price: 58.42, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Бердск", price: 54.58, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Бийск", price: 62.26, minSum: 793, delivery: "5" },
-            { from: "Москва", to: "Великие Луки", price: 55.34, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Великий Новгород", price: 36.89, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Владивосток", price: 90.70, minSum: 3050, delivery: "12" },
-            { from: "Москва", to: "Вологда", price: 33.05, minSum: 793, delivery: "1" },
-            { from: "Москва", to: "Волхов", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Воронеж", price: 21.52, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Выборг", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Горно-Алтайск", price: 62.26, minSum: 793, delivery: "5" },
-            { from: "Москва", to: "Гурьевск", price: 63.02, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Екатеринбург", price: 26.90, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Иркутск", price: 87.62, minSum: 793, delivery: "5" },
-            { from: "Москва", to: "Искитим", price: 55.34, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Казань", price: 23.83, minSum: 793, delivery: "3" },
-            { from: "Москва", to: "Кемерово", price: 55.34, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Кингисепп", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Кириши", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Киселевск", price: 58.42, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Краснодар", price: 23.83, minSum: 793, delivery: "3" },
-            { from: "Москва", to: "Красноярск", price: 59.95, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Курган", price: 64.56, minSum: 1525, delivery: "4" },
-            { from: "Москва", to: "Ленинск-Кузнецкий", price: 58.42, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Луга", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Междуреченск", price: 66.86, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Москва", price: 1583.32, minSum: 1256.60, delivery: "1" },
-            { from: "Москва", to: "Москва (МО,за МКАД)", price: 1583.32, minSum: 1256.60, delivery: "1" },
-            { from: "Москва", to: "Мыски", price: 66.86, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Нефтеюганск", price: 67.63, minSum: 2440, delivery: "4" },
-            { from: "Москва", to: "Нижний Новгород", price: 20.75, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Новоалтайск", price: 55.34, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Новокузнецк", price: 56.11, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Новосибирск", price: 44.58, minSum: 793, delivery: "3" },
-            { from: "Москва", to: "Новосибирск", price: 25.00, minSum: 793, delivery: "5" },
-            { from: "Москва", to: "Омск", price: 44.58, minSum: 793, delivery: "3" },
-            { from: "Москва", to: "Пермь", price: 43.04, minSum: 2541.67, delivery: "4" },
-            { from: "Москва", to: "Петрозаводск", price: 40.74, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Приозерск", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Прокопьевск", price: 58.42, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Псков", price: 40.74, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Ростов-на-Дону", price: 23.06, minSum: 793, delivery: "3" },
-            { from: "Москва", to: "Рубцовск", price: 73.02, minSum: 793, delivery: "5" },
-            { from: "Москва", to: "Самара", price: 28.44, minSum: 793, delivery: "3" },
-            { from: "Москва", to: "Санкт-Петербург", price: 28.44, minSum: 793, delivery: "1" },
-            { from: "Москва", to: "Саратов", price: 29.21, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Севастополь", price: 35.35, minSum: 793, delivery: "5" },
-            { from: "Москва", to: "Северск", price: 61.49, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Симферополь", price: 35.35, minSum: 793, delivery: "5" },
-            { from: "Москва", to: "Сосновый Бор", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Сочи", price: 36.12, minSum: 1525, delivery: "5" },
-            { from: "Москва", to: "Сургут", price: 62.26, minSum: 1830, delivery: "4" },
-            { from: "Москва", to: "Тайга", price: 69.95, minSum: 1073.60, delivery: "5" },
-            { from: "Москва", to: "Тихвин", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Томилино", price: 1583.32, minSum: 1256.60, delivery: "1" },
-            { from: "Москва", to: "Томск", price: 55.34, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Тюмень", price: 39.97, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Улан-Удэ", price: 93.77, minSum: 3050, delivery: "7" },
-            { from: "Москва", to: "Уфа", price: 34.58, minSum: 793, delivery: "4" },
-            { from: "Москва", to: "Хабаровск", price: 103.00, minSum: 3050, delivery: "12" },
-            { from: "Москва", to: "Челябинск", price: 27.67, minSum: 793, delivery: "2" },
-            { from: "Москва", to: "Чита", price: 93.77, minSum: 3050, delivery: "8" },
-            { from: "Москва", to: "Юрга", price: 55.34, minSum: 793, delivery: "5" },
-            { from: "Москва", to: "Ярославль", price: 26.14, minSum: 793, delivery: "1" },
-
-            // Москва (МО,за МКАД)
-            { from: "Москва (МО,за МКАД)", to: "Алейск", price: 63.79, minSum: 793, delivery: "5" },
-            { from: "Москва (МО,за МКАД)", to: "Барнаул", price: 55.34, minSum: 793, delivery: "4" },
-            { from: "Москва (МО,за МКАД)", to: "Бердск", price: 54.58, minSum: 793, delivery: "4" },
-            { from: "Москва (МО,за МКАД)", to: "Бийск", price: 62.26, minSum: 793, delivery: "4" },
-            { from: "Москва (МО,за МКАД)", to: "Владивосток", price: 90.70, minSum: 3050, delivery: "12" },
-            { from: "Москва (МО,за МКАД)", to: "Екатеринбург", price: 26.90, minSum: 793, delivery: "2" },
-            { from: "Москва (МО,за МКАД)", to: "Кемерово", price: 55.34, minSum: 793, delivery: "4" },
-            { from: "Москва (МО,за МКАД)", to: "Красноярск", price: 59.95, minSum: 793, delivery: "4" },
-            { from: "Москва (МО,за МКАД)", to: "Москва", price: 1583.32, minSum: 1256.60, delivery: "1" },
-            { from: "Москва (МО,за МКАД)", to: "Москва (МО,за МКАД)", price: 1583.32, minSum: 1256.60, delivery: "1" },
-            { from: "Москва (МО,за МКАД)", to: "Новокузнецк", price: 56.11, minSum: 793, delivery: "4" },
-            { from: "Москва (МО,за МКАД)", to: "Новосибирск", price: 44.58, minSum: 793, delivery: "3" },
-            { from: "Москва (МО,за МКАД)", to: "Омск", price: 44.58, minSum: 793, delivery: "3" },
-            { from: "Москва (МО,за МКАД)", to: "Рубцовск", price: 73.02, minSum: 793, delivery: "5" },
-            { from: "Москва (МО,за МКАД)", to: "Санкт-Петербург", price: 28.44, minSum: 793, delivery: "1" },
-            { from: "Москва (МО,за МКАД)", to: "Сургут", price: 62.26, minSum: 1830, delivery: "4" },
-            { from: "Москва (МО,за МКАД)", to: "Томилино", price: 1583.32, minSum: 1256.60, delivery: "1" },
-            { from: "Москва (МО,за МКАД)", to: "Томск", price: 55.34, minSum: 793, delivery: "4" },
-            { from: "Москва (МО,за МКАД)", to: "Тюмень", price: 39.97, minSum: 793, delivery: "2" },
-            { from: "Москва (МО,за МКАД)", to: "Челябинск", price: 27.67, minSum: 793, delivery: "2" },
-
-            // Мыски
-            { from: "Мыски", to: "Алейск", price: 38.44, minSum: 793, delivery: "3" },
-            { from: "Мыски", to: "Мыски", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Мыски", to: "Новокузнецк", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Мыски", to: "Новосибирск", price: 18.44, minSum: 793, delivery: "1" },
-            { from: "Мыски", to: "Рубцовск", price: 46.88, minSum: 793, delivery: "3" },
-
-            // Нефтеюганск
-            { from: "Нефтеюганск", to: "Нефтеюганск", price: 1521.83, minSum: 1207.80, delivery: "1" },
-
-            // Нижневартовск
-            { from: "Нижневартовск", to: "Нижневартовск", price: 1521.83, minSum: 1207.80, delivery: "1" },
-
-            // Нижний Новгород
-            { from: "Нижний Новгород", to: "Нижний Новгород", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Новоалтайск
-            { from: "Новоалтайск", to: "Алейск", price: 23.83, minSum: 793, delivery: "3" },
-            { from: "Новоалтайск", to: "Екатеринбург", price: 23.83, minSum: 793, delivery: "3" },
-            { from: "Новоалтайск", to: "Красноярск", price: 23.83, minSum: 793, delivery: "2" },
-            { from: "Новоалтайск", to: "Ленинск-Кузнецкий", price: 22.28, minSum: 793, delivery: "2" },
-            { from: "Новоалтайск", to: "Новоалтайск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Новоалтайск", to: "Новосибирск", price: 7.69, minSum: 793, delivery: "1" },
-            { from: "Новоалтайск", to: "Рубцовск", price: 31.51, minSum: 793, delivery: "3" },
-
-            // Новокузнецк
-            { from: "Новокузнецк", to: "Абакан", price: 57.65, minSum: 793, delivery: "3" },
-            { from: "Новокузнецк", to: "Алейск", price: 29.21, minSum: 793, delivery: "3" },
-            { from: "Новокузнецк", to: "Барнаул", price: 20.75, minSum: 793, delivery: "2" },
-            { from: "Новокузнецк", to: "Бийск", price: 27.67, minSum: 793, delivery: "3" },
-            { from: "Новокузнецк", to: "Воронеж", price: 50.72, minSum: 793, delivery: "6" },
-            { from: "Новокузнецк", to: "Екатеринбург", price: 25.37, minSum: 793, delivery: "3" },
-            { from: "Новокузнецк", to: "Иркутск", price: 53.03, minSum: 793, delivery: "4" },
-            { from: "Новокузнецк", to: "Казань", price: 53.03, minSum: 793, delivery: "7" },
-            { from: "Новокузнецк", to: "Кемерово", price: 18.44, minSum: 793, delivery: "2" },
-            { from: "Новокузнецк", to: "Краснодар", price: 59.95, minSum: 793, delivery: "8" },
-            { from: "Новокузнецк", to: "Красноярск", price: 25.37, minSum: 793, delivery: "2" },
-            { from: "Новокузнецк", to: "Ленинск-Кузнецкий", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Новокузнецк", to: "Междуреченск", price: 10.76, minSum: 793, delivery: "1" },
-            { from: "Новокузнецк", to: "Москва", price: 29.21, minSum: 793, delivery: "4" },
-            { from: "Новокузнецк", to: "Москва (МО,за МКАД)", price: 29.21, minSum: 793, delivery: "4" },
-            { from: "Новокузнецк", to: "Мыски", price: 10.76, minSum: 793, delivery: "1" },
-            { from: "Новокузнецк", to: "Нижний Новгород", price: 49.96, minSum: 793, delivery: "6" },
-            { from: "Новокузнецк", to: "Новокузнецк", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Новокузнецк", to: "Новосибирск", price: 10.00, minSum: 793, delivery: "1" },
-            { from: "Новокузнецк", to: "Омск", price: 22.28, minSum: 793, delivery: "2" },
-            { from: "Новокузнецк", to: "Осинники", price: 10.76, minSum: 793, delivery: "1" },
-            { from: "Новокузнецк", to: "Пермь", price: 85.32, minSum: 2541.67, delivery: "8" },
-            { from: "Новокузнецк", to: "Прокопьевск", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Новокузнецк", to: "Ростов-на-Дону", price: 58.42, minSum: 793, delivery: "7" },
-            { from: "Новокузнецк", to: "Рубцовск", price: 38.44, minSum: 793, delivery: "3" },
-            { from: "Новокузнецк", to: "Самара", price: 57.65, minSum: 793, delivery: "7" },
-            { from: "Новокузнецк", to: "Санкт-Петербург", price: 57.65, minSum: 793, delivery: "5" },
-            { from: "Новокузнецк", to: "Саратов", price: 59.18, minSum: 793, delivery: "8" },
-            { from: "Новокузнецк", to: "Саяногорск", price: 57.65, minSum: 793, delivery: "3" },
-            { from: "Новокузнецк", to: "Сургут", price: 46.88, minSum: 1830, delivery: "4" },
-            { from: "Новокузнецк", to: "Томск", price: 20.75, minSum: 793, delivery: "2" },
-            { from: "Новокузнецк", to: "Тюмень", price: 25.37, minSum: 793, delivery: "3" },
-            { from: "Новокузнецк", to: "Уфа", price: 64.56, minSum: 793, delivery: "8" },
-            { from: "Новокузнецк", to: "Челябинск", price: 32.28, minSum: 793, delivery: "4" },
-            { from: "Новокузнецк", to: "Ярославль", price: 55.34, minSum: 793, delivery: "6" },
-
-            // Новосибирск
-            { from: "Новосибирск", to: "Абакан", price: 47.65, minSum: 1525, delivery: "2" },
-            { from: "Новосибирск", to: "Алейск", price: 19.98, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Анжеро-Судженск", price: 26.90, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Архангельск", price: 69.95, minSum: 793, delivery: "5" },
-            { from: "Новосибирск", to: "Ачинск", price: 33.05, minSum: 793, delivery: "2" },
-            { from: "Новосибирск", to: "Барнаул", price: 10.76, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Белово", price: 14.60, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Бердск", price: 10.00, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Бийск", price: 17.68, minSum: 793, delivery: "2" },
-            { from: "Новосибирск", to: "Великие Луки", price: 75.32, minSum: 793, delivery: "5" },
-            { from: "Новосибирск", to: "Великий Новгород", price: 56.88, minSum: 793, delivery: "5" },
-            { from: "Новосибирск", to: "Владивосток", price: 40.00, minSum: 3050, delivery: "5" },
-            { from: "Новосибирск", to: "Вологда", price: 53.03, minSum: 793, delivery: "4" },
-            { from: "Новосибирск", to: "Волхов", price: 69.95, minSum: 793, delivery: "5" },
-            { from: "Новосибирск", to: "Воронеж", price: 40.74, minSum: 793, delivery: "5" },
-            { from: "Новосибирск", to: "Выборг", price: 69.95, minSum: 793, delivery: "5" },
-            { from: "Новосибирск", to: "Горно-Алтайск", price: 17.68, minSum: 793, delivery: "2" },
-            { from: "Новосибирск", to: "Гурьевск", price: 18.44, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Екатеринбург", price: 15.37, minSum: 793, delivery: "2" },
-            { from: "Новосибирск", to: "Иркутск", price: 43.04, minSum: 793, delivery: "2" },
-            { from: "Новосибирск", to: "Искитим", price: 10.76, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Казань", price: 43.81, minSum: 793, delivery: "6" },
-            { from: "Новосибирск", to: "Кемерово", price: 10.76, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Кингисепп", price: 69.95, minSum: 793, delivery: "5" },
-            { from: "Новосибирск", to: "Кириши", price: 69.95, minSum: 793, delivery: "5" },
-            { from: "Новосибирск", to: "Киселевск", price: 14.60, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Краснодар", price: 43.04, minSum: 793, delivery: "6" },
-            { from: "Новосибирск", to: "Красноярск", price: 15.37, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Курган", price: 39.97, minSum: 1525, delivery: "3" },
-            { from: "Новосибирск", to: "Ленинск-Кузнецкий", price: 14.60, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Линево", price: 10.76, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Луга", price: 69.95, minSum: 793, delivery: "5" },
-            { from: "Новосибирск", to: "Междуреченск", price: 22.28, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Москва", price: 19.98, minSum: 793, delivery: "3" },
-            { from: "Новосибирск", to: "Москва (МО,за МКАД)", price: 19.98, minSum: 793, delivery: "3" },
-            { from: "Новосибирск", to: "Мыски", price: 22.28, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Нефтеюганск", price: 39.20, minSum: 1830, delivery: "4" },
-            { from: "Новосибирск", to: "Нижневартовск", price: 37.66, minSum: 3660, delivery: "4" },
-            { from: "Новосибирск", to: "Нижний Новгород", price: 40.74, minSum: 793, delivery: "5" },
-            { from: "Новосибирск", to: "Новоалтайск", price: 10.76, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Новокузнецк", price: 12.30, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Новосибирск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Омск", price: 12.30, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Осинники", price: 14.60, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Пермь", price: 69.18, minSum: 2541.67, delivery: "7" },
-            { from: "Новосибирск", to: "Петрозаводск", price: 60.72, minSum: 793, delivery: "5" },
-            { from: "Новосибирск", to: "Полысаево", price: 14.60, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Приозерск", price: 69.95, minSum: 793, delivery: "5" },
-            { from: "Новосибирск", to: "Прокопьевск", price: 14.60, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Промышленная ПГТ", price: 16.91, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Псков", price: 60.72, minSum: 793, delivery: "5" },
-            { from: "Новосибирск", to: "Ростов-на-Дону", price: 43.04, minSum: 793, delivery: "6" },
-            { from: "Новосибирск", to: "Рубцовск", price: 28.44, minSum: 793, delivery: "6" },
-            { from: "Новосибирск", to: "Салаир", price: 18.44, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Самара", price: 47.65, minSum: 793, delivery: "6" },
-            { from: "Новосибирск", to: "Санкт-Петербург", price: 48.42, minSum: 793, delivery: "4" },
-            { from: "Новосибирск", to: "Саратов", price: 49.19, minSum: 793, delivery: "7" },
-            { from: "Новосибирск", to: "Саяногорск", price: 47.65, minSum: 793, delivery: "2" },
-            { from: "Новосибирск", to: "Севастополь", price: 55.34, minSum: 793, delivery: "8" },
-            { from: "Новосибирск", to: "Северск", price: 16.91, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Симферополь", price: 55.34, minSum: 793, delivery: "8" },
-            { from: "Новосибирск", to: "Сосновый Бор", price: 69.95, minSum: 793, delivery: "5" },
-            { from: "Новосибирск", to: "Сочи", price: 56.11, minSum: 1525, delivery: "8" },
-            { from: "Новосибирск", to: "Сургут", price: 37.66, minSum: 1830, delivery: "3" },
-            { from: "Новосибирск", to: "Тайга", price: 25.37, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Тихвин", price: 69.95, minSum: 793, delivery: "5" },
-            { from: "Новосибирск", to: "Томск", price: 10.76, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Топки", price: 13.07, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Тюмень", price: 15.37, minSum: 793, delivery: "2" },
-            { from: "Новосибирск", to: "Улан-Удэ", price: 49.19, minSum: 3050, delivery: "4" },
-            { from: "Новосибирск", to: "Уфа", price: 54.58, minSum: 793, delivery: "7" },
-            { from: "Новосибирск", to: "Хабаровск", price: 40.00, minSum: 3050, delivery: "4" },
-            { from: "Новосибирск", to: "Ханты-Мансийск", price: 36.12, minSum: 1525, delivery: "4" },
-            { from: "Новосибирск", to: "Челябинск", price: 22.28, minSum: 793, delivery: "3" },
-            { from: "Новосибирск", to: "Чита", price: 35.00, minSum: 3050, delivery: "2" },
-            { from: "Новосибирск", to: "Юрга", price: 10.76, minSum: 793, delivery: "1" },
-            { from: "Новосибирск", to: "Ярославль", price: 46.12, minSum: 793, delivery: "4" },
-
-            // Омск
-            { from: "Омск", to: "Алейск", price: 32.28, minSum: 793, delivery: "3" },
-            { from: "Омск", to: "Барнаул", price: 23.06, minSum: 793, delivery: "1" },
-            { from: "Омск", to: "Бийск", price: 29.98, minSum: 793, delivery: "2" },
-            { from: "Омск", to: "Владивосток", price: 52.26, minSum: 3050, delivery: "9" },
-            { from: "Омск", to: "Воронеж", price: 39.20, minSum: 793, delivery: "5" },
-            { from: "Омск", to: "Екатеринбург", price: 10.00, minSum: 793, delivery: "1" },
-            { from: "Омск", to: "Иркутск", price: 55.34, minSum: 793, delivery: "3" },
-            { from: "Омск", to: "Казань", price: 41.51, minSum: 793, delivery: "6" },
-            { from: "Омск", to: "Кемерово", price: 23.06, minSum: 793, delivery: "2" },
-            { from: "Омск", to: "Краснодар", price: 51.49, minSum: 793, delivery: "7" },
-            { from: "Омск", to: "Красноярск", price: 27.67, minSum: 793, delivery: "2" },
-            { from: "Омск", to: "Ленинск-Кузнецкий", price: 26.90, minSum: 793, delivery: "2" },
-            { from: "Омск", to: "Москва", price: 17.68, minSum: 793, delivery: "3" },
-            { from: "Омск", to: "Москва (МО,за МКАД)", price: 17.68, minSum: 793, delivery: "3" },
-            { from: "Омск", to: "Нижний Новгород", price: 38.44, minSum: 793, delivery: "5" },
-            { from: "Омск", to: "Новокузнецк", price: 24.60, minSum: 793, delivery: "2" },
-            { from: "Омск", to: "Новосибирск", price: 12.30, minSum: 793, delivery: "1" },
-            { from: "Омск", to: "Омск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Омск", to: "Пермь", price: 67.63, minSum: 2541.67, delivery: "7" },
-            { from: "Омск", to: "Ростов-на-Дону", price: 46.88, minSum: 793, delivery: "6" },
-            { from: "Омск", to: "Рубцовск", price: 40.74, minSum: 793, delivery: "3" },
-            { from: "Омск", to: "Самара", price: 46.12, minSum: 793, delivery: "6" },
-            { from: "Омск", to: "Санкт-Петербург", price: 46.12, minSum: 793, delivery: "4" },
-            { from: "Омск", to: "Саратов", price: 46.88, minSum: 793, delivery: "7" },
-            { from: "Омск", to: "Сургут", price: 31.51, minSum: 1830, delivery: "3" },
-            { from: "Омск", to: "Томск", price: 23.06, minSum: 793, delivery: "2" },
-            { from: "Омск", to: "Тюмень", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Омск", to: "Уфа", price: 52.26, minSum: 793, delivery: "7" },
-            { from: "Омск", to: "Хабаровск", price: 80.70, minSum: 3050, delivery: "8" },
-            { from: "Омск", to: "Челябинск", price: 24.60, minSum: 793, delivery: "3" },
-            { from: "Омск", to: "Ярославль", price: 43.81, minSum: 793, delivery: "5" },
-
-            // Осинники
-            { from: "Осинники", to: "Алейск", price: 29.21, minSum: 793, delivery: "3" },
-            { from: "Осинники", to: "Новокузнецк", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Осинники", to: "Новосибирск", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Осинники", to: "Осинники", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Осинники", to: "Рубцовск", price: 38.44, minSum: 793, delivery: "3" },
-
-            // Пермь
-            { from: "Пермь", to: "Екатеринбург", price: 67.63, minSum: 793, delivery: "6" },
-            { from: "Пермь", to: "Москва", price: 47.65, minSum: 2541.67, delivery: "3" },
-            { from: "Пермь", to: "Пермь", price: 999.18, minSum: 1830, delivery: "1" },
-            { from: "Пермь", to: "Санкт-Петербург", price: 76.09, minSum: 2541.67, delivery: "4" },
-
-            // Петрозаводск
-            { from: "Петрозаводск", to: "Алейск", price: 104.53, minSum: 793, delivery: "7" },
-            { from: "Петрозаводск", to: "Москва", price: 40.74, minSum: 793, delivery: "2" },
-            { from: "Петрозаводск", to: "Новосибирск", price: 85.32, minSum: 793, delivery: "5" },
-            { from: "Петрозаводск", to: "Петрозаводск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Петрозаводск", to: "Рубцовск", price: 113.75, minSum: 793, delivery: "7" },
-
-            // Полысаево
-            { from: "Полысаево", to: "Алейск", price: 29.21, minSum: 793, delivery: "3" },
-            { from: "Полысаево", to: "Красноярск", price: 24.60, minSum: 793, delivery: "2" },
-            { from: "Полысаево", to: "Новосибирск", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Полысаево", to: "Полысаево", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Полысаево", to: "Рубцовск", price: 37.66, minSum: 793, delivery: "3" },
-
-            // Приозерск
-            { from: "Приозерск", to: "Алейск", price: 113.75, minSum: 793, delivery: "7" },
-            { from: "Приозерск", to: "Москва", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Приозерск", to: "Новосибирск", price: 94.54, minSum: 793, delivery: "5" },
-            { from: "Приозерск", to: "Приозерск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Приозерск", to: "Рубцовск", price: 122.98, minSum: 793, delivery: "7" },
-
-            // Прокопьевск
-            { from: "Прокопьевск", to: "Алейск", price: 29.21, minSum: 793, delivery: "3" },
-            { from: "Прокопьевск", to: "Москва", price: 29.21, minSum: 793, delivery: "4" },
-            { from: "Прокопьевск", to: "Новосибирск", price: 10.00, minSum: 793, delivery: "1" },
-            { from: "Прокопьевск", to: "Прокопьевск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Прокопьевск", to: "Рубцовск", price: 38.44, minSum: 793, delivery: "3" },
-            { from: "Прокопьевск", to: "Санкт-Петербург", price: 57.65, minSum: 793, delivery: "5" },
-            { from: "Прокопьевск", to: "Томск", price: 20.75, minSum: 793, delivery: "2" },
-
-            // Промышленная ПГТ
-            { from: "Промышленная ПГТ", to: "Алейск", price: 28.44, minSum: 793, delivery: "3" },
-            { from: "Промышленная ПГТ", to: "Новосибирск", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Промышленная ПГТ", to: "Промышленная ПГТ", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Промышленная ПГТ", to: "Рубцовск", price: 37.66, minSum: 793, delivery: "3" },
-
-            // Псков
-            { from: "Псков", to: "Алейск", price: 113.75, minSum: 793, delivery: "7" },
-            { from: "Псков", to: "Москва", price: 40.74, minSum: 793, delivery: "2" },
-            { from: "Псков", to: "Новосибирск", price: 86.86, minSum: 793, delivery: "5" },
-            { from: "Псков", to: "Псков", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Псков", to: "Рубцовск", price: 116.06, minSum: 793, delivery: "7" },
-
-            // Ростов-на-Дону
-            { from: "Ростов-на-Дону", to: "Алейск", price: 80.70, minSum: 793, delivery: "8" },
-            { from: "Ростов-на-Дону", to: "Москва", price: 16.14, minSum: 793, delivery: "3" },
-            { from: "Ростов-на-Дону", to: "Новосибирск", price: 60.72, minSum: 793, delivery: "6" },
-            { from: "Ростов-на-Дону", to: "Ростов-на-Дону", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Ростов-на-Дону", to: "Рубцовск", price: 89.16, minSum: 793, delivery: "8" },
-
-            // Рубцовск
-            { from: "Рубцовск", to: "Рубцовск", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Салаир
-            { from: "Салаир", to: "Алейск", price: 29.21, minSum: 793, delivery: "3" },
-            { from: "Салаир", to: "Новосибирск", price: 10.00, minSum: 793, delivery: "1" },
-            { from: "Салаир", to: "Рубцовск", price: 38.44, minSum: 793, delivery: "3" },
-
-            // Самара
-            { from: "Самара", to: "Самара", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Санкт-Петербург
-            { from: "Санкт-Петербург", to: "Абакан", price: 121.44, minSum: 1525, delivery: "6" },
-            { from: "Санкт-Петербург", to: "Алейск", price: 93.77, minSum: 793, delivery: "6" },
-            { from: "Санкт-Петербург", to: "Барнаул", price: 84.55, minSum: 793, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Белово", price: 88.39, minSum: 793, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Бердск", price: 74.56, minSum: 793, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Бийск", price: 91.46, minSum: 793, delivery: "6" },
-            { from: "Санкт-Петербург", to: "Владивосток", price: 119.90, minSum: 3050, delivery: "13" },
-            { from: "Санкт-Петербург", to: "Горно-Алтайск", price: 91.46, minSum: 793, delivery: "6" },
-            { from: "Санкт-Петербург", to: "Екатеринбург", price: 56.88, minSum: 793, delivery: "3" },
-            { from: "Санкт-Петербург", to: "Иркутск", price: 117.60, minSum: 793, delivery: "7" },
-            { from: "Санкт-Петербург", to: "Искитим", price: 84.55, minSum: 793, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Кемерово", price: 84.55, minSum: 793, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Красноярск", price: 89.93, minSum: 793, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Курган", price: 94.54, minSum: 793, delivery: "4" },
-            { from: "Санкт-Петербург", to: "Ленинск-Кузнецкий", price: 88.39, minSum: 793, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Междуреченск", price: 96.84, minSum: 793, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Москва", price: 29.98, minSum: 793, delivery: "1" },
-            { from: "Санкт-Петербург", to: "Москва (МО,за МКАД)", price: 29.98, minSum: 793, delivery: "1" },
-            { from: "Санкт-Петербург", to: "Мыски", price: 96.84, minSum: 793, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Новоалтайск", price: 84.55, minSum: 793, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Новокузнецк", price: 86.09, minSum: 793, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Новосибирск", price: 73.79, minSum: 793, delivery: "4" },
-            { from: "Санкт-Петербург", to: "Омск", price: 73.79, minSum: 793, delivery: "4" },
-            { from: "Санкт-Петербург", to: "Пермь", price: 79.16, minSum: 2541.67, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Прокопьевск", price: 88.39, minSum: 793, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Рубцовск", price: 102.23, minSum: 793, delivery: "6" },
-            { from: "Санкт-Петербург", to: "Санкт-Петербург", price: 1775.47, minSum: 1409.10, delivery: "1" },
-            { from: "Санкт-Петербург", to: "Северск", price: 90.70, minSum: 793, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Сургут", price: 92.23, minSum: 1830, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Тайга", price: 99.14, minSum: 976, delivery: "6" },
-            { from: "Санкт-Петербург", to: "Томск", price: 85.32, minSum: 793, delivery: "5" },
-            { from: "Санкт-Петербург", to: "Тюмень", price: 69.95, minSum: 793, delivery: "3" },
-            { from: "Санкт-Петербург", to: "Улан-Удэ", price: 123.74, minSum: 3050, delivery: "8" },
-            { from: "Санкт-Петербург", to: "Хабаровск", price: 142.96, minSum: 3050, delivery: "13" },
-            { from: "Санкт-Петербург", to: "Челябинск", price: 57.65, minSum: 793, delivery: "3" },
-            { from: "Санкт-Петербург", to: "Чита", price: 123.74, minSum: 3050, delivery: "9" },
-            { from: "Санкт-Петербург", to: "Юрга", price: 85.32, minSum: 793, delivery: "5" },
-
-            // Саратов
-            { from: "Саратов", to: "Саратов", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Саяногорск
-            { from: "Саяногорск", to: "Красноярск", price: 19.21, minSum: 793, delivery: "1" },
-            { from: "Саяногорск", to: "Саяногорск", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Севастополь
-            { from: "Севастополь", to: "Алейск", price: 95.30, minSum: 793, delivery: "10" },
-            { from: "Севастополь", to: "Москва", price: 30.74, minSum: 793, delivery: "5" },
-            { from: "Севастополь", to: "Новосибирск", price: 75.32, minSum: 793, delivery: "8" },
-            { from: "Севастополь", to: "Рубцовск", price: 103.76, minSum: 793, delivery: "10" },
-            { from: "Севастополь", to: "Севастополь", price: 1237.45, minSum: 982.10, delivery: "1" },
-
-            // Северск
-            { from: "Северск", to: "Алейск", price: 31.51, minSum: 793, delivery: "3" },
-            { from: "Северск", to: "Новосибирск", price: 11.53, minSum: 793, delivery: "1" },
-            { from: "Северск", to: "Рубцовск", price: 39.97, minSum: 793, delivery: "3" },
-            { from: "Северск", to: "Северск", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Симферополь
-            { from: "Симферополь", to: "Алейск", price: 95.30, minSum: 793, delivery: "10" },
-            { from: "Симферополь", to: "Москва", price: 30.74, minSum: 793, delivery: "5" },
-            { from: "Симферополь", to: "Новосибирск", price: 75.32, minSum: 793, delivery: "8" },
-            { from: "Симферополь", to: "Рубцовск", price: 103.76, minSum: 793, delivery: "10" },
-            { from: "Симферополь", to: "Симферополь", price: 1237.45, minSum: 982.10, delivery: "1" },
-
-            // Сосновый Бор
-            { from: "Сосновый Бор", to: "Алейск", price: 114.52, minSum: 793, delivery: "7" },
-            { from: "Сосновый Бор", to: "Москва", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Сосновый Бор", to: "Новосибирск", price: 94.54, minSum: 793, delivery: "5" },
-            { from: "Сосновый Бор", to: "Рубцовск", price: 122.98, minSum: 793, delivery: "7" },
-            { from: "Сосновый Бор", to: "Сосновый Бор", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Сочи
-            { from: "Сочи", to: "Алейск", price: 91.46, minSum: 1525, delivery: "10" },
-            { from: "Сочи", to: "Москва", price: 26.90, minSum: 1525, delivery: "5" },
-            { from: "Сочи", to: "Новосибирск", price: 71.48, minSum: 1525, delivery: "8" },
-            { from: "Сочи", to: "Рубцовск", price: 99.92, minSum: 1525, delivery: "10" },
-            { from: "Сочи", to: "Сочи", price: 1488.01, minSum: 1180.96, delivery: "1" },
-
-            // Сургут
-            { from: "Сургут", to: "Алейск", price: 56.11, minSum: 1525, delivery: "6" },
-            { from: "Сургут", to: "Екатеринбург", price: 29.21, minSum: 1006.50, delivery: "2" },
-            { from: "Сургут", to: "Москва", price: 35.35, minSum: 1525, delivery: "4" },
-            { from: "Сургут", to: "Москва (МО,за МКАД)", price: 35.35, minSum: 1525, delivery: "4" },
-            { from: "Сургут", to: "Новосибирск", price: 36.12, minSum: 1525, delivery: "4" },
-            { from: "Сургут", to: "Рубцовск", price: 64.56, minSum: 1525, delivery: "6" },
-            { from: "Сургут", to: "Сургут", price: 1281.25, minSum: 1016.67, delivery: "1" },
-            { from: "Сургут", to: "Тюмень", price: 18.44, minSum: 1525, delivery: "1" },
-
-            // Тайга
-            { from: "Тайга", to: "Алейск", price: 37.66, minSum: 793, delivery: "3" },
-            { from: "Тайга", to: "Кемерово", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Тайга", to: "Москва", price: 37.66, minSum: 793, delivery: "4" },
-            { from: "Тайга", to: "Новосибирск", price: 17.68, minSum: 793, delivery: "1" },
-            { from: "Тайга", to: "Рубцовск", price: 46.88, minSum: 793, delivery: "3" },
-            { from: "Тайга", to: "Санкт-Петербург", price: 66.10, minSum: 976, delivery: "5" },
-            { from: "Тайга", to: "Тайга", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Тихвин
-            { from: "Тихвин", to: "Алейск", price: 114.52, minSum: 793, delivery: "7" },
-            { from: "Тихвин", to: "Москва", price: 49.96, minSum: 793, delivery: "2" },
-            { from: "Тихвин", to: "Новосибирск", price: 94.54, minSum: 793, delivery: "5" },
-            { from: "Тихвин", to: "Рубцовск", price: 122.98, minSum: 793, delivery: "7" },
-            { from: "Тихвин", to: "Тихвин", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Томск
-            { from: "Томск", to: "Абакан", price: 56.11, minSum: 793, delivery: "3" },
-            { from: "Томск", to: "Алейск", price: 28.44, minSum: 793, delivery: "3" },
-            { from: "Томск", to: "Барнаул", price: 19.98, minSum: 793, delivery: "2" },
-            { from: "Томск", to: "Бердск", price: 19.21, minSum: 793, delivery: "2" },
-            { from: "Томск", to: "Воронеж", price: 49.96, minSum: 793, delivery: "6" },
-            { from: "Томск", to: "Екатеринбург", price: 24.60, minSum: 793, delivery: "3" },
-            { from: "Томск", to: "Иркутск", price: 52.26, minSum: 793, delivery: "3" },
-            { from: "Томск", to: "Казань", price: 52.26, minSum: 793, delivery: "7" },
-            { from: "Томск", to: "Кемерово", price: 19.98, minSum: 793, delivery: "2" },
-            { from: "Томск", to: "Краснодар", price: 60.72, minSum: 793, delivery: "8" },
-            { from: "Томск", to: "Красноярск", price: 24.60, minSum: 793, delivery: "2" },
-            { from: "Томск", to: "Ленинск-Кузнецкий", price: 23.06, minSum: 793, delivery: "2" },
-            { from: "Томск", to: "Москва", price: 28.44, minSum: 793, delivery: "4" },
-            { from: "Томск", to: "Москва (МО,за МКАД)", price: 28.44, minSum: 793, delivery: "4" },
-            { from: "Томск", to: "Нижний Новгород", price: 49.19, minSum: 793, delivery: "6" },
-            { from: "Томск", to: "Новокузнецк", price: 20.75, minSum: 793, delivery: "2" },
-            { from: "Томск", to: "Новосибирск", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Томск", to: "Омск", price: 21.52, minSum: 793, delivery: "2" },
-            { from: "Томск", to: "Пермь", price: 84.55, minSum: 2541.67, delivery: "8" },
-            { from: "Томск", to: "Прокопьевск", price: 23.06, minSum: 793, delivery: "2" },
-            { from: "Томск", to: "Ростов-на-Дону", price: 57.65, minSum: 793, delivery: "7" },
-            { from: "Томск", to: "Рубцовск", price: 37.66, minSum: 793, delivery: "3" },
-            { from: "Томск", to: "Самара", price: 56.88, minSum: 793, delivery: "7" },
-            { from: "Томск", to: "Санкт-Петербург", price: 56.88, minSum: 793, delivery: "5" },
-            { from: "Томск", to: "Саратов", price: 58.42, minSum: 793, delivery: "8" },
-            { from: "Томск", to: "Томск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Томск", to: "Тюмень", price: 24.60, minSum: 793, delivery: "3" },
-            { from: "Томск", to: "Уфа", price: 63.79, minSum: 793, delivery: "8" },
-            { from: "Томск", to: "Челябинск", price: 31.51, minSum: 793, delivery: "4" },
-            { from: "Томск", to: "Юрга", price: 15.37, minSum: 793, delivery: "2" },
-            { from: "Томск", to: "Ярославль", price: 54.58, minSum: 793, delivery: "6" },
-
-            // Топки
-            { from: "Топки", to: "Алейск", price: 28.44, minSum: 793, delivery: "3" },
-            { from: "Топки", to: "Новосибирск", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Топки", to: "Рубцовск", price: 37.66, minSum: 793, delivery: "3" },
-            { from: "Топки", to: "Топки", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Тюмень
-            { from: "Тюмень", to: "Алейск", price: 37.66, minSum: 793, delivery: "4" },
-            { from: "Тюмень", to: "Барнаул", price: 28.44, minSum: 793, delivery: "3" },
-            { from: "Тюмень", to: "Воронеж", price: 38.44, minSum: 793, delivery: "4" },
-            { from: "Тюмень", to: "Екатеринбург", price: 8.46, minSum: 793, delivery: "1" },
-            { from: "Тюмень", to: "Иркутск", price: 60.72, minSum: 793, delivery: "5" },
-            { from: "Тюмень", to: "Казань", price: 40.74, minSum: 793, delivery: "5" },
-            { from: "Тюмень", to: "Кемерово", price: 28.44, minSum: 793, delivery: "3" },
-            { from: "Тюмень", to: "Краснодар", price: 46.88, minSum: 793, delivery: "6" },
-            { from: "Тюмень", to: "Красноярск", price: 33.05, minSum: 793, delivery: "3" },
-            { from: "Тюмень", to: "Курган", price: 24.60, minSum: 793, delivery: "1" },
-            { from: "Тюмень", to: "Москва", price: 16.91, minSum: 793, delivery: "2" },
-            { from: "Тюмень", to: "Москва (МО,за МКАД)", price: 16.91, minSum: 793, delivery: "2" },
-            { from: "Тюмень", to: "Нефтеюганск", price: 19.98, minSum: 1525, delivery: "3" },
-            { from: "Тюмень", to: "Нижневартовск", price: 22.28, minSum: 1525, delivery: "2" },
-            { from: "Тюмень", to: "Нижний Новгород", price: 37.66, minSum: 793, delivery: "4" },
-            { from: "Тюмень", to: "Новосибирск", price: 17.68, minSum: 793, delivery: "2" },
-            { from: "Тюмень", to: "Омск", price: 15.37, minSum: 793, delivery: "1" },
-            { from: "Тюмень", to: "Пермь", price: 66.86, minSum: 2541.67, delivery: "6" },
-            { from: "Тюмень", to: "Ростов-на-Дону", price: 46.12, minSum: 793, delivery: "5" },
-            { from: "Тюмень", to: "Рубцовск", price: 46.12, minSum: 793, delivery: "4" },
-            { from: "Тюмень", to: "Самара", price: 45.35, minSum: 793, delivery: "5" },
-            { from: "Тюмень", to: "Санкт-Петербург", price: 45.35, minSum: 793, delivery: "3" },
-            { from: "Тюмень", to: "Саратов", price: 46.12, minSum: 793, delivery: "6" },
-            { from: "Тюмень", to: "Сургут", price: 22.28, minSum: 1525, delivery: "3" },
-            { from: "Тюмень", to: "Томск", price: 28.44, minSum: 793, delivery: "4" },
-            { from: "Тюмень", to: "Тюмень", price: 1129.85, minSum: 896.70, delivery: "1" },
-            { from: "Тюмень", to: "Уфа", price: 51.49, minSum: 793, delivery: "6" },
-            { from: "Тюмень", to: "Ханты-Мансийск", price: 20.75, minSum: 1525, delivery: "2" },
-            { from: "Тюмень", to: "Челябинск", price: 12.30, minSum: 793, delivery: "1" },
-            { from: "Тюмень", to: "Ярославль", price: 43.04, minSum: 793, delivery: "4" },
-
-            // Улан-Удэ
-            { from: "Улан-Удэ", to: "Красноярск", price: 61.49, minSum: 3050, delivery: "4" },
-            { from: "Улан-Удэ", to: "Москва", price: 94.54, minSum: 3050, delivery: "6" },
-            { from: "Улан-Удэ", to: "Новосибирск", price: 74.56, minSum: 3050, delivery: "5" },
-            { from: "Улан-Удэ", to: "Омск", price: 86.86, minSum: 3050, delivery: "4" },
-            { from: "Улан-Удэ", to: "Санкт-Петербург", price: 122.98, minSum: 3050, delivery: "10" },
-            { from: "Улан-Удэ", to: "Улан-Удэ", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Уфа
-            { from: "Уфа", to: "Уфа", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Хабаровск
-            { from: "Хабаровск", to: "Алейск", price: 99.14, minSum: 3050, delivery: "9" },
-            { from: "Хабаровск", to: "Екатеринбург", price: 95.30, minSum: 3050, delivery: "8" },
-            { from: "Хабаровск", to: "Иркутск", price: 70.72, minSum: 3050, delivery: "8" },
-            { from: "Хабаровск", to: "Кемерово", price: 79.93, minSum: 3050, delivery: "8" },
-            { from: "Хабаровск", to: "Красноярск", price: 68.40, minSum: 3050, delivery: "8" },
-            { from: "Хабаровск", to: "Москва", price: 99.14, minSum: 3050, delivery: "9" },
-            { from: "Хабаровск", to: "Новосибирск", price: 79.93, minSum: 3050, delivery: "7" },
-            { from: "Хабаровск", to: "Рубцовск", price: 108.37, minSum: 3050, delivery: "9" },
-            { from: "Хабаровск", to: "Санкт-Петербург", price: 120.67, minSum: 3050, delivery: "10" },
-            { from: "Хабаровск", to: "Томск", price: 75.32, minSum: 3050, delivery: "8" },
-            { from: "Хабаровск", to: "Хабаровск", price: 999.18, minSum: 793, delivery: "1" },
-            { from: "Хабаровск", to: "Челябинск", price: 102.23, minSum: 3050, delivery: "8" },
-            { from: "Хабаровск", to: "Чита", price: 62.26, minSum: 3050, delivery: "8" },
-
-            // Ханты-Мансийск
-            { from: "Ханты-Мансийск", to: "Ханты-Мансийск", price: 1281.25, minSum: 1016.67, delivery: "1" },
-
-            // Челябинск
-            { from: "Челябинск", to: "Алейск", price: 43.81, minSum: 793, delivery: "4" },
-            { from: "Челябинск", to: "Барнаул", price: 35.35, minSum: 793, delivery: "3" },
-            { from: "Челябинск", to: "Владивосток", price: 76.86, minSum: 3050, delivery: "10" },
-            { from: "Челябинск", to: "Екатеринбург", price: 12.30, minSum: 793, delivery: "1" },
-            { from: "Челябинск", to: "Кемерово", price: 35.35, minSum: 793, delivery: "3" },
-            { from: "Челябинск", to: "Красноярск", price: 39.97, minSum: 793, delivery: "3" },
-            { from: "Челябинск", to: "Москва", price: 17.68, minSum: 793, delivery: "2" },
-            { from: "Челябинск", to: "Москва (МО,за МКАД)", price: 17.68, minSum: 793, delivery: "2" },
-            { from: "Челябинск", to: "Новокузнецк", price: 36.12, minSum: 793, delivery: "3" },
-            { from: "Челябинск", to: "Новосибирск", price: 24.60, minSum: 793, delivery: "2" },
-            { from: "Челябинск", to: "Омск", price: 21.52, minSum: 793, delivery: "2" },
-            { from: "Челябинск", to: "Рубцовск", price: 53.03, minSum: 793, delivery: "4" },
-            { from: "Челябинск", to: "Санкт-Петербург", price: 46.12, minSum: 793, delivery: "4" },
-            { from: "Челябинск", to: "Сургут", price: 36.12, minSum: 1830, delivery: "4" },
-            { from: "Челябинск", to: "Томск", price: 35.35, minSum: 793, delivery: "3" },
-            { from: "Челябинск", to: "Тюмень", price: 19.21, minSum: 793, delivery: "1" },
-            { from: "Челябинск", to: "Челябинск", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Чита
-            { from: "Чита", to: "Алейск", price: 89.16, minSum: 3050, delivery: "8" },
-            { from: "Чита", to: "Екатеринбург", price: 84.55, minSum: 3050, delivery: "7" },
-            { from: "Чита", to: "Москва", price: 89.16, minSum: 3050, delivery: "9" },
-            { from: "Чита", to: "Новосибирск", price: 69.18, minSum: 3050, delivery: "6" },
-            { from: "Чита", to: "Рубцовск", price: 97.61, minSum: 3050, delivery: "8" },
-            { from: "Чита", to: "Санкт-Петербург", price: 117.60, minSum: 3050, delivery: "10" },
-            { from: "Чита", to: "Челябинск", price: 99.14, minSum: 3050, delivery: "7" },
-            { from: "Чита", to: "Чита", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Юрга
-            { from: "Юрга", to: "Алейск", price: 28.44, minSum: 793, delivery: "3" },
-            { from: "Юрга", to: "Барнаул", price: 19.98, minSum: 793, delivery: "1" },
-            { from: "Юрга", to: "Москва", price: 28.44, minSum: 793, delivery: "3" },
-            { from: "Юрга", to: "Новокузнецк", price: 20.75, minSum: 793, delivery: "2" },
-            { from: "Юрга", to: "Новосибирск", price: 9.23, minSum: 793, delivery: "1" },
-            { from: "Юрга", to: "Рубцовск", price: 37.66, minSum: 793, delivery: "3" },
-            { from: "Юрга", to: "Санкт-Петербург", price: 56.88, minSum: 793, delivery: "4" },
-            { from: "Юрга", to: "Юрга", price: 999.18, minSum: 793, delivery: "1" },
-
-            // Ярославль
-            { from: "Ярославль", to: "Алейск", price: 89.93, minSum: 793, delivery: "6" },
-            { from: "Ярославль", to: "Москва", price: 26.14, minSum: 793, delivery: "1" },
-            { from: "Ярославль", to: "Новосибирск", price: 70.72, minSum: 793, delivery: "4" },
-            { from: "Ярославль", to: "Рубцовск", price: 99.14, minSum: 793, delivery: "6" },
-            { from: "Ярославль", to: "Ярославль", price: 999.18, minSum: 793, delivery: "1" },
-        ];
-
-
-        // ----- ОСНОВНЫЕ ТАРИФЫ (остальные перевозчики) -----
-        const mainTariffs = [
-            // НАША МАШИНА
+        const tariffsDB = [
+            // =========================================================
+            // 🏠 НАША МАШИНА
+            // =========================================================
             {
                 from: "Новосибирск",
                 to: "Чита",
@@ -2164,7 +1157,49 @@
                 isFinalPrice: true,
                 note: ""
             },
-            // Владивосток → Петропавловск-Камчатский
+            {
+                from: "Чита",
+                to: "Новосибирск",
+                carrier: "🏠 Наша машина",
+                kg: { upTo500: 40, upTo5000: 40, upTo20000: 40 },
+                m3: { upTo1: 10000, upTo7: 10000, upTo40: 10000 },
+                minSum: 0,
+                delivery: "2",
+                type: "🚛 Собственный авто",
+                isOurTruck: true,
+                isFinalPrice: true,
+                note: ""
+            },
+            {
+                from: "Хабаровск",
+                to: "Новосибирск",
+                carrier: "🏠 Наша машина",
+                kg: { upTo500: 40, upTo5000: 40, upTo20000: 40 },
+                m3: { upTo1: 10000, upTo7: 10000, upTo40: 10000 },
+                minSum: 0,
+                delivery: "4",
+                type: "🚛 Собственный авто",
+                isOurTruck: true,
+                isFinalPrice: true,
+                note: ""
+            },
+            {
+                from: "Владивосток",
+                to: "Новосибирск",
+                carrier: "🏠 Наша машина",
+                kg: { upTo500: 40, upTo5000: 40, upTo20000: 40 },
+                m3: { upTo1: 10000, upTo7: 10000, upTo40: 10000 },
+                minSum: 0,
+                delivery: "5",
+                type: "🚛 Собственный авто",
+                isOurTruck: true,
+                isFinalPrice: true,
+                note: ""
+            },
+
+            // =========================================================
+            // ВЛАДИВОСТОК → ПЕТРОПАВЛОВСК-КАМЧАТСКИЙ
+            // =========================================================
             {
                 from: "Владивосток",
                 to: "Петропавловск-Камчатский",
@@ -2187,30 +1222,261 @@
                 type: "Конт, море",
                 note: ""
             },
-            // Москва → Новосибирск
             {
-                from: "Москва",
+                from: "Владивосток",
+                to: "Петропавловск-Камчатский",
+                carrier: "ДВ ТЭК",
+                kg: { upTo500: 15 },
+                m3: { upTo1: 5000 },
+                minSum: 1500,
+                delivery: "12-14",
+                type: "Конт, море",
+                note: ""
+            },
+            {
+                from: "Владивосток",
+                to: "Петропавловск-Камчатский",
+                carrier: "Феско",
+                kg: { upTo500: 16.5 },
+                m3: { upTo1: 4300 },
+                minSum: 2500,
+                delivery: "12-14",
+                type: "Конт, море",
+                note: ""
+            },
+            {
+                from: "Владивосток",
+                to: "Петропавловск-Камчатский",
+                carrier: "Энни-Транс",
+                kg: { upTo500: 12 },
+                m3: { upTo1: 4200 },
+                minSum: 2400,
+                delivery: "12-14",
+                type: "Конт, море",
+                note: ""
+            },
+
+            // =========================================================
+            // ВЛАДИВОСТОК → МАГАДАН
+            // =========================================================
+            {
+                from: "Владивосток",
+                to: "Магадан",
+                carrier: "Баграм",
+                kg: { upTo500: 15 },
+                m3: { upTo1: 5100 },
+                minSum: 2600,
+                delivery: "12-14",
+                type: "Конт, море",
+                note: ""
+            },
+            {
+                from: "Владивосток",
+                to: "Магадан",
+                carrier: "ЕТЛ",
+                kg: { upTo500: 17.5 },
+                m3: { upTo1: 5500 },
+                minSum: 3300,
+                delivery: "12-14",
+                type: "Конт, море",
+                note: ""
+            },
+            {
+                from: "Владивосток",
+                to: "Магадан",
+                carrier: "ДВ ТЭК",
+                kg: { upTo500: 15 },
+                m3: { upTo1: 5800 },
+                minSum: 1500,
+                delivery: "12-14",
+                type: "Конт, море",
+                note: ""
+            },
+            {
+                from: "Владивосток",
+                to: "Магадан",
+                carrier: "Феско",
+                kg: { upTo500: 19 },
+                m3: { upTo1: 5000 },
+                minSum: 2500,
+                delivery: "12-14",
+                type: "Конт, море",
+                note: ""
+            },
+            {
+                from: "Владивосток",
+                to: "Магадан",
+                carrier: "Энни-Транс",
+                kg: { upTo500: 15 },
+                m3: { upTo1: 5000 },
+                minSum: 2600,
+                delivery: "12-14",
+                type: "Конт, море",
+                note: ""
+            },
+
+            // =========================================================
+            // ВЛАДИВОСТОК → ЮЖНО-САХАЛИНСК
+            // =========================================================
+            {
+                from: "Владивосток",
+                to: "Южно-Сахалинск",
+                carrier: "Баграм",
+                kg: { upTo500: 15 },
+                m3: { upTo1: 4200 },
+                minSum: 2300,
+                delivery: "12-14",
+                type: "Конт, море",
+                note: ""
+            },
+            {
+                from: "Владивосток",
+                to: "Южно-Сахалинск",
+                carrier: "ЕТЛ",
+                kg: { upTo500: 15.5, upTo5000: 14.5 },
+                m3: { upTo1: 4400, upTo7: 4300 },
+                minSum: 2550,
+                delivery: "12-14",
+                type: "Конт, море",
+                note: ""
+            },
+            {
+                from: "Владивосток",
+                to: "Южно-Сахалинск",
+                carrier: "ДВ ТЭК",
+                kg: { upTo500: 14 },
+                m3: { upTo1: 4800 },
+                minSum: 1500,
+                delivery: "12-14",
+                type: "Конт, море",
+                note: ""
+            },
+            {
+                from: "Владивосток",
+                to: "Южно-Сахалинск",
+                carrier: "Феско",
+                kg: { upTo500: 15 },
+                m3: { upTo1: 4000 },
+                minSum: 2500,
+                delivery: "—",
+                type: "Конт, море",
+                note: ""
+            },
+            {
+                from: "Владивосток",
+                to: "Южно-Сахалинск",
+                carrier: "Энни-Транс",
+                kg: { upTo500: 12 },
+                m3: { upTo1: 4000 },
+                minSum: 2200,
+                delivery: "12-14",
+                type: "Конт, море",
+                note: ""
+            },
+
+            // =========================================================
+            // ВЛАДИВОСТОК → МОСКВА
+            // =========================================================
+            {
+                from: "Владивосток",
+                to: "Москва",
+                carrier: "Транслиния",
+                kg: { upTo500: 58 },
+                m3: { upTo1: 11500 },
+                minSum: 0,
+                delivery: "—",
+                type: "Авто",
+                note: ""
+            },
+
+            // =========================================================
+            // ВЛАДИВОСТОК → НОВОСИБИРСК
+            // =========================================================
+            {
+                from: "Владивосток",
                 to: "Новосибирск",
                 carrier: "Транслиния",
-                kg: { upTo500: 20 },
-                m3: { upTo1: 4100 },
-                minSum: 2800,
-                delivery: "4-6",
+                kg: { upTo500: 48 },
+                m3: { upTo1: 9600 },
+                minSum: 0,
+                delivery: "—",
                 type: "Авто",
+                note: ""
+            },
+
+            // =========================================================
+            // МОСКВА → БЛАГОВЕЩЕНСК
+            // =========================================================
+            {
+                from: "Москва",
+                to: "Благовещенск",
+                carrier: "Рейл Континент",
+                kg: { upTo500: 29.5, upTo5000: 26.5, upTo20000: 25 },
+                m3: { upTo1: 7970, upTo7: 7400, upTo40: 6770 },
+                minSum: 1750,
+                delivery: "18",
+                type: "ЖД",
                 note: ""
             },
             {
                 from: "Москва",
-                to: "Новосибирск",
-                carrier: "Шерл",
-                kg: { upTo500: 23, upTo5000: 21, upTo20000: 20 },
-                m3: { upTo1: 5900, upTo7: 5600, upTo40: 4900 },
-                minSum: 2300,
-                delivery: "5",
-                type: "Авто",
+                to: "Благовещенск",
+                carrier: "Трансот",
+                kg: { upTo500: 54 },
+                m3: { upTo1: 12700 },
+                minSum: 4080,
+                delivery: "—",
+                type: "ЖД ПБ",
                 note: ""
             },
-            // Москва → Владивосток
+            {
+                from: "Москва",
+                to: "Благовещенск",
+                carrier: "ТрейдТрансГрупп",
+                kg: { upTo500: 37.5, upTo5000: 35.5, upTo20000: 35 },
+                m3: { upTo1: 8800, upTo7: 8600, upTo40: 8300 },
+                minSum: 4700,
+                delivery: "24-27",
+                type: "ЖД",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Благовещенск",
+                carrier: "Транслиния",
+                kg: { upTo500: 58 },
+                m3: { upTo1: 12000 },
+                minSum: 5900,
+                delivery: "16-20",
+                type: "АВТО",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Благовещенск",
+                carrier: "Транслиния (ЖД)",
+                kg: { upTo500: 25 },
+                m3: { upTo1: 6600 },
+                minSum: 3900,
+                delivery: "23-28",
+                type: "ЖД",
+                note: ""
+            },
+
+            // =========================================================
+            // МОСКВА → ВЛАДИВОСТОК
+            // =========================================================
+            {
+                from: "Москва",
+                to: "Владивосток",
+                carrier: "Трансот",
+                kg: { upTo500: 54 },
+                m3: { upTo1: 12700 },
+                minSum: 4080,
+                delivery: "8-9",
+                type: "ЖД ПБ",
+                note: ""
+            },
             {
                 from: "Москва",
                 to: "Владивосток",
@@ -2225,6 +1491,28 @@
             {
                 from: "Москва",
                 to: "Владивосток",
+                carrier: "Транслиния",
+                kg: { upTo500: 48 },
+                m3: { upTo1: 11800 },
+                minSum: 3800,
+                delivery: "13-14",
+                type: "авто",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Владивосток",
+                carrier: "Транслиния (ЖД)",
+                kg: { upTo500: 14 },
+                m3: { upTo1: 4300 },
+                minSum: 3100,
+                delivery: "20-25",
+                type: "жд",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Владивосток",
                 carrier: "Бюро перевозок",
                 kg: { upTo500: 43.5, upTo5000: 42.5, upTo20000: 41.5 },
                 m3: { upTo1: 9570, upTo7: 9350, upTo40: 9130 },
@@ -2233,7 +1521,594 @@
                 type: "авто",
                 note: ""
             },
-            // Новосибирск → Москва
+            {
+                from: "Москва",
+                to: "Владивосток",
+                carrier: "Бюро перевозок (Экспресс)",
+                kg: { upTo500: 45 },
+                m3: { upTo1: 9900 },
+                minSum: 1200,
+                delivery: "8-9",
+                type: "Авто",
+                note: ""
+            },
+
+            // =========================================================
+            // МОСКВА → ИРКУТСК
+            // =========================================================
+            {
+                from: "Москва",
+                to: "Иркутск",
+                carrier: "Трансот",
+                kg: { upTo500: 45 },
+                m3: { upTo1: 9900 },
+                minSum: 4080,
+                delivery: "5-6",
+                type: "ЖД ПБ",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Иркутск",
+                carrier: "Транслиния",
+                kg: { upTo500: 42 },
+                m3: { upTo1: 10800 },
+                minSum: 1850,
+                delivery: "7-9",
+                type: "АВТО",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Иркутск",
+                carrier: "Транслиния (ЖД)",
+                kg: { upTo500: 21 },
+                m3: { upTo1: 5500 },
+                minSum: 2600,
+                delivery: "15-17",
+                type: "ЖД",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Иркутск",
+                carrier: "Бюро перевозок",
+                kg: { upTo500: 33, upTo5000: 32.5, upTo20000: 32 },
+                m3: { upTo1: 7260, upTo7: 7150, upTo40: 7040 },
+                minSum: 600,
+                delivery: "8-9",
+                type: "Авто",
+                note: ""
+            },
+
+            // =========================================================
+            // МОСКВА → КАЛИНИНГРАД
+            // =========================================================
+            {
+                from: "Москва",
+                to: "Калининград",
+                carrier: "Трансот",
+                kg: { upTo500: 70 },
+                m3: { upTo1: 17500 },
+                minSum: 4080,
+                delivery: "2",
+                type: "ЖД ПБ",
+                note: ""
+            },
+
+            // =========================================================
+            // МОСКВА → КРАСНОЯРСК
+            // =========================================================
+            {
+                from: "Москва",
+                to: "Красноярск",
+                carrier: "Транслиния (ЖД)",
+                kg: { upTo500: 9 },
+                m3: { upTo1: 3000 },
+                minSum: 2300,
+                delivery: "13-15",
+                type: "ЖД",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Красноярск",
+                carrier: "Транслиния",
+                kg: { upTo500: 34 },
+                m3: { upTo1: 7800 },
+                minSum: 1800,
+                delivery: "6-8",
+                type: "АВТО",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Красноярск",
+                carrier: "Трансот",
+                kg: { upTo500: 41.5 },
+                m3: { upTo1: 8922.5 },
+                minSum: 4080,
+                delivery: "4-5",
+                type: "ЖД ПБ",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Красноярск",
+                carrier: "Бюро перевозок",
+                kg: { upTo500: 30, upTo5000: 29, upTo20000: 28 },
+                m3: { upTo1: 6600, upTo7: 6380, upTo40: 6160 },
+                minSum: 550,
+                delivery: "7-8",
+                type: "авто",
+                note: ""
+            },
+
+            // =========================================================
+            // МОСКВА → КОМСОМОЛЬСК-НА-АМУРЕ
+            // =========================================================
+            {
+                from: "Москва",
+                to: "Комсомольск-на-Амуре",
+                carrier: "ТрейдТрансГрупп",
+                kg: { upTo500: 32, upTo5000: 30, upTo20000: 29.5 },
+                m3: { upTo1: 8600, upTo7: 8500, upTo40: 8100 },
+                minSum: 4800,
+                delivery: "23-28",
+                type: "ЖД",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Комсомольск-на-Амуре",
+                carrier: "Транслиния",
+                kg: { upTo500: 56 },
+                m3: { upTo1: 11700 },
+                minSum: 5600,
+                delivery: "16-20",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Комсомольск-на-Амуре",
+                carrier: "Транслиния (ЖД)",
+                kg: { upTo500: 25 },
+                m3: { upTo1: 6600 },
+                minSum: 4000,
+                delivery: "23-28",
+                type: "ЖД",
+                note: ""
+            },
+
+            // =========================================================
+            // МОСКВА → НОВОСИБИРСК
+            // =========================================================
+            {
+                from: "Москва",
+                to: "Новосибирск",
+                carrier: "Трансот",
+                kg: { upTo500: 30 },
+                m3: { upTo1: 6000 },
+                minSum: 4080,
+                delivery: "—",
+                type: "ЖД ПБ",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Новосибирск",
+                carrier: "АРПИ",
+                kg: { upTo500: 44.53 },
+                m3: { upTo1: 11132.5 },
+                minSum: 793,
+                delivery: "60 часов",
+                type: "экспресс",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Новосибирск",
+                carrier: "Транслиния (ЖД)",
+                kg: { upTo500: 8 },
+                m3: { upTo1: 2300 },
+                minSum: 1800,
+                delivery: "10-12",
+                type: "ЖД",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Новосибирск",
+                carrier: "Транслиния",
+                kg: { upTo500: 20 },
+                m3: { upTo1: 4100 },
+                minSum: 2800,
+                delivery: "4-6",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Новосибирск",
+                carrier: "Вега (экспресс)",
+                kg: { upTo500: 25 },
+                m3: { upTo1: 6500 },
+                minSum: 10000,
+                delivery: "60 часов",
+                type: "экспресс",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Новосибирск",
+                carrier: "Вега",
+                kg: { upTo500: 20 },
+                m3: { upTo1: 5500 },
+                minSum: 10000,
+                delivery: "5",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Новосибирск",
+                carrier: "Шерл",
+                kg: { upTo500: 23, upTo5000: 21, upTo20000: 20 },
+                m3: { upTo1: 5900, upTo7: 5600, upTo40: 4900 },
+                minSum: 2300,
+                delivery: "5",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Новосибирск",
+                carrier: "Шерл (ЖД)",
+                kg: { upTo500: 11.2, upTo5000: 10.3, upTo20000: 9.8 },
+                m3: { upTo1: 3400, upTo7: 3350, upTo40: 3100 },
+                minSum: 2200,
+                delivery: "9-12",
+                type: "ЖД",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Новосибирск",
+                carrier: "ТрейдТрансГрупп",
+                kg: { upTo500: 12, upTo5000: 10, upTo20000: 9.5 },
+                m3: { upTo1: 3200, upTo7: 3000, upTo40: 2700 },
+                minSum: 2200,
+                delivery: "12-15",
+                type: "ЖД",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Новосибирск",
+                carrier: "Бюро перевозок",
+                kg: { upTo500: 25, upTo5000: 24, upTo20000: 23 },
+                m3: { upTo1: 5500, upTo7: 5280, upTo40: 5060 },
+                minSum: 550,
+                delivery: "6-7",
+                type: "авто",
+                note: ""
+            },
+
+            // =========================================================
+            // МОСКВА → ХАБАРОВСК
+            // =========================================================
+            {
+                from: "Москва",
+                to: "Хабаровск",
+                carrier: "ТрейдТрансГрупп",
+                kg: { upTo500: 18.5, upTo5000: 16.5, upTo20000: 16 },
+                m3: { upTo1: 5300, upTo7: 5100, upTo40: 4800 },
+                minSum: 3600,
+                delivery: "20-25",
+                type: "ЖД",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Хабаровск",
+                carrier: "Транслиния",
+                kg: { upTo500: 46 },
+                m3: { upTo1: 10000 },
+                minSum: 3800,
+                delivery: "12-14",
+                type: "АВТО",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Хабаровск",
+                carrier: "Транслиния (ЖД)",
+                kg: { upTo500: 14 },
+                m3: { upTo1: 4300 },
+                minSum: 3100,
+                delivery: "20-25",
+                type: "ЖД",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Хабаровск",
+                carrier: "Трансот",
+                kg: { upTo500: 54 },
+                m3: { upTo1: 12700 },
+                minSum: 4080,
+                delivery: "8-9",
+                type: "ЖД ПБ",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Хабаровск",
+                carrier: "Бюро перевозок",
+                kg: { upTo500: 42.5, upTo5000: 41.5, upTo20000: 40.5 },
+                m3: { upTo1: 9350, upTo7: 9130, upTo40: 8910 },
+                minSum: 1000,
+                delivery: "10-11",
+                type: "Авто",
+                note: ""
+            },
+
+            // =========================================================
+            // МОСКВА → РОСТОВ-НА-ДОНУ
+            // =========================================================
+            {
+                from: "Москва",
+                to: "Ростов-на-Дону",
+                carrier: "Трансот",
+                kg: { upTo500: 19 },
+                m3: { upTo1: 4750 },
+                minSum: 4080,
+                delivery: "1",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Ростов-на-Дону",
+                carrier: "Главтрасса",
+                kg: { upTo500: 15.5, upTo5000: 14.5, upTo20000: 14 },
+                m3: { upTo1: 4400, upTo7: 4150, upTo40: 4100 },
+                minSum: 600,
+                delivery: "2",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Ростов-на-Дону",
+                carrier: "Фастранс",
+                kg: { upTo500: 18.3, upTo5000: 16.66, upTo20000: 16.5 },
+                m3: { upTo1: 5030, upTo7: 4570, upTo40: 4470 },
+                minSum: 700,
+                delivery: "2",
+                type: "Авто",
+                note: ""
+            },
+
+            // =========================================================
+            // МОСКВА → КРАСНОДАР
+            // =========================================================
+            {
+                from: "Москва",
+                to: "Краснодар",
+                carrier: "Трансот",
+                kg: { upTo500: 20 },
+                m3: { upTo1: 5000 },
+                minSum: 4080,
+                delivery: "2",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Краснодар",
+                carrier: "Главтрасса",
+                kg: { upTo500: 16.5, upTo5000: 15, upTo20000: 14.8 },
+                m3: { upTo1: 4462.5, upTo7: 4016.25, upTo40: 3937.5 },
+                minSum: 450,
+                delivery: "2",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Краснодар",
+                carrier: "Фастранс",
+                kg: { upTo500: 20.2, upTo5000: 18.7, upTo20000: 17.5 },
+                m3: { upTo1: 5330, upTo7: 4780, upTo40: 4680 },
+                minSum: 750,
+                delivery: "—",
+                type: "Авто",
+                note: ""
+            },
+
+            // =========================================================
+            // МОСКВА → УЛАН-УДЭ
+            // =========================================================
+            {
+                from: "Москва",
+                to: "Улан-Удэ",
+                carrier: "Трансот",
+                kg: { upTo500: 43 },
+                m3: { upTo1: 10000 },
+                minSum: 4080,
+                delivery: "6-7",
+                type: "ЖД ПБ",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Улан-Удэ",
+                carrier: "Бюро перевозок",
+                kg: { upTo500: 33, upTo5000: 33, upTo20000: 32.5 },
+                m3: { upTo1: 7370, upTo7: 7260, upTo40: 7150 },
+                minSum: 650,
+                delivery: "8-9",
+                type: "Авто",
+                note: ""
+            },
+
+            // =========================================================
+            // МОСКВА → ЧИТА
+            // =========================================================
+            {
+                from: "Москва",
+                to: "Чита",
+                carrier: "Трансот",
+                kg: { upTo500: 45 },
+                m3: { upTo1: 10600 },
+                minSum: 4080,
+                delivery: "7-8",
+                type: "ЖД ПБ",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Чита",
+                carrier: "Бюро перевозок",
+                kg: { upTo500: 34, upTo5000: 33.5, upTo20000: 33 },
+                m3: { upTo1: 7480, upTo7: 7370, upTo40: 7260 },
+                minSum: 650,
+                delivery: "9-10",
+                type: "Авто",
+                note: ""
+            },
+
+            // =========================================================
+            // МОСКВА → ПЕТРОПАВЛОВСК-КАМЧАТСКИЙ
+            // =========================================================
+            {
+                from: "Москва",
+                to: "Петропавловск-Камчатский",
+                carrier: "ТрейдТрансГрупп",
+                kg: { upTo500: 38.5, upTo5000: 36.5, upTo20000: 36 },
+                m3: { upTo1: 11700, upTo7: 11500, upTo40: 11200 },
+                minSum: 6200,
+                delivery: "38-43",
+                type: "ЖД",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Петропавловск-Камчатский",
+                carrier: "Бюро перевозок",
+                kg: { upTo500: 43.5, upTo5000: 42.5, upTo20000: 41.5 },
+                m3: { upTo1: 9570, upTo7: 9350, upTo40: 9130 },
+                minSum: 1100,
+                delivery: "11-12",
+                type: "авто",
+                note: ""
+            },
+
+            // =========================================================
+            // МОСКВА → ЮЖНО-САХАЛИНСК
+            // =========================================================
+            {
+                from: "Москва",
+                to: "Южно-Сахалинск",
+                carrier: "ТрейдТрансГрупп",
+                kg: { upTo500: 36.5, upTo5000: 34.5, upTo20000: 34 },
+                m3: { upTo1: 8800, upTo7: 8600, upTo40: 8300 },
+                minSum: 5200,
+                delivery: "34-39",
+                type: "ЖД",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Южно-Сахалинск",
+                carrier: "Бюро перевозок",
+                kg: { upTo500: 43.5, upTo5000: 42.5, upTo20000: 41.5 },
+                m3: { upTo1: 9570, upTo7: 9350, upTo40: 9130 },
+                minSum: 1100,
+                delivery: "11-12",
+                type: "авто",
+                note: ""
+            },
+
+            // =========================================================
+            // НОВОСИБИРСК → ВЛАДИВОСТОК
+            // =========================================================
+            {
+                from: "Новосибирск",
+                to: "Владивосток",
+                carrier: "ТрейдТрансГрупп",
+                kg: { upTo500: 18, upTo5000: 16, upTo20000: 15.5 },
+                m3: { upTo1: 4400, upTo7: 4200, upTo40: 3900 },
+                minSum: 2300,
+                delivery: "18-20",
+                type: "ЖД",
+                note: ""
+            },
+            {
+                from: "Новосибирск",
+                to: "Владивосток",
+                carrier: "Транслиния",
+                kg: { upTo500: 26.5 },
+                m3: { upTo1: 6200 },
+                minSum: 2700,
+                delivery: "9-11",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Новосибирск",
+                to: "Владивосток",
+                carrier: "Транслиния (ЖД)",
+                kg: { upTo500: 14 },
+                m3: { upTo1: 3600 },
+                minSum: 1800,
+                delivery: "15-20",
+                type: "ЖД",
+                note: ""
+            },
+
+            // =========================================================
+            // НОВОСИБИРСК → ХАБАРОВСК
+            // =========================================================
+            {
+                from: "Новосибирск",
+                to: "Хабаровск",
+                carrier: "ТрейдТрансГрупп",
+                kg: { upTo500: 18, upTo5000: 16, upTo20000: 15.5 },
+                m3: { upTo1: 4400, upTo7: 4200, upTo40: 3900 },
+                minSum: 2300,
+                delivery: "15-18",
+                type: "ЖД",
+                note: ""
+            },
+            {
+                from: "Новосибирск",
+                to: "Хабаровск",
+                carrier: "Транслиния",
+                kg: { upTo500: 25.5 },
+                m3: { upTo1: 5950 },
+                minSum: 2700,
+                delivery: "8-10",
+                type: "АВТО",
+                note: ""
+            },
+            {
+                from: "Новосибирск",
+                to: "Хабаровск",
+                carrier: "Транслиния (ЖД)",
+                kg: { upTo500: 14 },
+                m3: { upTo1: 3600 },
+                minSum: 1800,
+                delivery: "15-20",
+                type: "ЖД",
+                note: ""
+            },
+
+            // =========================================================
+            // НОВОСИБИРСК → МОСКВА
+            // =========================================================
             {
                 from: "Новосибирск",
                 to: "Москва",
@@ -2245,33 +2120,614 @@
                 type: "Авто",
                 note: ""
             },
+            {
+                from: "Новосибирск",
+                to: "Москва",
+                carrier: "Фастранс",
+                kg: { upTo500: 16.7, upTo5000: 15.3, upTo20000: 14.2 },
+                m3: { upTo1: 4360, upTo7: 4000, upTo40: 3690 },
+                minSum: 700,
+                delivery: "5-6",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Новосибирск",
+                to: "Москва",
+                carrier: "Сибгеотехнотранс",
+                kg: { upTo500: 20.7 },
+                m3: { upTo1: 5200 },
+                minSum: 3200,
+                delivery: "4-6",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Новосибирск",
+                to: "Москва",
+                carrier: "Главтрасса",
+                kg: { upTo500: 14.6, upTo5000: 13.5 },
+                m3: { upTo1: 3900, upTo7: 3640, upTo40: 3600 },
+                minSum: 750,
+                delivery: "6",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Новосибирск",
+                to: "Москва",
+                carrier: "Арпи",
+                kg: { upTo500: 10.98 },
+                m3: { upTo1: 2525 },
+                minSum: 793,
+                delivery: "5-7",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Новосибирск",
+                to: "Москва",
+                carrier: "Арпи (Экспресс)",
+                kg: { upTo500: 15.86 },
+                m3: { upTo1: 4012.58 },
+                minSum: 793,
+                delivery: "60 часов",
+                type: "Эксперсс",
+                note: ""
+            },
+
+            // =========================================================
+            // НОВОСИБИРСК → КОМСОМОЛЬСК-НА-АМУРЕ
+            // =========================================================
+            {
+                from: "Новосибирск",
+                to: "Комсомольск-на-Амуре",
+                carrier: "ТрейдТрансГрупп",
+                kg: { upTo500: 24, upTo5000: 22, upTo20000: 21.5 },
+                m3: { upTo1: 6400, upTo7: 6200, upTo40: 5900 },
+                minSum: 3500,
+                delivery: "21-25",
+                type: "ЖД",
+                note: ""
+            },
+            {
+                from: "Новосибирск",
+                to: "Комсомольск-на-Амуре",
+                carrier: "Транслиния",
+                kg: { upTo500: 37 },
+                m3: { upTo1: 7400 },
+                minSum: 3700,
+                delivery: "12-14",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Новосибирск",
+                to: "Комсомольск-на-Амуре",
+                carrier: "Транслиния (ЖД)",
+                kg: { upTo500: 19.5 },
+                m3: { upTo1: 5400 },
+                minSum: 2700,
+                delivery: "23-25",
+                type: "ЖД",
+                note: ""
+            },
+
+            // =========================================================
+            // ХАБАРОВСК → ВЛАДИВОСТОК
+            // =========================================================
+            {
+                from: "Хабаровск",
+                to: "Владивосток",
+                carrier: "ЕТЛ",
+                kg: { upTo500: 5 },
+                m3: { upTo1: 1000 },
+                minSum: 1000,
+                delivery: "1",
+                type: "Авто",
+                note: ""
+            },
+
+            // =========================================================
+            // ХАБАРОВСК → КОМСОМОЛЬСК-НА-АМУРЕ
+            // =========================================================
+            {
+                from: "Хабаровск",
+                to: "Комсомольск-на-Амуре",
+                carrier: "ТК Партнер",
+                kg: { upTo500: 8.5, upTo5000: 8, upTo20000: 6 },
+                m3: { upTo1: 1700, upTo7: 1550, upTo40: 1450 },
+                minSum: 750,
+                delivery: "—",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Хабаровск",
+                to: "Комсомольск-на-Амуре",
+                carrier: "Навигатогр ДВ",
+                kg: { upTo500: 14 },
+                m3: { upTo1: 2800 },
+                minSum: 2800,
+                delivery: "—",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Хабаровск",
+                to: "Комсомольск-на-Амуре",
+                carrier: "ЕТЛ",
+                kg: { upTo500: 11 },
+                m3: { upTo1: 2200 },
+                minSum: 2200,
+                delivery: "1",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Хабаровск",
+                to: "Комсомольск-на-Амуре",
+                carrier: "Транслиния",
+                kg: { upTo500: 8.8 },
+                m3: { upTo1: 1450 },
+                minSum: 1100,
+                delivery: "2-3",
+                type: "Авто",
+                note: ""
+            },
+
+            // =========================================================
+            // ХАБАРОВСК → БЛАГОВЕЩЕНСК
+            // =========================================================
+            {
+                from: "Хабаровск",
+                to: "Благовещенск",
+                carrier: "Навигатогр ДВ",
+                kg: { upTo500: 11.5 },
+                m3: { upTo1: 2300 },
+                minSum: 2300,
+                delivery: "—",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Хабаровск",
+                to: "Благовещенск",
+                carrier: "ТК Партнер",
+                kg: { upTo500: 11, upTo5000: 10, upTo20000: 8.5 },
+                m3: { upTo1: 2150, upTo7: 1950, upTo40: 1800 },
+                minSum: 1000,
+                delivery: "—",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Хабаровск",
+                to: "Благовещенск",
+                carrier: "ЕТЛ",
+                kg: { upTo500: 12 },
+                m3: { upTo1: 2400 },
+                minSum: 2400,
+                delivery: "—",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Хабаровск",
+                to: "Благовещенск",
+                carrier: "Транслиния",
+                kg: { upTo500: 10.8 },
+                m3: { upTo1: 1950 },
+                minSum: 1250,
+                delivery: "3-4",
+                type: "Авто",
+                note: ""
+            },
+
+            // =========================================================
+            // ХАБАРОВСК → БИРОБИДЖАН
+            // =========================================================
+            {
+                from: "Хабаровск",
+                to: "Биробиджан",
+                carrier: "ТК Партнер",
+                kg: { upTo500: 8, upTo5000: 7.5, upTo20000: 7 },
+                m3: { upTo1: 1400, upTo7: 1350, upTo40: 1300 },
+                minSum: 850,
+                delivery: "—",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Хабаровск",
+                to: "Биробиджан",
+                carrier: "Навигатогр ДВ",
+                kg: { upTo500: 20.5 },
+                m3: { upTo1: 2100 },
+                minSum: 2100,
+                delivery: "—",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Хабаровск",
+                to: "Биробиджан",
+                carrier: "ЕТЛ",
+                kg: { upTo500: 10 },
+                m3: { upTo1: 1600 },
+                minSum: 1600,
+                delivery: "—",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Хабаровск",
+                to: "Биробиджан",
+                carrier: "Транслиния",
+                kg: { upTo500: 7.8 },
+                m3: { upTo1: 1250 },
+                minSum: 950,
+                delivery: "3-4",
+                type: "Авто",
+                note: ""
+            },
+
+            // =========================================================
+            // НОВОСИБИРСК → КРАСНОЯРСК
+            // =========================================================
+            {
+                from: "Новосибирск",
+                to: "Красноярск",
+                carrier: "Транслиния",
+                kg: { upTo500: 9.8 },
+                m3: { upTo1: 2050 },
+                minSum: 1100,
+                delivery: "1-2",
+                type: "АВТО",
+                note: ""
+            },
+
+            // =========================================================
+            // НОВОСИБИРСК → ИРКУТСК
+            // =========================================================
+            {
+                from: "Новосибирск",
+                to: "Иркутск",
+                carrier: "Транслиния",
+                kg: { upTo500: 15 },
+                m3: { upTo1: 3760 },
+                minSum: 1400,
+                delivery: "3-4",
+                type: "АВТО",
+                note: ""
+            },
+
+            // =========================================================
+            // НОВОСИБИРСК → ЧИТА
+            // =========================================================
+            {
+                from: "Новосибирск",
+                to: "Чита",
+                carrier: "Транслиния",
+                kg: { upTo500: 18 },
+                m3: { upTo1: 4500 },
+                minSum: 1600,
+                delivery: "5-7",
+                type: "АВТО",
+                note: ""
+            },
+
+            // =========================================================
+            // ХАБАРОВСК → НОВОСИБИРСК
+            // =========================================================
+            {
+                from: "Хабаровск",
+                to: "Новосибирск",
+                carrier: "Транслиния",
+                kg: { upTo500: 55 },
+                m3: { upTo1: 10800 },
+                minSum: 0,
+                delivery: "—",
+                type: "Авто",
+                note: ""
+            },
+
+            // =========================================================
+            // ХАБАРОВСК → МОСКВА
+            // =========================================================
+            {
+                from: "Хабаровск",
+                to: "Москва",
+                carrier: "Транслиния",
+                kg: { upTo500: 64 },
+                m3: { upTo1: 12700 },
+                minSum: 0,
+                delivery: "—",
+                type: "Авто",
+                note: ""
+            },
+
+            // =========================================================
+            // НОВОСИБИРСК → ТЫНДА (Абсолют Трейд)
+            // =========================================================
+            {
+                from: "Новосибирск",
+                to: "Тында",
+                carrier: "Абсолют Трейд",
+                kg: { upTo500: 30 },
+                m3: { upTo1: 6600 },
+                minSum: 1500,
+                delivery: "4.5",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Новосибирск",
+                to: "Нюренги",
+                carrier: "Абсолют Трейд",
+                kg: { upTo500: 31 },
+                m3: { upTo1: 6820 },
+                minSum: 1500,
+                delivery: "5.6",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Новосибирск",
+                to: "Алдан",
+                carrier: "Абсолют Трейд",
+                kg: { upTo500: 33 },
+                m3: { upTo1: 7260 },
+                minSum: 1500,
+                delivery: "6.7",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Новосибирск",
+                to: "Нижний бестях",
+                carrier: "Абсолют Трейд",
+                kg: { upTo500: 43 },
+                m3: { upTo1: 9460 },
+                minSum: 1500,
+                delivery: "7.8",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Новосибирск",
+                to: "Якутск",
+                carrier: "Абсолют Трейд",
+                kg: { upTo500: 43 },
+                m3: { upTo1: 9460 },
+                minSum: 1500,
+                delivery: "9.1",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Тында",
+                carrier: "Абсолют Трейд",
+                kg: { upTo500: 48 },
+                m3: { upTo1: 10560 },
+                minSum: 2000,
+                delivery: "9.1",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Нюренги",
+                carrier: "Абсолют Трейд",
+                kg: { upTo500: 49 },
+                m3: { upTo1: 10780 },
+                minSum: 2000,
+                delivery: "11.12",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Алдан",
+                carrier: "Абсолют Трейд",
+                kg: { upTo500: 55 },
+                m3: { upTo1: 12100 },
+                minSum: 2500,
+                delivery: "11.12",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Нижний бестях",
+                carrier: "Абсолют Трейд",
+                kg: { upTo500: 64 },
+                m3: { upTo1: 14080 },
+                minSum: 2500,
+                delivery: "13.14",
+                type: "Авто",
+                note: ""
+            },
+            {
+                from: "Москва",
+                to: "Якутск",
+                carrier: "Абсолют Трейд",
+                kg: { upTo500: 64 },
+                m3: { upTo1: 14080 },
+                minSum: 2500,
+                delivery: "14.15",
+                type: "Авто",
+                note: "🚚 Доставка до Адреса включена в стоимость куба и килограмма"
+            },
+
+            // =========================================================
+            // МАСТЕР ПЕРЕВОЗОК — НОВОСИБИРСК → ГОРОДА
+            // =========================================================
+            {
+                from: "Новосибирск",
+                to: "Томск",
+                carrier: "Мастер перевозок",
+                kg: { upTo500: 6 },
+                m3: { upTo1: 1100 },
+                minSum: 5000,
+                delivery: "—",
+                type: "Авто",
+                note: "🚚 Доставка до Адреса включена в стоимость куба и килограмма"
+            },
+            {
+                from: "Новосибирск",
+                to: "Барнаул",
+                carrier: "Мастер перевозок",
+                kg: { upTo500: 6 },
+                m3: { upTo1: 1100 },
+                minSum: 5000,
+                delivery: "—",
+                type: "Авто",
+                note: "🚚 Доставка до Адреса включена в стоимость куба и килограмма"
+            },
+            {
+                from: "Новосибирск",
+                to: "Кемерово",
+                carrier: "Мастер перевозок",
+                kg: { upTo500: 6 },
+                m3: { upTo1: 1200 },
+                minSum: 5500,
+                delivery: "—",
+                type: "Авто",
+                note: "🚚 Доставка до Адреса включена в стоимость куба и килограмма"
+            },
+            {
+                from: "Новосибирск",
+                to: "Новокузнецк",
+                carrier: "Мастер перевозок",
+                kg: { upTo500: 7 },
+                m3: { upTo1: 1450 },
+                minSum: 6000,
+                delivery: "—",
+                type: "Авто",
+                note: "🚚 Доставка до Адреса включена в стоимость куба и килограмма"
+            },
+            {
+                from: "Новосибирск",
+                to: "Красноярск",
+                carrier: "Мастер перевозок",
+                kg: { upTo500: 10 },
+                m3: { upTo1: 2400 },
+                minSum: 8000,
+                delivery: "—",
+                type: "Авто",
+                note: "🚚 Доставка до Адреса включена в стоимость куба и килограмма"
+            },
+            {
+                from: "Новосибирск",
+                to: "Екатеринбург",
+                carrier: "Мастер перевозок",
+                kg: { upTo500: 10 },
+                m3: { upTo1: 2400 },
+                minSum: 8000,
+                delivery: "—",
+                type: "Авто",
+                note: "🚚 Доставка до Адреса включена в стоимость куба и килограмма"
+            },
+            {
+                from: "Новосибирск",
+                to: "Омск",
+                carrier: "Мастер перевозок",
+                kg: { upTo500: 9 },
+                m3: { upTo1: 1800 },
+                minSum: 7000,
+                delivery: "—",
+                type: "Авто",
+                note: "🚚 Доставка до Адреса включена в стоимость куба и килограмма"
+            },
+
+            // =========================================================
+            // МАСТЕР ПЕРЕВОЗОК — ОБРАТНЫЕ МАРШРУТЫ (ЗАБОР ВКЛЮЧЁН)
+            // =========================================================
+            {
+                from: "Томск",
+                to: "Новосибирск",
+                carrier: "Мастер перевозок",
+                kg: { upTo500: 4 },
+                m3: { upTo1: 800 },
+                minSum: 4000,
+                delivery: "—",
+                type: "Авто",
+                note: "🚚 Забор с Адреса включен в стоимость куба и килограмма"
+            },
+            {
+                from: "Барнаул",
+                to: "Новосибирск",
+                carrier: "Мастер перевозок",
+                kg: { upTo500: 4 },
+                m3: { upTo1: 800 },
+                minSum: 4000,
+                delivery: "—",
+                type: "Авто",
+                note: "🚚 Забор с Адреса включен в стоимость куба и килограмма"
+            },
+            {
+                from: "Кемерово",
+                to: "Новосибирск",
+                carrier: "Мастер перевозок",
+                kg: { upTo500: 4 },
+                m3: { upTo1: 800 },
+                minSum: 4000,
+                delivery: "—",
+                type: "Авто",
+                note: "🚚 Забор с Адреса включен в стоимость куба и килограмма"
+            },
+            {
+                from: "Новокузнецк",
+                to: "Новосибирск",
+                carrier: "Мастер перевозок",
+                kg: { upTo500: 5 },
+                m3: { upTo1: 900 },
+                minSum: 5500,
+                delivery: "—",
+                type: "Авто",
+                note: "🚚 Забор с Адреса включен в стоимость куба и килограмма"
+            },
+            {
+                from: "Красноярск",
+                to: "Новосибирск",
+                carrier: "Мастер перевозок",
+                kg: { upTo500: 5 },
+                m3: { upTo1: 1000 },
+                minSum: 6000,
+                delivery: "—",
+                type: "Авто",
+                note: "🚚 Забор с Адреса включен в стоимость куба и килограмма"
+            },
+            {
+                from: "Екатеринбург",
+                to: "Новосибирск",
+                carrier: "Мастер перевозок",
+                kg: { upTo500: 14 },
+                m3: { upTo1: 2700 },
+                minSum: 10000,
+                delivery: "—",
+                type: "Авто",
+                note: "🚚 Забор с Адреса включен в стоимость куба и килограмма"
+            },
+            {
+                from: "Омск",
+                to: "Новосибирск",
+                carrier: "Мастер перевозок",
+                kg: { upTo500: 9 },
+                m3: { upTo1: 1800 },
+                minSum: 7000,
+                delivery: "—",
+                type: "Авто",
+                note: "🚚 Забор с Адреса включен в стоимость куба и килограмма"
+            },
         ];
 
 
         // ============================================================
         // 2. ЛОГИКА РАСЧЁТА
         // ============================================================
-
-        // Объединяем все тарифы
-        const allTariffs = [...mainTariffs];
-
-        // Добавляем АРПИ (только кг, цена финальная)
-        arpiPrices.forEach(item => {
-            allTariffs.push({
-                from: item.from,
-                to: item.to,
-                carrier: "🚛 НАШИ ЦЕНЫ АРПИ АВТО",
-                kg: { upTo500: item.price, upTo5000: item.price, upTo20000: item.price },
-                m3: { upTo1: 0, upTo7: 0, upTo40: 0 },
-                minSum: item.minSum,
-                delivery: item.delivery,
-                type: "🚛 Авто (собственный)",
-                isOurTruck: false,
-                isFinalPrice: true,
-                note: "💰 Цена уже финальная, наценка не применяется"
-            });
-        });
-
 
         function getUnitPrice(route, value, unit) {
             let price = 0;
@@ -2292,15 +2748,23 @@
         }
 
         function calculatePrice(from, to, value, unit) {
-            // Для АРПИ и Нашей машины показываем только если выбрана единица "кг"
-            let routes = allTariffs.filter(t => t.from === from && t.to === to);
+            // Фильтруем маршруты
+            let routes = tariffsDB.filter(t => t.from === from && t.to === to);
 
-            // Если выбраны м³ — исключаем АРПИ (у них нет м³)
+            // Если выбраны м³ — показываем только те, у которых есть цена за м³
             if (unit === 'm3') {
-                routes = routes.filter(t => t.carrier !== "🚛 НАШИ ЦЕНЫ АРПИ АВТО");
+                routes = routes.filter(t => {
+                    const price = getUnitPrice(t, value, unit);
+                    return price > 0;
+                });
             }
 
-            if (routes.length === 0) return { error: "Маршрут не найден" };
+            if (routes.length === 0) {
+                if (unit === 'm3') {
+                    return { error: "Нет тарифов за м³ для этого маршрута" };
+                }
+                return { error: "Маршрут не найден" };
+            }
 
             const results = routes.map(route => {
                 const unitPrice = getUnitPrice(route, value, unit);
@@ -2331,13 +2795,17 @@
                 };
             }).filter(r => r !== null);
 
-            if (results.length === 0) return { error: "Нет данных для этого объёма" };
+            if (results.length === 0) {
+                if (unit === 'm3') {
+                    return { error: "Нет тарифов за м³ для этого маршрута" };
+                }
+                return { error: "Нет данных для этого объёма" };
+            }
 
-            // Сортировка: сначала "Наша машина" и "АРПИ", потом остальные по цене
+            // Сортировка: сначала "Наша машина", потом остальные по цене
             results.sort((a, b) => {
-                const aPriority = a.carrier.includes("Наша машина") || a.carrier.includes("АРПИ") ? 0 : 1;
-                const bPriority = b.carrier.includes("Наша машина") || b.carrier.includes("АРПИ") ? 0 : 1;
-                if (aPriority !== bPriority) return aPriority - bPriority;
+                if (a.isOurTruck && !b.isOurTruck) return -1;
+                if (!a.isOurTruck && b.isOurTruck) return 1;
                 return a.price - b.price;
             });
 
@@ -2349,14 +2817,14 @@
             if (results.error) return results;
 
             return results.map(r => {
-                // Если цена уже финальная — не накручиваем наценку
-                if (r.isFinalPrice) {
+                if (r.isOurTruck && r.isFinalPrice) {
                     return {
                         ...r,
                         costPrice: r.price,
                         priceWithMargin: r.price,
                         marginRub: 0,
-                        marginPercent: 0
+                        marginPercent: 0,
+                        marginMultiplier: 1
                     };
                 }
 
@@ -2370,7 +2838,8 @@
                     costPrice: r.price,
                     priceWithMargin: priceWithMargin,
                     marginRub: marginRub,
-                    marginPercent: marginPercentActual
+                    marginPercent: marginPercentActual,
+                    marginMultiplier: multiplier
                 };
             });
         }
@@ -2478,12 +2947,8 @@
             }
             list.innerHTML = h.map((item, i) => {
                 const isOur = item.carrier && item.carrier.includes('Наша машина');
-                const isArpi = item.carrier && item.carrier.includes('АРПИ');
-                let cls = 'history-item';
-                if (isOur) cls += ' our-history';
-                if (isArpi) cls += ' arpi-history';
                 return `
-                    <div class="${cls}" data-index="${i}">
+                    <div class="history-item ${isOur ? 'our-history' : ''}" data-index="${i}">
                         <span class="route">${item.from} → ${item.to}</span>
                         <span class="info">${item.value} ${item.unit} · ${item.carrier}${item.marginPercent ? ' · +'+item.marginPercent+'%' : ''}</span>
                         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
@@ -2526,7 +2991,7 @@
         const clearHistoryBtn = document.getElementById('clearHistory');
 
         // Города
-        const cities = [...new Set(allTariffs.map(t => t.from))].sort();
+        const cities = [...new Set(tariffsDB.map(t => t.from))].sort();
         cities.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c;
@@ -2539,7 +3004,7 @@
             toSelect.innerHTML = '<option value="">Выберите город</option>';
             toSelect.disabled = true;
             if (!from) return;
-            const dest = [...new Set(allTariffs.filter(t => t.from === from).map(t => t.to))].sort();
+            const dest = [...new Set(tariffsDB.filter(t => t.from === from).map(t => t.to))].sort();
             dest.forEach(c => {
                 const opt = document.createElement('option');
                 opt.value = c;
@@ -2676,17 +3141,14 @@
                 const marginInfo = formatMargin(r.marginPercent, r.marginRub);
                 const marginColor = getMarginColor(r.marginPercent);
                 const hasNote = r.note && r.note.length > 0;
-                const isArpi = r.carrier.includes("АРПИ");
 
                 let cls = 'result-card';
-                if (isBest && !isOur && !isArpi) cls += ' best';
+                if (isBest && !isOur) cls += ' best';
                 if (isOur) cls += ' our-truck';
-                if (isArpi) cls += ' arpi-price';
 
                 let badges = '';
-                if (isBest && !isOur && !isArpi) badges += ' <span class="badge badge-best">⭐ Лучший</span>';
+                if (isBest && !isOur) badges += ' <span class="badge badge-best">⭐ Лучший</span>';
                 if (isOur) badges += ' <span class="badge badge-our">🏠 Свой транспорт</span>';
-                if (isArpi) badges += ' <span class="badge badge-arpi">🚛 Наши цены</span>';
                 if (isFinal) badges += ' <span class="badge badge-final">💰 Финальная цена</span>';
                 if (usedMin) badges += ' <span class="badge badge-min">⚠️ Мин. сумма</span>';
                 if (hasNote) badges += ' <span class="badge badge-note">📌</span>';
@@ -2695,7 +3157,7 @@
                     <div class="${cls}">
                         <div class="result-header">
                             <span class="carrier-name">${r.carrier} ${badges}</span>
-                            <span class="price-tag ${isBest && !isOur && !isArpi ? 'best-price' : ''}">${r.priceWithMargin.toLocaleString()} ₽</span>
+                            <span class="price-tag ${isBest && !isOur ? 'best-price' : ''}">${r.priceWithMargin.toLocaleString()} ₽</span>
                         </div>
                         <div class="margin-block">
                             <div class="margin-row">
@@ -2718,13 +3180,12 @@
                             </div>
                         </div>
                         <div class="result-details">
-                            ${r.unitPrice > 0 ? `<span>📊 ${r.unitPrice} ₽/${unitLabel}</span>` : ''}
+                            <span>📊 ${r.unitPrice} ₽/${unitLabel}</span>
                             ${r.minSum > 0 ? `<span>💰 Мин. сумма: ${r.minSum.toLocaleString()} ₽</span>` : ''}
                             ${usedMin ? `<span class="highlight">⚠️ Применена минимальная сумма</span>` : ''}
                             <span>📅 ${r.delivery} дн.</span>
                             <span>🚛 ${r.type}</span>
                             ${isOur ? '<span>🏷️ Собственный транспорт</span>' : ''}
-                            ${isArpi ? '<span>🏷️ Наши фиксированные цены</span>' : ''}
                             ${hasNote ? `<span class="note-text">📌 ${r.note}</span>` : ''}
                         </div>
                     </div>
@@ -2747,11 +3208,11 @@
             });
         });
 
-        console.log('🚚 Калькулятор v4.1 загружен!');
-        console.log(`📊 Загружено ${allTariffs.length} тарифов`);
-        console.log(`🚛 Из них АРПИ: ${arpiPrices.length} маршрутов`);
+        console.log('🚚 Калькулятор v4.2 загружен!');
+        console.log(`📊 Загружено ${tariffsDB.length} тарифов`);
         console.log('🏙️ Доступные города:', cities.join(', '));
-        console.log('✅ АРПИ цены — финальные, без наценки');
+        console.log('✅ АРПИ убран из основной таблицы');
+        console.log('✅ При выборе м³ показываются только маршруты с ценами за м³');
     </script>
 
 </body>
