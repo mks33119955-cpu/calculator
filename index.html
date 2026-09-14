@@ -3,20 +3,24 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>🚚 Калькулятор грузоперевозок v5.0</title>
+<title>🚚 Калькулятор грузоперевозок v7.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
---primary: #4f46e5; --success: #10b981; --success-bg: #ecfdf5;
---warning: #f59e0b; --warning-bg: #fffbeb;
+--primary: #4f46e5;
+--success: #10b981;
+--success-bg: #ecfdf5;
+--warning: #f59e0b;
 --danger: #ef4444;
---express: #ef4444; --express-bg: #fef2f2;
---standard: #3b82f6; --standard-bg: #eff6ff;
---economy: #10b981; --economy-bg: #ecfdf5;
+--express: #ef4444;
+--standard: #3b82f6;
+--economy: #10b981;
 --card-bg: rgba(255, 255, 255, 0.85);
---text-primary: #0f172a; --text-secondary: #475569; --text-muted: #94a3b8;
+--text-primary: #0f172a;
+--text-secondary: #475569;
+--text-muted: #94a3b8;
 --border: rgba(226, 232, 240, 0.8);
 --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -34,7 +38,8 @@ color: var(--text-primary); line-height: 1.5;
 max-width: 900px; margin: 0 auto; background: var(--card-bg);
 backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.6);
 border-radius: 24px; padding: 32px;
-box-shadow: var(--shadow-lg); animation: fadeIn 0.6s ease;
+box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+animation: fadeIn 0.6s ease;
 }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 16px; }
@@ -49,21 +54,23 @@ h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
 
 /* Mode Switcher */
 .mode-switcher {
-display: flex; gap: 4px; background: #e2e8f0; padding: 4px; border-radius: 16px; margin-bottom: 28px;
+display: flex; gap: 4px; background: #e2e8f0; padding: 6px; border-radius: 16px; margin-bottom: 28px;
 }
 .mode-btn {
-flex: 1; padding: 14px; border: none; border-radius: 12px; background: transparent; cursor: pointer;
+flex: 1; padding: 14px 20px; border: none; border-radius: 12px; background: transparent; cursor: pointer;
 font-weight: 700; font-size: 15px; font-family: inherit; transition: all 0.25s; color: var(--text-secondary);
 display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.mode-btn.active { background: #ffffff; color: var(--primary); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
-
+.mode-btn.active {
+background: #ffffff; color: var(--primary);
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
 .mode-content { display: none; }
 .mode-content.active { display: block; animation: fadeIn 0.3s ease; }
 
-.form-group { margin-bottom: 20px; position: relative; }
+.form-group { margin-bottom: 20px; }
 label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
-select, input[type="text"], input[type="number"] {
+select, input {
 width: 100%; padding: 14px 16px; border: 1.5px solid #cbd5e1; border-radius: 14px;
 font-size: 16px; font-family: inherit; transition: all 0.2s; background: #ffffff;
 appearance: none; box-shadow: var(--shadow-sm);
@@ -73,7 +80,6 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px;
 }
 select:focus, input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15); }
-
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
 .unit-toggle { display: flex; gap: 4px; background: #e2e8f0; padding: 4px; border-radius: 14px; margin-bottom: 20px; }
@@ -81,160 +87,130 @@ select:focus, input:focus { outline: none; border-color: var(--primary); box-sha
 flex: 1; padding: 12px; border: none; border-radius: 10px; background: transparent; cursor: pointer;
 font-weight: 600; font-size: 15px; font-family: inherit; transition: all 0.25s; color: var(--text-secondary);
 }
-.unit-btn.active { background: #ffffff; color: var(--text-primary); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
-
-/* Category Tabs */
-.category-tabs {
-display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; background: #f8fafc; padding: 8px;
-border-radius: 16px; border: 1px solid var(--border);
-}
-.category-tab {
-flex: 1; min-width: 110px; padding: 12px 16px; border: none; border-radius: 12px;
-background: transparent; cursor: pointer; font-weight: 600; font-size: 14px; font-family: inherit;
-transition: all 0.2s; color: var(--text-secondary);
-display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.category-tab:hover { background: #e2e8f0; }
-.category-tab.active[data-cat="express"] { color: var(--express); background: var(--express-bg); }
-.category-tab.active[data-cat="standard"] { color: var(--standard); background: var(--standard-bg); }
-.category-tab.active[data-cat="economy"] { color: var(--economy); background: var(--economy-bg); }
-.category-tab .count { background: rgba(0,0,0,0.08); padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 700; }
+.unit-btn.active { background: #ffffff; color: var(--text-primary); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); transform: scale(1.02); }
 
 .calc-btn {
 width: 100%; padding: 16px 24px; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white;
 border: none; border-radius: 16px; font-size: 17px; font-weight: 700; font-family: inherit; cursor: pointer;
-transition: all 0.3s; margin-bottom: 12px; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+transition: all 0.3s; margin-bottom: 12px;
+box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
 }
 .calc-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
-
-.secondary-btn {
+.density-btn {
 width: 100%; padding: 14px 24px; background: #ffffff; color: var(--primary);
 border: 2px solid #e0e7ff; border-radius: 16px; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer;
 transition: all 0.2s; margin-bottom: 12px;
 }
-.secondary-btn:hover { background: #eef2ff; border-color: var(--primary); }
+.density-btn:hover { background: #eef2ff; border-color: var(--primary); }
 
+/* Results */
 .results { margin-top: 24px; }
 @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
 .result-item {
-background: #ffffff; border-radius: 16px; padding: 20px; margin-bottom: 16px;
-border: 1px solid var(--border); border-left: 4px solid #cbd5e1;
-transition: all 0.3s; animation: slideUp 0.4s ease backwards; box-shadow: var(--shadow-sm);
+background: #ffffff; border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid var(--border);
+border-left: 4px solid #cbd5e1; transition: all 0.3s;
+animation: slideUp 0.4s ease backwards; box-shadow: var(--shadow-sm);
 }
 .result-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.result-item.best { border-left-color: var(--success); background: linear-gradient(to right, var(--success-bg), #ffffff); }
 .result-item.express { border-left-color: var(--express); }
 .result-item.standard { border-left-color: var(--standard); }
 .result-item.economy { border-left-color: var(--economy); }
-.result-item.best { background: linear-gradient(to right, var(--success-bg), #ffffff); border-color: rgba(16, 185, 129, 0.3); }
 
 .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 12px; }
 .result-carrier { font-weight: 700; font-size: 17px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .result-price { font-weight: 800; font-size: 22px; color: #1e40af; }
-.result-price.best-price { color: var(--success); }
-
 .result-details { display: flex; gap: 10px; font-size: 13px; color: var(--text-secondary); flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #e2e8f0; }
 .result-details span { background: #f8fafc; padding: 4px 10px; border-radius: 8px; font-weight: 500; }
 
-.badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-.badge.best-badge { background: var(--success); color: white; }
-.badge.express-badge { background: var(--express); color: white; }
-.badge.standard-badge { background: var(--standard); color: white; }
-.badge.economy-badge { background: var(--economy); color: white; }
-.badge.min-badge { background: #f97316; color: white; }
+.badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: white; }
+.badge.best-badge { background: var(--success); }
+.badge.express-badge { background: var(--express); }
+.badge.standard-badge { background: var(--standard); }
+.badge.economy-badge { background: var(--economy); }
+.badge.min-badge { background: #f97316; }
 
 .no-results { text-align: center; padding: 48px 20px; color: var(--text-secondary); background: #f8fafc; border-radius: 16px; border: 2px dashed #cbd5e1; }
 .no-results .emoji { font-size: 48px; margin-bottom: 16px; display: block; }
+
+.summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 20px; background: linear-gradient(135deg, #f8fafc, #f1f5f9); border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--border); }
+.summary-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.summary-item .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; }
+.summary-item .value { font-size: 20px; font-weight: 800; margin-top: 6px; }
 
 /* Expedition specific */
 .extras-section {
 background: #f8fafc; border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border);
 }
-.extras-title { font-weight: 700; font-size: 15px; margin-bottom: 16px; color: var(--text-primary); }
+.extras-title { font-weight: 700; font-size: 15px; margin-bottom: 16px; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
 .extra-item {
 display: flex; align-items: center; gap: 12px; padding: 12px; background: white; border-radius: 12px;
-margin-bottom: 8px; border: 1px solid var(--border); transition: all 0.2s;
+margin-bottom: 8px; border: 1px solid var(--border); transition: all 0.2s; flex-wrap: wrap;
 }
 .extra-item:hover { border-color: var(--primary); }
-.extra-item input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer; }
-.extra-item label { margin: 0; flex: 1; cursor: pointer; font-size: 14px; }
-.extra-item .extra-input {
-width: 100px; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px;
-font-size: 14px; font-family: inherit;
+.extra-item input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0; }
+.extra-item label { margin: 0; flex: 1; cursor: pointer; font-size: 14px; min-width: 200px; }
+.extra-input {
+width: 120px !important; padding: 8px 12px !important; border: 1.5px solid #cbd5e1 !important;
+border-radius: 8px !important; font-size: 14px !important;
 }
 .extra-item.disabled { opacity: 0.5; pointer-events: none; }
 
 .expedition-result {
 background: linear-gradient(135deg, #f8fafc, #f1f5f9); border-radius: 16px; padding: 24px;
-border: 1px solid var(--border); margin-top: 20px;
+border: 1px solid var(--border); margin-top: 20px; animation: slideUp 0.4s ease;
 }
 .expedition-result h3 { font-size: 18px; margin-bottom: 16px; }
 .result-line {
-display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #e2e8f0;
-font-size: 14px;
+display: flex; justify-content: space-between; align-items: center; padding: 10px 0;
+border-bottom: 1px dashed #e2e8f0; font-size: 14px; gap: 12px; flex-wrap: wrap;
 }
 .result-line:last-child { border-bottom: none; }
 .result-line.total {
 font-size: 18px; font-weight: 800; color: var(--primary); padding-top: 16px; margin-top: 8px;
 border-top: 2px solid var(--primary); border-bottom: none;
 }
+.result-line .label { color: var(--text-secondary); }
+.result-line .value { font-weight: 600; }
 
 /* History */
 .history { margin-top: 32px; border-top: 2px solid #e2e8f0; padding-top: 20px; }
 .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 12px; }
 .history-header h3 { font-size: 18px; font-weight: 700; }
 .clear-history { background: #fef2f2; border: 1px solid #fecaca; color: #ef4444; cursor: pointer; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 8px; }
-.history-item {
-display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #ffffff;
-border-radius: 12px; margin-bottom: 8px; font-size: 14px; cursor: pointer; transition: all 0.2s;
-flex-wrap: wrap; gap: 8px; border: 1px solid var(--border);
-}
+.history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #ffffff; border-radius: 12px; margin-bottom: 8px; font-size: 14px; cursor: pointer; transition: all 0.2s; flex-wrap: wrap; gap: 8px; border: 1px solid var(--border); }
 .history-item:hover { background: #f8fafc; transform: translateX(4px); }
 .history-item .route { font-weight: 700; }
 .history-item .info { color: var(--text-secondary); font-size: 13px; }
 .history-item .hprice { color: var(--primary); font-weight: 800; }
-.history-empty { color: var(--text-muted); text-align: center; padding: 24px; font-size: 14px; }
+.history-empty { color: var(--text-muted); text-align: center; padding: 24px; }
 
 /* Modal */
-.modal-overlay {
-position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
-display: flex; align-items: center; justify-content: center; z-index: 1000;
-opacity: 0; visibility: hidden; transition: all 0.3s;
-}
+.modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
 .modal-overlay.active { opacity: 1; visibility: visible; }
-.modal-content {
-background: #ffffff; border-radius: 24px; padding: 32px; max-width: 420px; width: 90%;
-box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: scale(0.95); transition: all 0.3s;
-position: relative;
-}
+.modal-content { background: #ffffff; border-radius: 24px; padding: 32px; max-width: 420px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: scale(0.95); transition: all 0.3s; position: relative; }
 .modal-overlay.active .modal-content { transform: scale(1); }
-.modal-close {
-position: absolute; top: 16px; right: 16px; background: #f1f5f9; border: none; width: 32px; height: 32px;
-border-radius: 50%; cursor: pointer; font-size: 18px; color: var(--text-secondary);
-}
+.modal-close { position: absolute; top: 16px; right: 16px; background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 18px; }
 .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 24px; text-align: center; }
-.density-result {
-margin-top: 20px; padding: 16px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--border);
-text-align: center; font-weight: 700; font-size: 16px; display: none;
-}
+.density-result { margin-top: 20px; padding: 16px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--border); text-align: center; font-weight: 700; display: none; }
 .density-result.show { display: block; }
 .density-result.weight-win { background: #ecfdf5; border-color: #10b981; color: #047857; }
 .density-result.volume-win { background: #fffbeb; border-color: #f59e0b; color: #b45309; }
 
 @media (max-width: 768px) {
-.row { grid-template-columns: 1fr; }
-.category-tabs { flex-direction: column; }
-.category-tab { min-width: auto; }
-.header-left { flex-wrap: wrap; }
+.summary { grid-template-columns: 1fr; }
+.summary-item { flex-direction: row; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0; }
+.summary-item:last-child { border-bottom: none; }
 }
 @media (max-width: 600px) {
 body { padding: 12px; }
 .container { padding: 20px; border-radius: 20px; }
+.row { grid-template-columns: 1fr; }
 h1 { font-size: 20px; }
 .result-header { flex-direction: column; align-items: flex-start; }
 .header { flex-direction: column; align-items: flex-start; }
-.logo { padding-right: 16px; border-right: 2px solid var(--border); }
-.logo .company { font-size: 13px; }
+.extra-item { flex-direction: column; align-items: flex-start; }
+.extra-input { width: 100% !important; }
 }
 </style>
 </head>
@@ -247,9 +223,9 @@ h1 { font-size: 20px; }
 <span class="rf">РФ</span>
 <span class="full">ТРАНСПОРТНАЯ ГРУЗОВАЯ КОМПАНИЯ</span>
 </div>
-<h1>🚚 Калькулятор v5.0</h1>
+<h1>🚚 Калькулятор</h1>
 </div>
-<span class="version">v5.0</span>
+<span class="version">v7.0</span>
 </div>
 <p class="subtitle">Межгород + Экспедирование по городу</p>
 
@@ -270,7 +246,6 @@ h1 { font-size: 20px; }
 <select id="toCity" disabled><option value="">Сначала "Откуда"</option></select>
 </div>
 </div>
-
 <div class="form-group">
 <label>Единица измерения</label>
 <div class="unit-toggle">
@@ -278,21 +253,12 @@ h1 { font-size: 20px; }
 <button class="unit-btn" data-unit="m3">📐 Объём (м³)</button>
 </div>
 </div>
-
 <div class="form-group">
 <label id="valueLabel">Вес (кг)</label>
 <input type="number" id="valueInput" placeholder="Например: 500" min="0.1" step="0.1" />
 </div>
-
-<div class="category-tabs">
-<button class="category-tab active" data-cat="express">🚀 Экспресс <span class="count" id="count-express">0</span></button>
-<button class="category-tab" data-cat="standard">⚡ Стандарт <span class="count" id="count-standard">0</span></button>
-<button class="category-tab" data-cat="economy">💰 Эконом <span class="count" id="count-economy">0</span></button>
-</div>
-
-<button class="calc-btn" id="calcBtn">🧮 Рассчитать стоимость</button>
-<button class="secondary-btn" id="openDensityBtn">⚖️ Калькулятор плотности (250 кг/м³)</button>
-
+<button class="calc-btn" id="calcBtn">🧮 Рассчитать перевозку</button>
+<button class="density-btn" id="openDensityBtn">⚖️ Калькулятор плотности (250 кг/м³)</button>
 <div id="resultsContainer" class="results"></div>
 </div>
 
@@ -310,56 +276,66 @@ h1 { font-size: 20px; }
 <option value="Хабаровск">Хабаровск</option>
 </select>
 </div>
-
 <div class="form-group">
-<label>📦 Вес груза (кг)</label>
-<input type="number" id="expWeight" placeholder="Например: 1000" min="0" step="1" />
+<label>🚛 Грузоподъёмность</label>
+<select id="expWeight">
+<option value="1500">до 1 500 кг</option>
+<option value="3000">1 501 — 3 000 кг</option>
+<option value="5000">3 001 — 5 000 кг</option>
+<option value="10000">5 001 — 10 000 кг</option>
+</select>
 </div>
 
 <div class="extras-section">
 <div class="extras-title">🔧 Дополнительные услуги</div>
 
-<div class="extra-item" data-extra="extrakm">
+<div class="extra-item">
 <input type="checkbox" id="chk-extrakm" />
-<label for="chk-extrakm">🛣️ Дополнительный пробег</label>
+<label for="chk-extrakm">🛣️ Доп. пробег (сверх нормы)</label>
 <input type="number" class="extra-input" id="exp-extrakm" placeholder="км" min="0" disabled />
 </div>
 
-<div class="extra-item" data-extra="remote">
+<div class="extra-item">
 <input type="checkbox" id="chk-remote" />
 <label for="chk-remote">🏘️ Доставка в отдалённый район</label>
 </div>
 
-<div class="extra-item" data-extra="crate">
+<div class="extra-item">
 <input type="checkbox" id="chk-crate" />
 <label for="chk-crate">📦 Обрешётка груза</label>
 <input type="number" class="extra-input" id="exp-crate" placeholder="м³" min="0" step="0.1" disabled />
 </div>
 
-<div class="extra-item" data-extra="avizo">
+<div class="extra-item">
 <input type="checkbox" id="chk-avizo" />
-<label for="chk-avizo">⏰ Подача ТС ко времени</label>
+<label for="chk-avizo">⏰ Подача ТС ко времени (авизация)</label>
 </div>
 
-<div class="extra-item" data-extra="mkad" data-city="Москва">
+<div class="extra-item" id="mkad-item">
 <input type="checkbox" id="chk-mkad" />
 <label for="chk-mkad">🛣️ Пробег за МКАД</label>
 <input type="number" class="extra-input" id="exp-mkad" placeholder="км" min="0" disabled />
 </div>
 
-<div class="extra-item" data-extra="prr">
+<div class="extra-item" id="outside-item">
+<input type="checkbox" id="chk-outside" />
+<label for="chk-outside">🛣️ Пробег за пределы города</label>
+<input type="number" class="extra-input" id="exp-outside" placeholder="км" min="0" disabled />
+</div>
+
+<div class="extra-item">
 <input type="checkbox" id="chk-prr" />
 <label for="chk-prr">📥 ПРР (разгрузка)</label>
 <input type="number" class="extra-input" id="exp-prr" placeholder="кг" min="0" disabled />
 </div>
 
-<div class="extra-item" data-extra="overtime">
+<div class="extra-item">
 <input type="checkbox" id="chk-overtime" />
 <label for="chk-overtime">⏱️ Сверхнормативное время</label>
 <input type="number" class="extra-input" id="exp-overtime" placeholder="часы" min="0" step="0.25" disabled />
 </div>
 
-<div class="extra-item" data-extra="storage">
+<div class="extra-item">
 <input type="checkbox" id="chk-storage" />
 <label for="chk-storage">🏬 Хранение груза</label>
 <input type="number" class="extra-input" id="exp-storage" placeholder="сутки" min="0" disabled />
@@ -367,7 +343,6 @@ h1 { font-size: 20px; }
 </div>
 
 <button class="calc-btn" id="calcExpBtn">💰 Рассчитать экспедирование</button>
-
 <div id="expResultsContainer"></div>
 </div>
 
@@ -381,7 +356,7 @@ h1 { font-size: 20px; }
 </div>
 </div>
 
-<!-- Модалка плотности -->
+<!-- ============ МОДАЛКА ПЛОТНОСТИ ============ -->
 <div class="modal-overlay" id="densityModal">
 <div class="modal-content">
 <button class="modal-close" id="closeDensityBtn">✕</button>
@@ -404,10 +379,9 @@ h1 { font-size: 20px; }
 
 <script>
 // ============================================================
-// БАЗА ДАННЫХ ТАРИФОВ ПЕРЕВОЗКИ
+// 🚚 БАЗА ТАРИФОВ ПЕРЕВОЗКИ (ТК ГК)
 // ============================================================
-// Экспресс — тарифы ТК ГК (из прайса от 01.08.26)
-const expressTariffs = [
+const transportTariffs = [
 { from: "Москва", to: "Новосибирск", pricePerM3: 10710, minSum: 1500 },
 { from: "Москва", to: "Екатеринбург", pricePerM3: 6503, minSum: 1500 },
 { from: "Москва", to: "Иркутск", pricePerM3: 15300, minSum: 1500 },
@@ -443,7 +417,7 @@ const expressTariffs = [
 { from: "Новосибирск", to: "Владивосток", pricePerM3: 10000, minSum: 1500 },
 { from: "Новосибирск", to: "Благовещенск", pricePerM3: 14350, minSum: 1500 },
 { from: "Новосибирск", to: "Комсомольск-на-Амуре", pricePerM3: 13900, minSum: 1500 },
-{ from: "Новосибирск", to: "Южно-Сахалинск (хаб)", pricePerM3: 27970, minSum: 2400 },
+{ from: "Новосибирск", to: "Южно-Сахалинск (хаб)", pricePerM3: 27970, minSum: 1500 },
 { from: "Новосибирск", to: "Магадан", pricePerM3: 25120, minSum: 2400 },
 { from: "Новосибирск", to: "Петропавловск-Камчатский", pricePerM3: 22927, minSum: 2400 },
 { from: "Новосибирск", to: "Находка", pricePerM3: 15692, minSum: 1500 },
@@ -451,304 +425,96 @@ const expressTariffs = [
 { from: "Новосибирск", to: "Южно-Сахалинск (Влд)", pricePerM3: 23524, minSum: 2400 }
 ];
 
-// Стандарт — Москва-Новосибирск
-const standardTariffs = [
-{ from: "Москва", to: "Новосибирск", pricePerM3: 6500, pricePerKg: 26, minSum: 1500, delivery: "5 дней" }
-];
-
-// Эконом — пока пусто, можно добавить позже
-const economyTariffs = [];
-
 const DENSITY = 250; // кг/м³
 
 // ============================================================
-// БАЗА ДАННЫХ ЭКСПЕДИРОВАНИЯ
+// 📦 БАЗА ТАРИФОВ ЭКСПЕДИРОВАНИЯ
 // ============================================================
 const expeditionDB = {
 "Москва": {
-ranges: [
-{ max: 1500, price: 10200, min: 1700 },
-{ max: 3000, price: 15120, min: 1800 },
-{ max: 5000, price: 18240, min: 1900 },
-{ max: 10000, price: 20160, min: 2100 }
-],
-extrakm: { 1500: 44.40, 3000: 51.60, 5000: 66.00, 10000: 80.40 },
+base: { 1500: 10200, 3000: 15120, 5000: 18240, 10000: 20160 },
 remote: { 1500: 2040, 3000: 2160, 5000: 2280, 10000: 2520 },
 crate: { perM3: 2760, min: 1000 },
-avizo: { 500: 3060, more: 3420 },
-mkad: 72.00, // за км (для 1.5т)
-prr: { perKg: 720, min: 1800 },
+avizo: { under500: 3060, over500: 3420 },
+mkad: { 1500: 72, 3000: 74.4, 5000: 78, 10000: 80.4 },
+outside: null,
+prr: { perKg: 0, min: 0 }, // ПРР не указан для Москвы в прайсе
 overtime: { 1500: 2040, 3000: 2160, 5000: 2280, 10000: 2520 },
-storage: { perKgDay: 2.70 }
+storage: null
 },
 "Новосибирск": {
-ranges: [
-{ max: 1500, price: 3600, min: 1500 },
-{ max: 3000, price: 4644, min: 1935 },
-{ max: 5000, price: 7920, min: 2200 },
-{ max: 10000, price: 16470, min: 2745 }
-],
-extrakm: { 1500: 44.40, 3000: 51.60, 5000: 66.00, 10000: 80.40 },
+base: { 1500: 3600, 3000: 4644, 5000: 7920, 10000: 16470 },
 remote: { 1500: 1800, 3000: 2322, 5000: 2640, 10000: 3294 },
 crate: { perM3: 2400, min: 1000 },
-avizo: { 500: 2700, more: 3960 },
+avizo: { under500: 2700, over500: 3960 },
+mkad: null,
+outside: { 1500: 44.4, 3000: 51.6, 5000: 66, 10000: 80.4 },
 prr: { perKg: 720, min: 1800 },
 overtime: { 1500: 1800, 3000: 2322, 5000: 2640, 10000: 3294 },
-storage: { perPalletDay: 60 }
+storage: { perPallet: 60 }
 },
 "Владивосток": {
-ranges: [
-{ max: 1500, price: 3600, min: 1500 },
-{ max: 3000, price: 5856, min: 2440 },
-{ max: 5000, price: 8784, min: 2440 },
-{ max: 10000, price: 18300, min: 3050 }
-],
-extrakm: { 1500: 72.00, 3000: 84.00, 5000: 108.00, 10000: 132.00 },
+base: { 1500: 3600, 3000: 5856, 5000: 8784, 10000: 18300 },
 remote: { 1500: 1800, 3000: 2928, 5000: 2928, 10000: 3660 },
 crate: { perM3: 3600, min: 1500 },
-avizo: { 500: 2700, more: 4392 },
+avizo: { under500: 2700, over500: 4392 },
+mkad: null,
+outside: { 1500: 72, 3000: 84, 5000: 108, 10000: 132 },
 prr: { perKg: 720, min: 1800 },
 overtime: { 1500: 1800, 3000: 2928, 5000: 2928, 10000: 3660 },
-storage: { perPalletDay: 162 }
+storage: { perPallet: 162 }
 },
 "Владивосток-Уссурийск": {
-ranges: [
-{ max: 1500, price: 14400, min: 14400 },
-{ max: 3000, price: 16800, min: 16800 },
-{ max: 5000, price: 21600, min: 21600 }
-]
+base: { 1500: 14400, 3000: 16800, 5000: 21600, 10000: 0 },
+remote: null, crate: null, avizo: null, mkad: null, outside: null,
+prr: null, overtime: null, storage: null
 },
 "Чита": {
-ranges: [
-{ max: 1500, price: 3660, min: 1525 },
-{ max: 3000, price: 8640, min: 2400 },
-{ max: 5000, price: 9720, min: 2700 },
-{ max: 10000, price: 18300, min: 3050 }
-],
+base: { 1500: 3660, 3000: 8640, 5000: 9720, 10000: 18300 },
 remote: { 1500: 1830, 3000: 2880, 5000: 3240, 10000: 3660 },
 crate: { perM3: 1800, min: 700 },
-avizo: { 500: 3294, more: 4860 },
+avizo: { under500: 3294, over500: 4860 },
+mkad: null,
+outside: null,
 prr: { perKg: 1080, min: 1800 },
-overtime: { 1500: 1830, 3000: 2880, 5000: 3240, 10000: 3660 }
+overtime: { 1500: 1830, 3000: 2880, 5000: 3240, 10000: 3660 },
+storage: null
 },
 "Хабаровск": {
-ranges: [
-{ max: 1500, price: 4392, min: 1830 },
-{ max: 3000, price: 5124, min: 2360 },
-{ max: 5000, price: 10248, min: 2845 },
-{ max: 10000, price: 20496, min: 3416 }
-],
-extrakm: { 1500: 72.00, 3000: 84.00, 5000: 108.00, 10000: 132.00 },
-remote: { 1500: 2196, 3000: 2832, 5000: 3414, 10000: 4099.20 },
+base: { 1500: 4392, 3000: 5124, 5000: 10248, 10000: 20496 },
+remote: { 1500: 2196, 3000: 2832, 5000: 3414, 10000: 4099.2 },
 crate: { perM3: 3600, min: 1500 },
-avizo: { 500: 3294, more: 5121 },
+avizo: { under500: 3294, over500: 5121 },
+mkad: null,
+outside: { 1500: 72, 3000: 84, 5000: 108, 10000: 132 },
 prr: { perKg: 1200, min: 2000 },
-overtime: { 1500: 2196, 3000: 2832, 5000: 3414, 10000: 4099.20 },
-storage: { perKgDay: 2.70, perM3Day: 540 }
+overtime: { 1500: 2196, 3000: 2832, 5000: 3414, 10000: 4099.2 },
+storage: { perKg: 2.7, perM3: 540 }
 }
 };
 
 // ============================================================
-// ЛОГИКА РАСЧЁТА ПЕРЕВОЗКИ
+// ПЕРЕКЛЮЧЕНИЕ РЕЖИМОВ
 // ============================================================
-function calculateTransport(from, to, value, unit) {
-const results = [];
-
-// Экспресс
-expressTariffs.forEach(t => {
-if (t.from === from && t.to === to) {
-let m3, priceByM3;
-if (unit === 'kg') {
-m3 = value / DENSITY;
-priceByM3 = Math.round(m3 * t.pricePerM3);
-} else {
-m3 = value;
-priceByM3 = Math.round(value * t.pricePerM3);
-}
-let finalPrice = Math.max(priceByM3, t.minSum);
-results.push({
-carrier: "ТК ГК",
-category: "express",
-price: finalPrice,
-pricePerM3: t.pricePerM3,
-minSum: t.minSum,
-usedMinSum: priceByM3 < t.minSum,
-delivery: "Экспресс",
-m3: m3.toFixed(2)
+document.querySelectorAll('.mode-btn').forEach(btn => {
+btn.addEventListener('click', function() {
+document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+this.classList.add('active');
+document.querySelectorAll('.mode-content').forEach(c => c.classList.remove('active'));
+document.getElementById('mode-' + this.dataset.mode).classList.add('active');
 });
-}
 });
-
-// Стандарт
-standardTariffs.forEach(t => {
-if (t.from === from && t.to === to) {
-let priceByKg, priceByM3, m3;
-if (unit === 'kg') {
-priceByKg = value * t.pricePerKg;
-m3 = value / DENSITY;
-priceByM3 = m3 * t.pricePerM3;
-} else {
-m3 = value;
-priceByM3 = value * t.pricePerM3;
-priceByKg = value * DENSITY * t.pricePerKg;
-}
-const price = Math.max(priceByKg, priceByM3, t.minSum);
-results.push({
-carrier: "Стандарт",
-category: "standard",
-price: Math.round(price),
-pricePerM3: t.pricePerM3,
-pricePerKg: t.pricePerKg,
-minSum: t.minSum,
-usedMinSum: price <= t.minSum,
-delivery: t.delivery,
-m3: m3.toFixed(2)
-});
-}
-});
-
-// Эконом
-economyTariffs.forEach(t => {
-if (t.from === from && t.to === to) {
-let m3 = unit === 'kg' ? value / DENSITY : value;
-let price = Math.round(m3 * t.pricePerM3);
-let finalPrice = Math.max(price, t.minSum);
-results.push({
-carrier: t.carrier,
-category: "economy",
-price: finalPrice,
-pricePerM3: t.pricePerM3,
-minSum: t.minSum,
-usedMinSum: price < t.minSum,
-delivery: t.delivery,
-m3: m3.toFixed(2)
-});
-}
-});
-
-return results.sort((a, b) => a.price - b.price);
-}
 
 // ============================================================
-// ЛОГИКА РАСЧЁТА ЭКСПЕДИРОВАНИЯ
-// ============================================================
-function getRangeForWeight(ranges, weight) {
-for (const r of ranges) {
-if (weight <= r.max) return r;
-}
-return ranges[ranges.length - 1];
-}
-
-function calculateExpedition(city, weight, extras) {
-const data = expeditionDB[city];
-if (!data) return null;
-
-const range = getRangeForWeight(data.ranges, weight);
-let basePrice = Math.max(range.price, range.min);
-
-const breakdown = [{ label: "🚚 Базовый тариф", value: basePrice, detail: `до ${range.max} кг` }];
-let total = basePrice;
-
-// Доп. пробег
-if (extras.extrakm && data.extrakm) {
-const km = parseFloat(extras.extrakm) || 0;
-const rate = getRateForWeight(data.extrakm, weight);
-const cost = Math.round(km * rate);
-breakdown.push({ label: "🛣️ Доп. пробег", value: cost, detail: `${km} км × ${rate} ₽` });
-total += cost;
-}
-
-// Отдалённый район
-if (extras.remote && data.remote) {
-const cost = getRateForWeight(data.remote, weight);
-breakdown.push({ label: "🏘️ Отдалённый район", value: cost, detail: "" });
-total += cost;
-}
-
-// Обрешётка
-if (extras.crate && data.crate) {
-const m3 = parseFloat(extras.crate) || 0;
-const cost = Math.max(Math.round(m3 * data.crate.perM3), data.crate.min);
-breakdown.push({ label: "📦 Обрешётка", value: cost, detail: `${m3} м³` });
-total += cost;
-}
-
-// Подача ко времени
-if (extras.avizo && data.avizo) {
-const cost = weight <= 500 ? data.avizo[500] : data.avizo.more;
-breakdown.push({ label: "⏰ Подача ко времени", value: cost, detail: weight <= 500 ? "до 500 кг" : "от 500 кг" });
-total += cost;
-}
-
-// Пробег за МКАД (только Москва)
-if (extras.mkad && data.mkad) {
-const km = parseFloat(extras.mkad) || 0;
-const cost = Math.round(km * data.mkad);
-breakdown.push({ label: "🛣️ Пробег за МКАД", value: cost, detail: `${km} км × ${data.mkad} ₽` });
-total += cost;
-}
-
-// ПРР
-if (extras.prr && data.prr) {
-const kg = parseFloat(extras.prr) || 0;
-const cost = Math.max(Math.round(kg * data.prr.perKg), data.prr.min);
-breakdown.push({ label: "📥 ПРР (разгрузка)", value: cost, detail: `${kg} кг` });
-total += cost;
-}
-
-// Сверхнормативное время
-if (extras.overtime && data.overtime) {
-const hours = parseFloat(extras.overtime) || 0;
-const rate = getRateForWeight(data.overtime, weight);
-const cost = Math.round(hours * rate);
-breakdown.push({ label: "⏱️ Сверхнормативное время", value: cost, detail: `${hours} ч × ${rate} ₽` });
-total += cost;
-}
-
-// Хранение
-if (extras.storage && data.storage) {
-const days = parseFloat(extras.storage) || 0;
-let cost = 0;
-if (data.storage.perKgDay) {
-cost = Math.round(weight * data.storage.perKgDay * days);
-} else if (data.storage.perPalletDay) {
-const pallets = Math.ceil(weight / 500);
-cost = Math.round(pallets * data.storage.perPalletDay * days);
-} else if (data.storage.perM3Day) {
-const m3 = weight / DENSITY;
-cost = Math.round(m3 * data.storage.perM3Day * days);
-}
-breakdown.push({ label: "🏬 Хранение", value: cost, detail: `${days} сут.` });
-total += cost;
-}
-
-return { basePrice, total, breakdown };
-}
-
-function getRateForWeight(rateObj, weight) {
-if (!rateObj) return 0;
-const keys = Object.keys(rateObj).map(k => parseFloat(k)).sort((a, b) => a - b);
-for (const k of keys) {
-if (weight <= k) return rateObj[k];
-}
-return rateObj[keys[keys.length - 1]];
-}
-
-// ============================================================
-// ИНТЕРФЕЙС
+// 🚚 ЛОГИКА ПЕРЕВОЗКИ
 // ============================================================
 const fromSelect = document.getElementById('fromCity');
 const toSelect = document.getElementById('toCity');
 const valueInput = document.getElementById('valueInput');
 const valueLabel = document.getElementById('valueLabel');
-const calcBtn = document.getElementById('calcBtn');
-const resultsContainer = document.getElementById('resultsContainer');
 
-// Заполняем города
-const allCities = new Set();
-expressTariffs.forEach(t => { allCities.add(t.from); allCities.add(t.to); });
-standardTariffs.forEach(t => { allCities.add(t.from); allCities.add(t.to); });
-[...allCities].sort().forEach(city => {
+const cities = [...new Set(transportTariffs.map(t => t.from))].sort();
+cities.forEach(city => {
 const opt = document.createElement('option');
 opt.value = city; opt.textContent = city;
 fromSelect.appendChild(opt);
@@ -759,11 +525,8 @@ const from = this.value;
 toSelect.innerHTML = '<option value="">Выберите город</option>';
 toSelect.disabled = !from;
 if (!from) return;
-const destinations = new Set();
-expressTariffs.filter(t => t.from === from).forEach(t => destinations.add(t.to));
-standardTariffs.filter(t => t.from === from).forEach(t => destinations.add(t.to));
-economyTariffs.filter(t => t.from === from).forEach(t => destinations.add(t.to));
-[...destinations].sort().forEach(city => {
+const dests = [...new Set(transportTariffs.filter(t => t.from === from).map(t => t.to))].sort();
+dests.forEach(city => {
 const opt = document.createElement('option');
 opt.value = city; opt.textContent = city;
 toSelect.appendChild(opt);
@@ -779,100 +542,87 @@ valueInput.placeholder = this.dataset.unit === 'kg' ? 'Например: 500' : 
 });
 });
 
-let currentCategory = 'express';
-document.querySelectorAll('.category-tab').forEach(tab => {
-tab.addEventListener('click', function() {
-document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
-this.classList.add('active');
-currentCategory = this.dataset.cat;
-filterResults();
-});
-});
-
-function filterResults() {
-document.querySelectorAll('.result-item').forEach(item => {
-item.style.display = item.dataset.category === currentCategory ? '' : 'none';
-});
-}
-
-// ============================================================
-// РАСЧЁТ ПЕРЕВОЗКИ
-// ============================================================
-calcBtn.addEventListener('click', function() {
+document.getElementById('calcBtn').addEventListener('click', function() {
 const from = fromSelect.value;
 const to = toSelect.value;
 const unit = document.querySelector('.unit-btn.active').dataset.unit;
 const value = parseFloat(valueInput.value);
+const container = document.getElementById('resultsContainer');
 
 if (!from || !to) {
-resultsContainer.innerHTML = `<div class="no-results"><span class="emoji">⚠️</span><p>Выберите маршрут</p></div>`;
+container.innerHTML = `<div class="no-results"><span class="emoji">⚠️</span><p>Выберите маршрут</p></div>`;
 return;
 }
 if (!value || value <= 0) {
-resultsContainer.innerHTML = `<div class="no-results"><span class="emoji">⚠️</span><p>Введите значение</p></div>`;
+container.innerHTML = `<div class="no-results"><span class="emoji">⚠️</span><p>Введите значение</p></div>`;
 return;
 }
 
-const results = calculateTransport(from, to, value, unit);
-if (results.length === 0) {
-resultsContainer.innerHTML = `<div class="no-results"><span class="emoji">😕</span><p>Маршрут не найден</p></div>`;
+const routes = transportTariffs.filter(t => t.from === from && t.to === to);
+if (routes.length === 0) {
+container.innerHTML = `<div class="no-results"><span class="emoji">😕</span><p>Маршрут не найден</p></div>`;
 return;
 }
 
-// Обновляем счётчики
-const counts = { express: 0, standard: 0, economy: 0 };
-results.forEach(r => counts[r.category]++);
-document.getElementById('count-express').textContent = counts.express;
-document.getElementById('count-standard').textContent = counts.standard;
-document.getElementById('count-economy').textContent = counts.economy;
+// Конвертируем в м³
+const m3 = unit === 'kg' ? value / DENSITY : value;
+const results = routes.map(r => {
+let price = Math.round(m3 * r.pricePerM3);
+let usedMin = false;
+if (price < r.minSum) { price = r.minSum; usedMin = true; }
+return { ...r, price, m3: m3.toFixed(2), usedMin };
+}).sort((a, b) => a.price - b.price);
 
-const unitLabel = unit === 'kg' ? 'кг' : 'м³';
-const m3 = unit === 'kg' ? (value / DENSITY).toFixed(2) : value.toFixed(2);
-
-let html = `<h3 style="margin-bottom:16px;font-size:16px;">✅ Найдено ${results.length} вариантов · ${value} ${unitLabel} = ${m3} м³</h3>`;
+const best = results[0];
+let html = `
+<h3 style="margin-bottom:16px;font-size:16px;">
+✅ Найдено ${results.length} вариантов · ${value} ${unit === 'kg' ? 'кг' : 'м³'} = ${m3.toFixed(2)} м³
+</h3>
+<div class="summary">
+<div class="summary-item">
+<span class="label">🏆 Лучшая цена</span>
+<span class="value" style="color:var(--success);">${best.price.toLocaleString()} ₽</span>
+</div>
+<div class="summary-item">
+<span class="label">📦 Объём</span>
+<span class="value">${m3.toFixed(2)} м³</span>
+</div>
+<div class="summary-item">
+<span class="label">💰 Мин. сумма</span>
+<span class="value">${best.minSum.toLocaleString()} ₽</span>
+</div>
+</div>
+`;
 
 results.forEach((r, i) => {
 const isBest = i === 0;
-const catClass = r.category;
-const badgeClass = r.category + '-badge';
-const catLabel = r.category === 'express' ? '🚀 Экспресс' : r.category === 'standard' ? '⚡ Стандарт' : '💰 Эконом';
-
 html += `
-<div class="result-item ${catClass} ${isBest ? 'best' : ''}" data-category="${r.category}" style="${r.category !== currentCategory ? 'display:none' : ''}">
+<div class="result-item ${isBest ? 'best' : ''}">
 <div class="result-header">
 <span class="result-carrier">
-${r.carrier}
-<span class="badge ${badgeClass}">${catLabel}</span>
+ТК ГК · ${r.from} → ${r.to}
 ${isBest ? '<span class="badge best-badge">⭐ Лучший</span>' : ''}
-${r.usedMinSum ? '<span class="badge min-badge">⚠️ Минималка</span>' : ''}
+${r.usedMin ? '<span class="badge min-badge">⚠️ Минималка</span>' : ''}
 </span>
-<span class="result-price ${isBest ? 'best-price' : ''}">${r.price.toLocaleString()} ₽</span>
+<span class="result-price">${r.price.toLocaleString()} ₽</span>
 </div>
 <div class="result-details">
 <span>💰 ${r.pricePerM3.toLocaleString()} ₽/м³</span>
-${r.pricePerKg ? `<span>💰 ${r.pricePerKg} ₽/кг</span>` : ''}
-<span>📦 ${m3} м³</span>
-${r.minSum ? `<span>⚠️ Мин: ${r.minSum.toLocaleString()} ₽</span>` : ''}
-<span>📅 ${r.delivery}</span>
+<span>📦 ${r.m3} м³</span>
+<span>⚠️ Мин: ${r.minSum.toLocaleString()} ₽</span>
 </div>
 </div>
 `;
 });
 
-resultsContainer.innerHTML = html;
-
-saveHistory({
-type: 'transport',
-from, to, unit, value,
-carrier: results[0].carrier,
-price: results[0].price,
-category: results[0].category
-});
+container.innerHTML = html;
+saveHistory({ type: 'transport', from, to, value, unit, price: best.price });
 });
 
 // ============================================================
-// ЭКСПЕДИРОВАНИЕ — чекбоксы
+// 📦 ЛОГИКА ЭКСПЕДИРОВАНИЯ
 // ============================================================
+// Активация полей при чекбоксах
 document.querySelectorAll('.extra-item input[type="checkbox"]').forEach(chk => {
 chk.addEventListener('change', function() {
 const item = this.closest('.extra-item');
@@ -881,99 +631,171 @@ if (input) input.disabled = !this.checked;
 });
 });
 
-// ============================================================
-// РАСЧЁТ ЭКСПЕДИРОВАНИЯ
-// ============================================================
 document.getElementById('calcExpBtn').addEventListener('click', function() {
 const city = document.getElementById('expCity').value;
-const weight = parseFloat(document.getElementById('expWeight').value);
+const weight = parseInt(document.getElementById('expWeight').value);
 const container = document.getElementById('expResultsContainer');
+const db = expeditionDB[city];
 
 if (!city) {
 container.innerHTML = `<div class="no-results"><span class="emoji">⚠️</span><p>Выберите город</p></div>`;
 return;
 }
-if (!weight || weight <= 0) {
-container.innerHTML = `<div class="no-results"><span class="emoji">⚠️</span><p>Введите вес</p></div>`;
+if (!db) {
+container.innerHTML = `<div class="no-results"><span class="emoji">😕</span><p>Нет данных для этого города</p></div>`;
 return;
 }
 
-const extras = {
-extrakm: document.getElementById('chk-extrakm').checked ? document.getElementById('exp-extrakm').value : null,
-remote: document.getElementById('chk-remote').checked,
-crate: document.getElementById('chk-crate').checked ? document.getElementById('exp-crate').value : null,
-avizo: document.getElementById('chk-avizo').checked,
-mkad: document.getElementById('chk-mkad').checked ? document.getElementById('exp-mkad').value : null,
-prr: document.getElementById('chk-prr').checked ? document.getElementById('exp-prr').value : null,
-overtime: document.getElementById('chk-overtime').checked ? document.getElementById('exp-overtime').value : null,
-storage: document.getElementById('chk-storage').checked ? document.getElementById('exp-storage').value : null
-};
-
-const result = calculateExpedition(city, weight, extras);
-if (!result) {
-container.innerHTML = `<div class="no-results"><span class="emoji">😕</span><p>Город не найден</p></div>`;
+const basePrice = db.base[weight] || 0;
+if (basePrice === 0) {
+container.innerHTML = `<div class="no-results"><span class="emoji">😕</span><p>Нет тарифа для этой категории</p></div>`;
 return;
 }
 
+const breakdown = [{ label: '🚛 Базовый тариф', value: basePrice, detail: `до ${weight} кг` }];
+let total = basePrice;
+
+// Доп. пробег
+if (document.getElementById('chk-extrakm').checked) {
+const km = parseFloat(document.getElementById('exp-extrakm').value) || 0;
+if (km > 0) {
+// Используем тариф "за пределы города" если есть, иначе базовый
+const rate = db.outside ? db.outside[weight] : 50;
+const cost = Math.round(km * rate);
+breakdown.push({ label: '🛣️ Доп. пробег', value: cost, detail: `${km} км × ${rate} ₽` });
+total += cost;
+}
+}
+
+// Отдалённый район
+if (document.getElementById('chk-remote').checked && db.remote) {
+const cost = db.remote[weight];
+breakdown.push({ label: '🏘️ Отдалённый район', value: cost, detail: '' });
+total += cost;
+}
+
+// Обрешётка
+if (document.getElementById('chk-crate').checked && db.crate) {
+const m3 = parseFloat(document.getElementById('exp-crate').value) || 0;
+if (m3 > 0) {
+const cost = Math.max(Math.round(m3 * db.crate.perM3), db.crate.min);
+breakdown.push({ label: '📦 Обрешётка', value: cost, detail: `${m3} м³` });
+total += cost;
+}
+}
+
+// Авизация
+if (document.getElementById('chk-avizo').checked && db.avizo) {
+// Предполагаем что если груз до 500 кг - используем under500, иначе over500
+// Для простоты используем over500 (более частый случай)
+const cost = db.avizo.over500;
+breakdown.push({ label: '⏰ Авизация', value: cost, detail: 'подача ко времени' });
+total += cost;
+}
+
+// Пробег за МКАД (только Москва)
+if (document.getElementById('chk-mkad').checked && db.mkad) {
+const km = parseFloat(document.getElementById('exp-mkad').value) || 0;
+if (km > 0) {
+const rate = db.mkad[weight];
+const cost = Math.round(km * rate);
+breakdown.push({ label: '🛣️ За МКАД', value: cost, detail: `${km} км × ${rate} ₽` });
+total += cost;
+}
+}
+
+// Пробег за пределы города
+if (document.getElementById('chk-outside').checked && db.outside) {
+const km = parseFloat(document.getElementById('exp-outside').value) || 0;
+if (km > 0) {
+const rate = db.outside[weight];
+const cost = Math.round(km * rate);
+breakdown.push({ label: '🛣️ За пределы города', value: cost, detail: `${km} км × ${rate} ₽` });
+total += cost;
+}
+}
+
+// ПРР
+if (document.getElementById('chk-prr').checked && db.prr) {
+const kg = parseFloat(document.getElementById('exp-prr').value) || 0;
+if (kg > 0) {
+const cost = Math.max(Math.round(kg * db.prr.perKg), db.prr.min);
+breakdown.push({ label: '📥 ПРР (разгрузка)', value: cost, detail: `${kg} кг` });
+total += cost;
+}
+}
+
+// Сверхнормативное время
+if (document.getElementById('chk-overtime').checked && db.overtime) {
+const hours = parseFloat(document.getElementById('exp-overtime').value) || 0;
+if (hours > 0) {
+const ratePerHour = db.overtime[weight] / 4; // тариф за 4 часа → за 1 час
+const cost = Math.round(hours * ratePerHour);
+breakdown.push({ label: '⏱️ Сверхнормативное время', value: cost, detail: `${hours} ч` });
+total += cost;
+}
+}
+
+// Хранение
+if (document.getElementById('chk-storage').checked && db.storage) {
+const days = parseFloat(document.getElementById('exp-storage').value) || 0;
+if (days > 0) {
+let cost = 0;
+let detail = '';
+if (db.storage.perPallet) {
+cost = Math.round(days * db.storage.perPallet);
+detail = `${days} сут × ${db.storage.perPallet} ₽/паллет`;
+} else if (db.storage.perKg) {
+cost = Math.round(days * db.storage.perKg * 1000); // примерный расчёт на 1 тонну
+detail = `${days} сут`;
+}
+breakdown.push({ label: '🏬 Хранение', value: cost, detail });
+total += cost;
+}
+}
+
+// Рендерим результат
 let html = `
 <div class="expedition-result">
 <h3>📦 Экспедирование: ${city}</h3>
 <div class="result-line">
-<span>Вес груза</span>
-<span><strong>${weight} кг</strong></span>
+<span class="label">🚛 Категория</span>
+<span class="value">до ${weight.toLocaleString()} кг</span>
 </div>
 `;
-result.breakdown.forEach(line => {
+
+breakdown.forEach(line => {
 html += `
 <div class="result-line">
-<span>${line.label} ${line.detail ? `<small style="color:var(--text-muted)">(${line.detail})</small>` : ''}</span>
-<span><strong>${line.value.toLocaleString()} ₽</strong></span>
+<span class="label">${line.label} ${line.detail ? `<small style="color:var(--text-muted)">(${line.detail})</small>` : ''}</span>
+<span class="value">${line.value.toLocaleString()} ₽</span>
 </div>
 `;
 });
+
 html += `
 <div class="result-line total">
 <span>💰 ИТОГО:</span>
-<span>${result.total.toLocaleString()} ₽</span>
+<span>${total.toLocaleString()} ₽</span>
 </div>
 </div>
 `;
 
 container.innerHTML = html;
-
-saveHistory({
-type: 'expedition',
-from: city,
-to: city,
-weight,
-price: result.total,
-extras: Object.keys(extras).filter(k => extras[k]).join(', ')
-});
-});
-
-// ============================================================
-// ПЕРЕКЛЮЧЕНИЕ РЕЖИМОВ
-// ============================================================
-document.querySelectorAll('.mode-btn').forEach(btn => {
-btn.addEventListener('click', function() {
-document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-this.classList.add('active');
-document.querySelectorAll('.mode-content').forEach(c => c.classList.remove('active'));
-document.getElementById('mode-' + this.dataset.mode).classList.add('active');
-});
+saveHistory({ type: 'expedition', from: city, to: city, value: weight, unit: 'кг', price: total });
 });
 
 // ============================================================
 // ИСТОРИЯ
 // ============================================================
 function getHistory() {
-try { return JSON.parse(localStorage.getItem('calcHistory5')) || []; } catch { return []; }
+try { return JSON.parse(localStorage.getItem('calcHistory7')) || []; } catch { return []; }
 }
 function saveHistory(entry) {
 const h = getHistory();
 h.unshift({ ...entry, timestamp: new Date().toLocaleString('ru-RU') });
 if (h.length > 50) h.pop();
-localStorage.setItem('calcHistory5', JSON.stringify(h));
+localStorage.setItem('calcHistory7', JSON.stringify(h));
 renderHistory();
 }
 function renderHistory() {
@@ -983,21 +805,26 @@ if (h.length === 0) {
 list.innerHTML = '<div class="history-empty">История пуста</div>';
 return;
 }
-list.innerHTML = h.map((item, i) => {
-const isExp = item.type === 'expedition';
-const route = isExp ? `📦 ${item.from}` : `${item.from} → ${item.to}`;
-const info = isExp ? `${item.weight} кг · ${item.extras || 'без доп. услуг'}` : `${item.value} ${item.unit} · ${item.carrier}`;
-return `
+list.innerHTML = h.map((item, i) => `
 <div class="history-item" data-index="${i}">
-<span class="route">${route}</span>
-<span class="info">${info}</span>
+<span class="route">${item.type === 'transport' ? '🚚' : '📦'} ${item.from} → ${item.to}</span>
+<span class="info">${item.value} ${item.unit}</span>
 <span class="hprice">${item.price.toLocaleString()} ₽</span>
 </div>
-`;
-}).join('');
+`).join('');
+list.querySelectorAll('.history-item').forEach(el => {
+el.addEventListener('click', function() {
+const idx = parseInt(this.dataset.index);
+const item = getHistory()[idx];
+if (!item) return;
+// Переключаем в нужный режим
+const modeBtn = document.querySelector(`.mode-btn[data-mode="${item.type === 'transport' ? 'transport' : 'expedition'}"]`);
+if (modeBtn) modeBtn.click();
+});
+});
 }
 document.getElementById('clearHistory').addEventListener('click', () => {
-localStorage.removeItem('calcHistory5');
+localStorage.removeItem('calcHistory7');
 renderHistory();
 });
 renderHistory();
@@ -1006,15 +833,10 @@ renderHistory();
 // КАЛЬКУЛЯТОР ПЛОТНОСТИ
 // ============================================================
 const densityModal = document.getElementById('densityModal');
-document.getElementById('openDensityBtn').addEventListener('click', () => {
-densityModal.classList.add('active');
-});
-document.getElementById('closeDensityBtn').addEventListener('click', () => {
-densityModal.classList.remove('active');
-});
-densityModal.addEventListener('click', (e) => {
-if (e.target === densityModal) densityModal.classList.remove('active');
-});
+document.getElementById('openDensityBtn').addEventListener('click', () => densityModal.classList.add('active'));
+document.getElementById('closeDensityBtn').addEventListener('click', () => densityModal.classList.remove('active'));
+densityModal.addEventListener('click', e => { if (e.target === densityModal) densityModal.classList.remove('active'); });
+
 document.getElementById('calcDensityBtn').addEventListener('click', () => {
 const w = parseFloat(document.getElementById('densityWeight').value) || 0;
 const v = parseFloat(document.getElementById('densityVolume').value) || 0;
@@ -1038,12 +860,9 @@ result.classList.add('show');
 }
 });
 
-valueInput.addEventListener('keypress', e => { if (e.key === 'Enter') calcBtn.click(); });
-
-console.log('🚚 Калькулятор v5.0 загружен!');
-console.log(`📊 Экспресс: ${expressTariffs.length} тарифов`);
-console.log(`⚡ Стандарт: ${standardTariffs.length} тарифов`);
-console.log(`💰 Эконом: ${economyTariffs.length} тарифов`);
+console.log('🚚 Калькулятор v7.0 загружен!');
+console.log(`🚚 Перевозка: ${transportTariffs.length} маршрутов`);
+console.log(`📦 Экспедирование: ${Object.keys(expeditionDB).length} городов`);
 </script>
 </body>
 </html>
