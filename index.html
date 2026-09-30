@@ -3,84 +3,75 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#2563eb">
-<title>Logistic Pro — калькулятор перевозки</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#4f46e5">
+<title>Калькулятор грузоперевозок</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<main class="app">
-<header class="topbar">
-  <div class="brand"><div class="brand-mark">↗</div><div><h1>Logistic Pro</h1><p>Калькулятор перевозки и экспедирования</p></div></div>
-  <div class="status">Тарифная база подключена</div>
-</header>
-
-<section class="layout">
-  <div class="panel">
-    <div class="panel-head"><h2>Новый расчёт</h2><p>Выберите услугу и заполните только необходимые параметры.</p></div>
-    <div class="body">
-      <div class="tabs">
-        <button class="tab active" data-mode="transport">🚚 Перевозка</button>
-        <button class="tab" data-mode="expedition">📦 Экспедирование</button>
-      </div>
-
-      <div id="transportForm">
-        <div class="grid2">
-          <div class="field"><label>Откуда</label><select id="from" class="select"><option value="">Выберите город</option></select></div>
-          <div class="field"><label>Куда</label><select id="to" class="select" disabled><option value="">Сначала выберите отправление</option></select></div>
-        </div>
-        <div class="field">
-          <label>Единица расчёта <span class="hint">плотность базы: 250 кг/м³</span></label>
-          <div class="seg"><button id="unitKg" class="active" data-unit="kg">Вес, кг</button><button id="unitM3" data-unit="m3">Объём, м³</button></div>
-        </div>
-        <div class="field"><label id="valueLabel">Вес</label><input id="cargoValue" class="input" type="number" min="0" step="0.1" placeholder="Например, 500"></div>
-        <button id="calcTransport" class="primary">Рассчитать стоимость</button>
-        <button id="densityOpen" class="secondary">⚖️ Проверить вес / объём</button>
-      </div>
-
-      <div id="expeditionForm" class="hidden">
-        <div class="grid2">
-          <div class="field"><label>Город</label><select id="expCity" class="select"><option value="">Выберите город</option></select></div>
-          <div class="field"><label>Категория груза</label><select id="expWeight" class="select"><option value="1500">до 1 500 кг</option><option value="3000">1 501–3 000 кг</option><option value="5000">3 001–5 000 кг</option><option value="10000">5 001–10 000 кг</option></select></div>
-        </div>
-        <div class="extras">
-          <h3>Дополнительные услуги</h3>
-          <div class="extra"><input id="x-remote" type="checkbox"><label for="x-remote">Отдалённый район</label><span></span></div>
-          <div class="extra"><input id="x-crate" type="checkbox"><label for="x-crate">Обрешётка</label><input id="v-crate" class="mini" type="number" min="0" step="0.1" placeholder="м³" disabled></div>
-          <div class="extra"><input id="x-avizo" type="checkbox"><label for="x-avizo">Авизация</label><span></span></div>
-          <div class="extra"><input id="x-mkad" type="checkbox"><label for="x-mkad">Пробег за МКАД</label><input id="v-mkad" class="mini" type="number" min="0" placeholder="км" disabled></div>
-          <div class="extra"><input id="x-outside" type="checkbox"><label for="x-outside">Пробег за пределы города</label><input id="v-outside" class="mini" type="number" min="0" placeholder="км" disabled></div>
-          <div class="extra"><input id="x-prr" type="checkbox"><label for="x-prr">ПРР / разгрузка</label><input id="v-prr" class="mini" type="number" min="0" placeholder="кг" disabled></div>
-          <div class="extra"><input id="x-overtime" type="checkbox"><label for="x-overtime">Сверхнормативное время</label><input id="v-overtime" class="mini" type="number" min="0" step="0.25" placeholder="часы" disabled></div>
-          <div class="extra"><input id="x-storage" type="checkbox"><label for="x-storage">Хранение</label><input id="v-storage" class="mini" type="number" min="0" step="1" placeholder="сутки" disabled></div>
-        </div>
-        <button id="calcExpedition" class="primary" style="margin-top:15px">Рассчитать экспедирование</button>
-      </div>
+<main class="container">
+  <header class="header">
+    <div class="header-left">
+      <div class="logo"><span class="company">ГРУЗОВАЯ КОМПАНИЯ</span><span class="rf">РФ</span><span class="full">ТРАНСПОРТНАЯ ГРУЗОВАЯ КОМПАНИЯ</span></div>
+      <div><h1>🚚 Калькулятор грузоперевозок</h1><p class="subtitle">Перевозка + экспедирование · прозрачный расчёт стоимости</p></div>
     </div>
+    <span class="version">v8.0</span>
+  </header>
+
+  <div class="mode-switcher">
+    <button class="mode-btn active" data-mode="transport">🚚 Перевозка</button>
+    <button class="mode-btn" data-mode="expedition">📦 Экспедирование</button>
   </div>
 
-  <aside class="panel result-panel">
-    <div id="resultHead" class="result-head"><div><h2>Результат расчёта</h2><p>Введите параметры слева — здесь появится прозрачная детализация стоимости.</p></div></div>
-    <div id="resultBody" class="result-body"><div class="result-empty"><span class="empty-icon">🧮</span>Готово к расчёту</div></div>
-  </aside>
-</section>
+  <section id="mode-transport" class="mode-content active">
+    <div class="row">
+      <div class="form-group"><label>📍 Откуда</label><select id="from"><option value="">Выберите город</option></select></div>
+      <div class="form-group"><label>🎯 Куда</label><select id="to" disabled><option value="">Сначала выберите отправление</option></select></div>
+    </div>
+    <div class="form-group">
+      <label>Единица расчёта</label>
+      <div class="unit-toggle"><button id="unitKg" class="unit-btn active" data-unit="kg">📦 Вес, кг</button><button id="unitM3" class="unit-btn" data-unit="m3">📐 Объём, м³</button></div>
+    </div>
+    <div class="form-group"><label id="valueLabel">Вес (кг)</label><input id="cargoValue" type="number" min="0.1" step="0.1" placeholder="Например: 500"></div>
+    <button id="calcTransport" class="calc-btn">🧮 Рассчитать стоимость</button>
+    <button id="densityOpen" class="density-btn">⚖️ Проверить плотность · 250 кг/м³</button>
+    <div id="transportResult" class="results"></div>
+  </section>
 
-<section class="panel history">
-  <div class="panel-head"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><h2>История расчётов</h2><p>Последние расчёты сохраняются локально в браузере.</p></div><button id="clearHistory" class="clear">Очистить</button></div></div>
-  <div id="historyList" class="history-list"></div>
-</section>
+  <section id="mode-expedition" class="mode-content">
+    <div class="row">
+      <div class="form-group"><label>📍 Город</label><select id="expCity"><option value="">Выберите город</option></select></div>
+      <div class="form-group"><label>🚛 Категория груза</label><select id="expWeight"><option value="1500">до 1 500 кг</option><option value="3000">1 501–3 000 кг</option><option value="5000">3 001–5 000 кг</option><option value="10000">5 001–10 000 кг</option></select></div>
+    </div>
+    <div class="extras-section">
+      <div class="extras-title">🔧 Дополнительные услуги</div>
+      <div class="extra-item"><input id="x-remote" type="checkbox"><label for="x-remote">🏘️ Доставка в отдалённый район</label><span></span></div>
+      <div class="extra-item"><input id="x-crate" type="checkbox"><label for="x-crate">📦 Обрешётка груза</label><input id="v-crate" class="extra-input" type="number" min="0" step="0.1" placeholder="м³" disabled></div>
+      <div class="extra-item"><input id="x-avizo" type="checkbox"><label for="x-avizo">⏰ Подача ТС ко времени (авизация)</label><span></span></div>
+      <div class="extra-item"><input id="x-mkad" type="checkbox"><label for="x-mkad">🛣️ Пробег за МКАД</label><input id="v-mkad" class="extra-input" type="number" min="0" placeholder="км" disabled></div>
+      <div class="extra-item"><input id="x-outside" type="checkbox"><label for="x-outside">🛣️ Пробег за пределы города</label><input id="v-outside" class="extra-input" type="number" min="0" placeholder="км" disabled></div>
+      <div class="extra-item"><input id="x-prr" type="checkbox"><label for="x-prr">📥 ПРР / разгрузка</label><input id="v-prr" class="extra-input" type="number" min="0" placeholder="кг" disabled></div>
+      <div class="extra-item"><input id="x-overtime" type="checkbox"><label for="x-overtime">⏱️ Сверхнормативное время</label><input id="v-overtime" class="extra-input" type="number" min="0" step="0.25" placeholder="часы" disabled></div>
+      <div class="extra-item"><input id="x-storage" type="checkbox"><label for="x-storage">🏬 Хранение груза</label><input id="v-storage" class="extra-input" type="number" min="0" step="1" placeholder="сутки" disabled></div>
+    </div>
+    <button id="calcExpedition" class="calc-btn">💰 Рассчитать экспедирование</button>
+    <div id="expeditionResult" class="results"></div>
+  </section>
+
+  <section class="history">
+    <div class="history-header"><h3>📋 История расчётов</h3><button id="clearHistory" class="clear-history">Очистить</button></div>
+    <div id="historyList"></div>
+  </section>
 </main>
 
-<div id="densityModal" class="modal">
-  <div class="modal-card">
-    <div class="modal-head"><h2>Плотность груза</h2><button id="densityClose" class="close">×</button></div>
-    <p style="color:#64748b;font-size:13px">База расчёта: 250 кг на 1 м³.</p>
-    <div class="field"><label>Вес, кг</label><input id="densityWeight" class="input" type="number" min="0" step="0.1"></div>
-    <div class="field"><label>Объём, м³</label><input id="densityVolume" class="input" type="number" min="0" step="0.01"></div>
-    <button id="densityCalc" class="primary">Сравнить</button>
-    <div id="densityOut" class="notice" style="margin-top:12px">Введите вес и объём.</div>
+<div id="densityModal" class="modal-overlay">
+  <div class="modal-content">
+    <button id="densityClose" class="modal-close">×</button>
+    <div class="modal-title">⚖️ Плотность груза</div>
+    <p class="modal-note">База расчёта: 250 кг на 1 м³.</p>
+    <div class="form-group"><label>Вес, кг</label><input id="densityWeight" type="number" min="0" step="0.1"></div>
+    <div class="form-group"><label>Объём, м³</label><input id="densityVolume" type="number" min="0" step="0.01"></div>
+    <button id="densityCalc" class="calc-btn">Сравнить</button>
+    <div id="densityOut" class="density-result"></div>
   </div>
 </div>
 <script src="data.js"></script>
