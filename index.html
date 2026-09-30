@@ -718,6 +718,13 @@ select,input{
 .history{
   border-top:1px solid #e2e8f0;
 }
+
+.result-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin:26px 0 16px;padding:22px 24px;border-radius:20px;background:linear-gradient(135deg,#0f172a,#1e3a5f);color:white;box-shadow:0 16px 35px rgba(15,23,42,.16)}
+.eyebrow{font-size:11px;letter-spacing:1.5px;opacity:.65;font-weight:800;margin-bottom:7px}
+.route-title{font-size:23px;font-weight:750;letter-spacing:-.5px}.route-title span{opacity:.5;margin:0 6px}.hero-price{font-size:30px;font-weight:800;letter-spacing:-1px;white-space:nowrap}
+.price-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.price-breakdown>div{padding:13px 14px;background:#f8fafc;border:1px solid #e8eef5;border-radius:12px}.price-breakdown span{display:block;color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}.price-breakdown strong{font-size:14px;color:#1e293b}
+.density-note{display:flex;gap:10px;align-items:center;padding:14px 16px;background:#eff8ff;border:1px solid #d7ecff;border-radius:13px;color:#42617c;font-size:13px;margin-top:12px}.note-icon{font-size:18px}
+@media(max-width:600px){.result-hero{align-items:flex-start;flex-direction:column}.hero-price{font-size:26px}.price-breakdown{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -735,16 +742,7 @@ select,input{
             </div>
             <span class="version">v4.0 · Прайс</span>
         </div>
-        <p class="subtitle">Точный расчёт по вашему прайсу · плотность груза 250 кг/м³</p>
-
-        <!-- НАСТРОЙКА НАЦЕНКИ -->
-        <div class="margin-settings">
-            <label>⚙️ Наценка:</label>
-            <input type="number" id="marginPercent" value="43" min="0" max="300" step="0.5" />
-            <span class="hint">% (коэффициент ×<span id="marginMultiplierDisplay">1.43</span>)</span>
-            <button class="reset-btn" id="resetMarginBtn">↺ Сбросить</button>
-        </div>
-
+        <p class="subtitle">Точный расчёт по актуальному прайсу · плотность груза 250 кг/м³</p> 
         <!-- ВЫБОР МАРШРУТА -->
         <div class="row">
             <div class="form-group">
@@ -794,7 +792,6 @@ select,input{
 
     <script>
 const DENSITY_KG_PER_M3 = 250;
-const DEFAULT_MARGIN = 43;
 const tariffsDB = [["Москва","Новосибирск",10710],["Москва","Екатеринбург",6503],["Москва","Иркутск",15300],["Москва","Казань",6248],["Москва","Кемерово",12623],["Москва","Краснодар",6822],["Москва","Красноярск",13543],["Москва","Новокузнецк",12495],["Москва","Омск",10073],["Москва","Пермь",7215],["Москва","Санкт-Петербург",5738],["Москва","Томск",12495],["Москва","Тюмень",8735],["Москва","Уфа",6120],["Москва","Челябинск",6630],["Новосибирск","Иркутск",7650],["Новосибирск","Краснодар",9308],["Новосибирск","Красноярск",4782],["Новосибирск","Москва",6375],["Новосибирск","Омск",3825],["Новосибирск","Пермь",6185],["Новосибирск","Санкт-Петербург",7905],["Новосибирск","Тюмень",4845],["Новосибирск","Уфа",7395],["Новосибирск","Челябинск",5610],["Новосибирск","Екатеринбург",4782],["Новосибирск","Барнаул",3698],["Новосибирск","Кемерово",3698],["Новосибирск","Новокузнецк",4017],["Новосибирск","Томск",3698],["Новосибирск","Чита",7500],["Новосибирск","Хабаровск",10000],["Новосибирск","Владивосток",10000],["Новосибирск","Благовещенск",14350],["Новосибирск","Комсомольск-на-Амуре",13900],["Новосибирск","Южно-Сахалинск (хаб)",27970],["Новосибирск","Магадан",25120],["Новосибирск","Петропавловск-Камчатский",22927],["Новосибирск","Находка",15692],["Новосибирск","Уссурийск",14160],["Новосибирск","Южно-Сахалинск (Влд)",23524]].map(([from,to,m3Price]) => ({
     from, to, carrier: "Тариф по прайсу",
     m3Price,
@@ -827,26 +824,8 @@ function calculatePrice(from, to, value, unit) {
         usedMinSum: false
     }];
 }
-function calculateWithMargin(from, to, value, unit, marginPercent) {
-    const results = calculatePrice(from, to, value, unit);
-    if (results.error) return results;
-    const multiplier = 1 + marginPercent / 100;
-    return results.map(r => {
-        const priceWithMargin = Math.round(r.price * multiplier);
-        return {...r, priceWithMargin, marginRub: priceWithMargin - r.price,
-            marginPercent: marginPercent, marginMultiplier: multiplier};
-    });
-}
-function getMarginColor(percent) {
-    if (percent >= 50) return "#48bb78";
-    if (percent >= 30) return "#ecc94b";
-    if (percent >= 15) return "#ed8936";
-    return "#fc8181";
-}
-function formatMargin(percent, rub) {
-    return {text: `${rub.toLocaleString("ru-RU")} ₽ (${percent}%)`,
-        color: getMarginColor(percent),
-        emoji: percent >= 50 ? "🟢" : percent >= 30 ? "🟡" : percent >= 15 ? "🟠" : "🔴"};
+function calculateWithMargin(from, to, value, unit) {
+    return calculatePrice(from, to, value, unit);
 }
 
 const fromSelect = document.getElementById("fromCity");
@@ -857,9 +836,6 @@ const calcBtn = document.getElementById("calcBtn");
 const resultsContainer = document.getElementById("resultsContainer");
 const historyList = document.getElementById("historyList");
 const clearHistoryBtn = document.getElementById("clearHistory");
-const marginPercentInput = document.getElementById("marginPercent");
-const marginMultiplierDisplay = document.getElementById("marginMultiplierDisplay");
-const resetMarginBtn = document.getElementById("resetMarginBtn");
 
 const cities = [...new Set(tariffsDB.map(t => t.from))].sort((a,b)=>a.localeCompare(b,"ru"));
 cities.forEach(city => {
@@ -888,12 +864,6 @@ document.querySelectorAll(".unit-btn").forEach(btn => btn.addEventListener("clic
     valueInput.placeholder=unit==="kg" ? "Например: 500" : "Например: 2.5";
 }));
 
-function updateMarginDisplay() {
-    const val=parseFloat(marginPercentInput.value)||0;
-    marginMultiplierDisplay.textContent=(1+val/100).toFixed(2);
-}
-marginPercentInput.addEventListener("input", updateMarginDisplay);
-resetMarginBtn.addEventListener("click",()=>{marginPercentInput.value=DEFAULT_MARGIN;updateMarginDisplay();});
 
 function getHistory(){try{return JSON.parse(localStorage.getItem("calcHistory"))||[]}catch{return[]}}
 function saveHistory(entry){
@@ -909,18 +879,15 @@ function renderHistory(){
     historyList.innerHTML=history.map((item,index)=>`
       <div class="history-item" data-index="${index}">
         <span class="route">${item.from} → ${item.to}</span>
-        <span class="info">${item.value} ${item.unit} · ${item.carrier} · +${item.marginPercent}%</span>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <span class="hcost">${(item.costPrice||0).toLocaleString("ru-RU")} ₽</span>
-          <span class="hprice">${(item.priceWithMargin||0).toLocaleString("ru-RU")} ₽</span>
-        </div>
+        <span class="info">${item.value} ${item.unit} · ${item.carrier}</span>
+        <span class="hprice">${(item.priceWithMargin||0).toLocaleString("ru-RU")} ₽</span>
       </div>`).join("");
     historyList.querySelectorAll(".history-item").forEach(el=>el.addEventListener("click",()=>{
       const item=getHistory()[parseInt(el.dataset.index)];
       if(!item)return;
       fromSelect.value=item.from; fromSelect.dispatchEvent(new Event("change"));
       setTimeout(()=>{toSelect.value=item.to;},50);
-      const b=document.querySelector(`.unit-btn[data-unit="${item.unit}"]`);
+      const b=document.querySelector(`.unit-btn[data-unit="${item.unit}"`);
       if(b)b.click(); valueInput.value=item.value; setTimeout(()=>calcBtn.click(),100);
     }));
 }
@@ -930,48 +897,43 @@ calcBtn.addEventListener("click",function(){
     const from=fromSelect.value, to=toSelect.value;
     const unit=document.querySelector(".unit-btn.active").dataset.unit;
     const value=parseFloat(valueInput.value);
-    const marginPercent=parseFloat(marginPercentInput.value)||0;
-    if(!from||!to){resultsContainer.innerHTML='<div class="no-results"><div class="emoji">📍</div><p>Выберите город отправки и назначения</p></div>';return;}
+        if(!from||!to){resultsContainer.innerHTML='<div class="no-results"><div class="emoji">📍</div><p>Выберите город отправки и назначения</p></div>';return;}
     if(!value||value<=0){resultsContainer.innerHTML='<div class="no-results"><div class="emoji">⚠️</div><p>Введите корректный вес или объём</p></div>';return;}
-    const results=calculateWithMargin(from,to,value,unit,marginPercent);
+    const results=calculateWithMargin(from,to,value,unit);
     if(results.error){resultsContainer.innerHTML=`<div class="no-results"><div class="emoji">😕</div><p>${results.error}</p></div>`;return;}
     const r=results[0], unitLabel=unit==="kg"?"кг":"м³";
-    const marginInfo=formatMargin(r.marginPercent,r.marginRub);
     resultsContainer.innerHTML=`
-      <h3 style="margin-bottom:16px;color:#2d3748">✅ Расчёт готов</h3>
-      <div class="margin-summary">
-        <div class="margin-summary-item"><span class="label">🚚 Себестоимость</span><span class="value" style="color:#718096">${r.costPrice.toLocaleString("ru-RU")} ₽</span></div>
-        <div class="margin-summary-item"><span class="label">💰 Цена клиенту</span><span class="value" style="color:#2b6cb0">${r.priceWithMargin.toLocaleString("ru-RU")} ₽</span></div>
-        <div class="margin-summary-item"><span class="label">📈 Маржа</span><span class="value" style="color:${marginInfo.color}">${r.marginRub.toLocaleString("ru-RU")} ₽</span></div>
+      <div class="result-hero">
+        <div>
+          <div class="eyebrow">РАСЧЁТ ГОТОВ</div>
+          <div class="route-title">${from} <span>→</span> ${to}</div>
+        </div>
+        <div class="hero-price">${r.price.toLocaleString("ru-RU")} ₽</div>
       </div>
       <div class="result-item best">
         <div class="result-header">
-          <span class="result-carrier">🚚 Тариф по прайсу <span class="badge best-badge">✓ Актуальный тариф</span></span>
-          <span class="result-price best-price">${r.priceWithMargin.toLocaleString("ru-RU")} ₽</span>
+          <span class="result-carrier">🚚 Тариф по прайсу <span class="badge best-badge">✓ Актуальный</span></span>
+          <span class="result-price best-price">${r.price.toLocaleString("ru-RU")} ₽</span>
         </div>
-        <div class="margin-block">
-          <div class="margin-row"><span class="margin-label">📦 Себестоимость:</span><span class="margin-value cost">${r.costPrice.toLocaleString("ru-RU")} ₽</span></div>
-          <div class="margin-row"><span class="margin-label">💰 Цена клиенту:</span><span class="margin-value price">${r.priceWithMargin.toLocaleString("ru-RU")} ₽</span><span class="margin-badge">+${r.marginPercent}%</span></div>
-          <div class="margin-row"><span class="margin-label">📈 Прибыль:</span><span class="margin-value profit" style="color:${marginInfo.color}">${marginInfo.text}</span><span class="margin-emoji">${marginInfo.emoji}</span></div>
-          <div class="margin-progress"><div class="margin-progress-bar" style="width:${Math.min(r.marginPercent,100)}%;background:${marginInfo.color}"></div></div>
+        <div class="price-breakdown">
+          <div><span>Объём / вес</span><strong>${value.toLocaleString("ru-RU")} ${unitLabel}</strong></div>
+          <div><span>Тариф</span><strong>${r.unitPrice.toLocaleString("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2})} ₽/${unitLabel}</strong></div>
+          <div><span>Плотность</span><strong>${DENSITY_KG_PER_M3} кг/м³</strong></div>
         </div>
         <div class="result-details">
-          <span>📊 Тариф: ${r.unitPrice.toLocaleString("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2})} ₽/${unitLabel}</span>
-          <span>📐 Плотность: ${DENSITY_KG_PER_M3} кг/м³</span>
           <span>🧭 ${from} → ${to}</span>
           <span>🚛 ${r.type}</span>
+          <span>✓ Цена без наценки</span>
         </div>
       </div>
-      <div class="result-item" style="border-left-color:#4299e1;background:#f8fbff">
-        <div class="result-details" style="font-size:14px;color:#4a5568">
-          <span>💡 ${unit==="kg" ? `Расчёт: ${value} кг ÷ ${DENSITY_KG_PER_M3} = ${(value/DENSITY_KG_PER_M3).toLocaleString("ru-RU",{maximumFractionDigits:3})} м³` : `Эквивалент: ${value} м³ × ${DENSITY_KG_PER_M3} = ${(value*DENSITY_KG_PER_M3).toLocaleString("ru-RU")} кг`}</span>
-        </div>
+      <div class="density-note">
+        <span class="note-icon">💡</span>
+        <span>${unit==="kg" ? `Расчёт объёма: ${value} кг ÷ ${DENSITY_KG_PER_M3} = ${(value/DENSITY_KG_PER_M3).toLocaleString("ru-RU",{maximumFractionDigits:3})} м³` : `Эквивалентный вес: ${value} м³ × ${DENSITY_KG_PER_M3} = ${(value*DENSITY_KG_PER_M3).toLocaleString("ru-RU")} кг`}</span>
       </div>`;
-    saveHistory({from,to,unit,value,carrier:r.carrier,costPrice:r.costPrice,priceWithMargin:r.priceWithMargin,marginPercent:r.marginPercent,marginRub:r.marginRub});
+    saveHistory({from,to,unit,value,carrier:r.carrier,costPrice:r.costPrice,priceWithMargin:r.priceWithMargin});
 });
 valueInput.addEventListener("keypress",e=>{if(e.key==="Enter")calcBtn.click()});
 renderHistory();
-updateMarginDisplay();
 console.log(`🚚 Калькулятор: ${tariffsDB.length} тарифов, плотность ${DENSITY_KG_PER_M3} кг/м³`);
 </script>
 
