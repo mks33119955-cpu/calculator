@@ -567,7 +567,10 @@ select,input{
 .price-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.price-breakdown>div{padding:13px 14px;background:#f8fafc;border:1px solid #e8eef5;border-radius:12px}.price-breakdown span{display:block;color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}.price-breakdown strong{font-size:14px;color:#1e293b}
 .density-note{display:flex;gap:10px;align-items:center;padding:14px 16px;background:#eff8ff;border:1px solid #d7ecff;border-radius:13px;color:#42617c;font-size:13px;margin-top:12px}.note-icon{font-size:18px}
 @media(max-width:600px){.result-hero{align-items:flex-start;flex-direction:column}.hero-price{font-size:26px}.price-breakdown{grid-template-columns:1fr}}
+
+.kp-actions{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:12px}.kp-btn,.kp-template-btn{min-height:46px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}.kp-btn{border:1px solid #cfe3f7;background:#eff8ff;color:#2467a6}.kp-btn:hover{background:#e2f2ff;transform:translateY(-1px)}.kp-template-btn{padding:0 16px;border:1px solid #e2e8f0;background:#fff;color:#64748b}.kp-template-btn:hover{border-color:#4299e1;color:#2b6cb0}.kp-status{min-height:20px;margin-top:8px;text-align:center;color:#64748b;font-size:12px}.kp-status.success{color:#2f855a}.kp-status.error{color:#c53030}@media(max-width:600px){.kp-actions{grid-template-columns:1fr}.kp-template-btn{min-height:42px}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 <body>
 
@@ -618,6 +621,7 @@ select,input{
 
         <!-- КНОПКА РАСЧЁТА -->
         <button class="calc-btn" id="calcBtn">🧮 Рассчитать стоимость</button>
+<div class="kp-actions"><button class="kp-btn" id="generateKpBtn" type="button">📄 Сформировать КП</button><label class="kp-template-btn" for="kpTemplateInput">⚙️ Шаблон КП</label><input id="kpTemplateInput" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden /></div><div id="kpStatus" class="kp-status"></div>
 
         <!-- РЕЗУЛЬТАТЫ -->
         <div id="resultsContainer" class="results"></div>
@@ -734,6 +738,18 @@ function renderHistory(){
     }));
 }
 clearHistoryBtn.addEventListener("click",clearHistory);
+const kpGenerateBtn = document.getElementById("generateKpBtn");
+const kpTemplateInput = document.getElementById("kpTemplateInput");
+const kpStatus = document.getElementById("kpStatus");
+const KP_DB_NAME = "calculator-kp", KP_STORE = "templates";
+function kpSetStatus(text,type=""){kpStatus.textContent=text;kpStatus.className="kp-status "+type;}
+function kpOpenDb(){return new Promise((resolve,reject)=>{const req=indexedDB.open(KP_DB_NAME,1);req.onupgradeneeded=()=>req.result.createObjectStore(KP_STORE);req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});}
+async function kpSaveTemplate(file){const db=await kpOpenDb();return new Promise((resolve,reject)=>{const tx=db.transaction(KP_STORE,"readwrite");tx.objectStore(KP_STORE).put(file,KP_STORE);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}
+async function kpGetTemplate(){const db=await kpOpenDb();return new Promise((resolve,reject)=>{const tx=db.transaction(KP_STORE,"readonly");const req=tx.objectStore(KP_STORE).get(KP_STORE);req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>reject(req.error);});}
+kpTemplateInput.addEventListener("change",async()=>{const file=kpTemplateInput.files[0];if(!file)return;try{await kpSaveTemplate(file);kpSetStatus("Шаблон КП сохранён. Теперь его можно формировать одной кнопкой.","success");}catch(e){kpSetStatus("Не удалось сохранить шаблон.","error");}});
+function kpXmlReplace(xml,from,to,price){const routeRe=/<w:t([^>]*)>\\s*[^<]*→[^<]*\\s*<\\/w:t>/;if(routeRe.test(xml))xml=xml.replace(routeRe,"<w:t$1>"+from+" → "+to+"</w:t>");const priceRe=/<w:t([^>]*)>\\s*[0-9][0-9\\s]*₽\\s*<\\/w:t>/;if(priceRe.test(xml))xml=xml.replace(priceRe,"<w:t$1>"+price.toLocaleString("ru-RU")+" ₽</w:t>");return xml;}
+async function kpGenerate(){const from=fromSelect.value,to=toSelect.value,unit=document.querySelector(".unit-btn.active").dataset.unit,value=parseFloat(valueInput.value);if(!from||!to||!value||value<=0){kpSetStatus("Сначала выполните корректный расчёт.","error");return;}const tariff=getTariff(from,to);if(!tariff){kpSetStatus("Для этого направления нет тарифа.","error");return;}let template=await kpGetTemplate();if(!template){kpSetStatus("Выберите Word-шаблон КП через «⚙️ Шаблон КП».","error");kpTemplateInput.click();return;}if(typeof JSZip==="undefined"){kpSetStatus("Не загрузился модуль Word. Обновите страницу и попробуйте ещё раз.","error");return;}try{const zip=await JSZip.loadAsync(await template.arrayBuffer());const doc=zip.file("word/document.xml");if(!doc)throw new Error("document.xml missing");const xml=await doc.async("string");const price=Math.round(value*(unit==="kg"?tariff.kgPrice:tariff.m3Price));zip.file("word/document.xml",kpXmlReplace(xml,from,to,price));const blob=await zip.generateAsync({type:"blob",mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="КП_"+from+"__"+to+".docx";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);kpSetStatus("КП сформировано и скачивается.","success");}catch(e){console.error(e);kpSetStatus("Не удалось сформировать КП. Проверьте шаблон Word.","error");}}
+kpGenerateBtn.addEventListener("click",kpGenerate);
 
 calcBtn.addEventListener("click",function(){
     const from=fromSelect.value, to=toSelect.value;
