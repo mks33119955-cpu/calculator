@@ -568,7 +568,7 @@ select,input{
 .density-note{display:flex;gap:10px;align-items:center;padding:14px 16px;background:#eff8ff;border:1px solid #d7ecff;border-radius:13px;color:#42617c;font-size:13px;margin-top:12px}.note-icon{font-size:18px}
 @media(max-width:600px){.result-hero{align-items:flex-start;flex-direction:column}.hero-price{font-size:26px}.price-breakdown{grid-template-columns:1fr}}
 
-.kp-actions{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:12px}.kp-btn,.kp-template-btn{min-height:46px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}.kp-btn{border:1px solid #cfe3f7;background:#eff8ff;color:#2467a6}.kp-btn:hover{background:#e2f2ff;transform:translateY(-1px)}.kp-template-btn{padding:0 16px;border:1px solid #e2e8f0;background:#fff;color:#64748b}.kp-template-btn:hover{border-color:#4299e1;color:#2b6cb0}.kp-status{min-height:20px;margin-top:8px;text-align:center;color:#64748b;font-size:12px}.kp-status.success{color:#2f855a}.kp-status.error{color:#c53030}.kp-cart{margin-top:14px}.kp-cart:empty{display:none}.kp-cart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.kp-cart-title{font-weight:800;color:#1e293b;font-size:14px}.kp-cart-count{font-size:12px;color:#64748b}.kp-cart-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 14px;background:#f8fafc;border:1px solid #e5edf5;border-radius:12px;margin-bottom:8px}.kp-cart-route{font-weight:700;color:#1e293b}.kp-cart-meta{font-size:12px;color:#64748b;margin-top:4px}.kp-cart-price{font-weight:800;color:#2b6cb0;text-align:right}.kp-cart-actions{display:flex;gap:6px;margin-top:6px}.kp-cart-actions button{border:0;background:transparent;color:#64748b;font-size:12px;font-weight:700;cursor:pointer;padding:3px 6px}.kp-cart-actions .remove{color:#c53030}@media(max-width:600px){.kp-actions{grid-template-columns:1fr}.kp-template-btn{min-height:42px}.kp-cart-item{grid-template-columns:1fr}.kp-cart-price{text-align:left}}
+.kp-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.kp-btn{min-height:46px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}.kp-btn{border:1px solid #cfe3f7;background:#eff8ff;color:#2467a6}.kp-btn:hover{background:#e2f2ff;transform:translateY(-1px)}.kp-status{min-height:20px;margin-top:8px;text-align:center;color:#64748b;font-size:12px}.kp-status.success{color:#2f855a}.kp-status.error{color:#c53030}.kp-cart{margin-top:14px}.kp-cart:empty{display:none}.kp-cart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.kp-cart-title{font-weight:800;color:#1e293b;font-size:14px}.kp-cart-count{font-size:12px;color:#64748b}.kp-cart-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 14px;background:#f8fafc;border:1px solid #e5edf5;border-radius:12px;margin-bottom:8px}.kp-cart-route{font-weight:700;color:#1e293b}.kp-cart-meta{font-size:12px;color:#64748b;margin-top:4px}.kp-cart-price{font-weight:800;color:#2b6cb0;text-align:right}.kp-cart-actions{display:flex;gap:6px;margin-top:6px}.kp-cart-actions button{border:0;background:transparent;color:#64748b;font-size:12px;font-weight:700;cursor:pointer;padding:3px 6px}.kp-cart-actions .remove{color:#c53030}@media(max-width:600px){.kp-actions{grid-template-columns:1fr}.kp-cart-item{grid-template-columns:1fr}.kp-cart-price{text-align:left}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><script src="https://unpkg.com/docx-preview@0.3.6/dist/docx-preview.min.js"></script>
 </head>
@@ -621,7 +621,7 @@ select,input{
 
         <!-- КНОПКА РАСЧЁТА -->
         <button class="calc-btn" id="calcBtn">🧮 Рассчитать стоимость</button>
-<div class="kp-actions"><button class="kp-btn" id="addToKpBtn" type="button">➕ Добавить расчёт в КП</button><label class="kp-template-btn" for="kpTemplateInput">⚙️ Загрузить исходный Word</label><input id="kpTemplateInput" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden></div><div class="kp-actions"><button class="kp-btn" id="generateKpBtn" type="button">📄 Сформировать PDF КП</button></div><div id="kpStatus" class="kp-status"></div><div id="kpCart" class="kp-cart"></div>
+<div class="kp-actions"><button class="kp-btn" id="addToKpBtn" type="button">➕ Добавить расчёт в КП</button><button class="kp-btn" id="generateKpBtn" type="button">📄 Сформировать PDF КП</button></div><div id="kpStatus" class="kp-status"></div><div id="kpCart" class="kp-cart"></div>
 
         <!-- РЕЗУЛЬТАТЫ -->
         <div id="resultsContainer" class="results"></div>
@@ -740,10 +740,10 @@ function renderHistory(){
 clearHistoryBtn.addEventListener("click",clearHistory);
 const kpGenerateBtn=document.getElementById("generateKpBtn");
 const addToKpBtn=document.getElementById("addToKpBtn");
-const kpTemplateInput=document.getElementById("kpTemplateInput");
 const kpStatus=document.getElementById("kpStatus");
 const kpCart=document.getElementById("kpCart");
-const KP_TEMPLATE_KEY="calculator_kp_template_v2";
+const KP_TEMPLATE_URL="https://raw.githubusercontent.com/mks33119955-cpu/calculator/main/kp-template/base64.txt";
+let kpTemplatePromise=null;
 let kpCartItems=[];let kpEditingIndex=-1;
 
 function kpSetStatus(text,type=""){kpStatus.textContent=text;kpStatus.className="kp-status "+type;}
@@ -773,18 +773,15 @@ addToKpBtn.addEventListener("click",()=>{
  renderKpCart();kpSetStatus("Позиция добавлена в КП.","success");
 });
 
-kpTemplateInput.addEventListener("change",async e=>{
- const file=e.target.files&&e.target.files[0];if(!file)return;
- if(!file.name.toLowerCase().endsWith(".docx")){kpSetStatus("Нужен исходный файл Word в формате .docx.","error");return;}
- const bytes=new Uint8Array(await file.arrayBuffer());
- let bin="";const chunk=0x8000;for(let i=0;i<bytes.length;i+=chunk)bin+=String.fromCharCode(...bytes.subarray(i,i+chunk));
- localStorage.setItem(KP_TEMPLATE_KEY,btoa(bin));
- kpSetStatus("Исходный Word сохранён в браузере. Теперь КП будет строиться на его основе.","success");
-});
-
-function getStoredTemplate(){
- const b64=localStorage.getItem(KP_TEMPLATE_KEY);if(!b64)return null;
- const bin=atob(b64),bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return bytes;
+async function getStoredTemplate(){
+ if(!kpTemplatePromise){
+  kpTemplatePromise=fetch(KP_TEMPLATE_URL,{cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("Не удалось загрузить встроенный Word-шаблон");return r.text();}).then(b64=>{
+   const clean=b64.replace(/\s/g,""),bin=atob(clean),bytes=new Uint8Array(bin.length);
+   for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+   return bytes;
+  });
+ }
+ return kpTemplatePromise;
 }
 function xmlEsc(v){return String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function replaceCellText(cell,text,secondLine=""){
@@ -801,23 +798,26 @@ function deliveryLabel(value){
  const n=Number(s); if(n===1)return "1 день"; if(n>=2&&n<=4)return s+" дня"; return s+" дней";
 }
 function setRowData(row,item,index){
- const cells=row.match(/<w:tc(?:\s|>)[\s\S]*?<\/w:tc>/g); if(!cells||cells.length<3)return row;
+ const cells=row.match(/<w:tc(?:\s|>)[\s\S]*?<\/w:tc>/g); if(!cells||cells.length<4)return row;
+ const displayUnit=item.unit==="kg"?formatNumber(Math.round(item.weight))+" кг":formatNumber(item.volume,3)+" м³";
  const newCells=[
-   replaceCellText(cells[0],item.from+" → "+item.to,"Вес: "+formatNumber(Math.round(item.weight))+" кг"),
-   replaceCellText(cells[1],deliveryLabel(item.delivery)),
-   replaceCellText(cells[2],formatNumber(item.m3Price)+" ₽/м³","Стоимость: "+formatNumber(item.price)+" ₽")
+  replaceCellText(cells[0],item.from+" → "+item.to),
+  replaceCellText(cells[1],displayUnit),
+  replaceCellText(cells[2],deliveryLabel(item.delivery)),
+  replaceCellText(cells[3],formatNumber(item.m3Price)+" ₽/м³","Стоимость: "+formatNumber(item.price)+" ₽")
  ];
- for(let i=0;i<3;i++)row=row.replace(cells[i],newCells[i]);
+ for(let i=0;i<4;i++)row=row.replace(cells[i],newCells[i]);
  const fill=index%2===0?"EAF3FC":"F7FAFE";
  return row.replace(/<w:shd\b[^>]*\/>/g,function(m){return m.replace(/w:fill="[^"]*"/,'w:fill="'+fill+'"');});
 }
 async function makeTemplateDocx(items){
- const bytes=getStoredTemplate(); if(!bytes)throw new Error("NO_TEMPLATE");
+ if(items.length>10)throw new Error("В КП можно добавить максимум 10 направлений.");
+ const bytes=await getStoredTemplate();
  const zip=await JSZip.loadAsync(bytes);
  let xml=await zip.file("word/document.xml").async("string");
  const tbls=xml.match(/<w:tbl(?:\s|>)[\s\S]*?<\/w:tbl>/g)||[];
  let target=null;
- for(const t of tbls)if(t.includes("НАПРАВЛЕНИЕ")&&t.includes("ТАРИФ ЗА 1 М³")){target=t;break;}
+ for(const t of tbls)if(t.includes("НАПРАВЛЕНИЕ")&&t.includes("ВЕС / ОБЪЁМ")&&t.includes("ТАРИФ ЗА 1 М³")){target=t;break;}
  if(!target)throw new Error("TABLE_NOT_FOUND");
  const rows=target.match(/<w:tr(?:\s|>)[\s\S]*?<\/w:tr>/g)||[];
  if(rows.length<2)throw new Error("ROWS_NOT_FOUND");
@@ -830,15 +830,14 @@ async function makeTemplateDocx(items){
 }
 async function generateKpPdf(){
  if(!kpCartItems.length){kpSetStatus("Добавьте хотя бы одно направление в КП.","error");return;}
- if(!getStoredTemplate()){kpSetStatus("Сначала нажмите «Загрузить исходный Word» и выберите ваш КП .docx.","error");kpTemplateInput.click();return;}
- // Окно открываем сразу по клику, иначе браузер может заблокировать его после await.
+  // Окно открываем сразу по клику, иначе браузер может заблокировать его после await.
  const win=window.open("","_blank");
  if(!win){kpSetStatus("Разрешите всплывающие окна для сайта.","error");return;}
  win.document.open();
  win.document.write('<!doctype html><html><head><title>Формирование КП…</title><style>html,body{margin:0;padding:24px;background:#fff;font-family:Arial,sans-serif;color:#334155}.loading{max-width:720px;margin:15vh auto;text-align:center;font-size:18px}</style><script src="https://unpkg.com/docx-preview@0.3.6/dist/docx-preview.min.js"><\\/script></head><body><div class="loading">Формирую коммерческое предложение…</div></body></html>');
  win.document.close();
  try{
-  kpSetStatus("Формирую КП на основе исходного Word…");
+  kpSetStatus("Формирую КП на встроенном Word-шаблоне…");
   const blob=await makeTemplateDocx(kpCartItems);
   await new Promise((resolve,reject)=>{
    const started=Date.now();
