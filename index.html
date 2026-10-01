@@ -786,7 +786,7 @@ async function getStoredTemplate(){
 function xmlEsc(v){return String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function replaceCellText(cell,text,secondLine=""){
  const tcPrEnd=cell.indexOf("</w:tcPr>"); if(tcPrEnd<0)return cell;
- const prefix=cell.slice(0,tcPrEnd+8);
+ const prefix=cell.slice(0,tcPrEnd+9);
  const p1='<w:p><w:pPr><w:spacing w:before="60" w:after="60"/></w:pPr><w:r><w:t>'+xmlEsc(text)+'</w:t></w:r></w:p>';
  const p2=secondLine?'<w:p><w:pPr><w:spacing w:before="0" w:after="60"/></w:pPr><w:r><w:rPr><w:color w:val="5D6F89"/><w:sz w:val="15"/></w:rPr><w:t>'+xmlEsc(secondLine)+'</w:t></w:r></w:p>':"";
  return prefix+p1+p2+"</w:tc>";
