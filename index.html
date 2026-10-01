@@ -570,7 +570,7 @@ select,input{
 
 .kp-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.kp-btn{min-height:46px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}.kp-btn{border:1px solid #cfe3f7;background:#eff8ff;color:#2467a6}.kp-btn:hover{background:#e2f2ff;transform:translateY(-1px)}.kp-status{min-height:20px;margin-top:8px;text-align:center;color:#64748b;font-size:12px}.kp-status.success{color:#2f855a}.kp-status.error{color:#c53030}.kp-cart{margin-top:14px}.kp-cart:empty{display:none}.kp-cart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.kp-cart-title{font-weight:800;color:#1e293b;font-size:14px}.kp-cart-count{font-size:12px;color:#64748b}.kp-cart-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 14px;background:#f8fafc;border:1px solid #e5edf5;border-radius:12px;margin-bottom:8px}.kp-cart-route{font-weight:700;color:#1e293b}.kp-cart-meta{font-size:12px;color:#64748b;margin-top:4px}.kp-cart-price{font-weight:800;color:#2b6cb0;text-align:right}.kp-cart-actions{display:flex;gap:6px;margin-top:6px}.kp-cart-actions button{border:0;background:transparent;color:#64748b;font-size:12px;font-weight:700;cursor:pointer;padding:3px 6px}.kp-cart-actions .remove{color:#c53030}@media(max-width:600px){.kp-actions{grid-template-columns:1fr}.kp-cart-item{grid-template-columns:1fr}.kp-cart-price{text-align:left}}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><script src="https://unpkg.com/docx-preview@0.3.6/dist/docx-preview.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -836,11 +836,13 @@ async function generateKpPdf(){
  const now=new Date().toLocaleDateString("ru-RU");
  const doc=document.createElement("div");
  doc.id="kp-pdf-document";
- doc.style.position="fixed";
- doc.style.left="-10000px";
+ doc.style.position="absolute";
+ doc.style.left="0";
  doc.style.top="0";
  doc.style.width="794px";
+ doc.style.minHeight="1123px";
  doc.style.background="#fff";
+ doc.style.zIndex="999999";
  doc.innerHTML=
  '<style>'+
  '*{box-sizing:border-box}.kp-page{width:794px;min-height:1123px;padding:48px 52px 42px;background:#fff;color:#1f3045;font-family:Arial,"Segoe UI",sans-serif;font-size:11px;line-height:1.4}.top{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:14px;border-bottom:3px solid #1f6fae}.brand{font-size:17px;font-weight:800;letter-spacing:1.2px;color:#173b5c}.brand-sub{display:block;margin-top:3px;font-size:8px;font-weight:700;letter-spacing:2px;color:#5f7890}.company-data{text-align:right;color:#64788b;font-size:8.5px;line-height:1.55}.company-data strong{color:#173b5c;font-size:9.5px}.title{margin:23px 0 4px;text-align:center;font-size:23px;font-weight:800;color:#173b5c;letter-spacing:.3px}.subtitle{text-align:center;color:#2b78b6;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase}.date{text-align:center;margin-top:7px;color:#8797a7;font-size:8px}.hero{margin:18px 0 20px;padding:14px 16px;background:#f4f8fb;border:1px solid #dce7f0;border-left:4px solid #2b78b6}.hero-title{font-size:12px;font-weight:800;color:#173b5c;margin-bottom:5px}.hero p{margin:0;color:#53697e;font-size:9.5px}.section{margin-top:18px}.section h2{margin:0 0 8px;font-size:11px;color:#173b5c;letter-spacing:.8px;text-transform:uppercase}.section p{margin:0 0 7px;color:#53697e;font-size:9.5px}.section ul{margin:4px 0 0;padding-left:17px;color:#53697e;font-size:9px}.section li{margin:4px 0}.split{display:grid;grid-template-columns:1fr 1fr;gap:18px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:9px}.card{padding:10px 11px;border:1px solid #dce7f0;border-radius:6px;background:#fbfcfe}.card h3{margin:0 0 5px;font-size:9.5px;color:#173b5c}.card p{margin:0;font-size:8.5px;color:#64788b}.page-break{page-break-before:always}.table-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:8px}.table-head h2{margin:0;font-size:11px;color:#173b5c;letter-spacing:.8px;text-transform:uppercase}.table-head span{font-size:8px;color:#8797a7}table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #cfdce8;border-radius:7px;overflow:hidden;table-layout:fixed}th{padding:9px 8px;background:#173b5c;color:#fff;border-right:1px solid rgba(255,255,255,.16);font-size:8px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;text-align:left}th:last-child{border-right:0}td{padding:9px 8px;border-top:1px solid #dce5ed;border-right:1px solid #dce5ed;vertical-align:middle;font-size:9.5px}td:last-child{border-right:0}tbody tr:nth-child(even){background:#f8fafc}.route{line-height:1.1}.route-from,.route-to{font-weight:800;color:#213b55}.route-arrow{margin:2px 0;color:#2b78b6;font-weight:800}.center{text-align:center}.delivery{display:inline-block;padding:4px 7px;border-radius:999px;background:#eef6fc;color:#235e8d;font-weight:800;font-size:8.5px}.tariff{font-weight:800;color:#173b5c;font-size:10px}.row-cost{margin-top:3px;color:#2b78b6;font-size:8.5px;font-weight:700}.note{margin-top:14px;padding:10px 12px;border:1px solid #dce7f0;border-radius:6px;background:#fbfcfe}.note strong{display:block;margin-bottom:5px;color:#173b5c;font-size:9px}.note p{margin:3px 0;color:#64788b;font-size:8.5px}.contact{margin-top:20px;padding:14px 16px;background:#173b5c;color:#fff;border-radius:7px}.contact-title{font-size:10px;font-weight:800;letter-spacing:.6px;margin-bottom:7px}.contact p{margin:3px 0;color:#dce9f3;font-size:8.5px}.footer{margin-top:18px;padding-top:8px;border-top:2px solid #1f6fae;display:flex;justify-content:space-between;gap:20px;color:#7a8c9d;font-size:8px}.footer strong{color:#173b5c}'+
@@ -862,9 +864,19 @@ async function generateKpPdf(){
    '<div class="footer"><div><strong>ООО «ТК Грузовая Компания»</strong></div><div>Быстрее доставка. Быстрее товар в обороте.</div></div>'+
  '</div>';
 
+ const appContainer=document.querySelector(".container");
+ const previousDisplay=appContainer ? appContainer.style.display : "";
+ if(appContainer) appContainer.style.display="none";
  document.body.appendChild(doc);
  kpSetStatus("Формируем PDF…","success");
  try{
+   await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+   const page=doc.querySelector(".kp-page");
+   const rect=page ? page.getBoundingClientRect() : {width:0,height:0};
+   const textLength=page ? page.innerText.trim().length : 0;
+   if(!page || rect.width<700 || rect.height<900 || textLength<500){
+     throw new Error("Не удалось подготовить содержимое КП для PDF.");
+   }
    const filename="КП_"+kpCartItems.map(x=>x.to+"_"+x.from).join("_").replace(/[^a-zA-Zа-яА-ЯёЁ0-9_ -]/g,"")+".pdf";
    await html2pdf().set({
      margin:0,
@@ -880,6 +892,7 @@ async function generateKpPdf(){
    kpSetStatus("Не удалось сформировать PDF: "+(err&&err.message?err.message:"ошибка"),"error");
  }finally{
    doc.remove();
+   if(appContainer) appContainer.style.display=previousDisplay;
  }
 }
 kpGenerateBtn.addEventListener("click",generateKpPdf);
