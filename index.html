@@ -570,7 +570,8 @@ select,input{
 
 .kp-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.kp-btn{min-height:46px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}.kp-btn{border:1px solid #cfe3f7;background:#eff8ff;color:#2467a6}.kp-btn:hover{background:#e2f2ff;transform:translateY(-1px)}.kp-status{min-height:20px;margin-top:8px;text-align:center;color:#64748b;font-size:12px}.kp-status.success{color:#2f855a}.kp-status.error{color:#c53030}.kp-cart{margin-top:14px}.kp-cart:empty{display:none}.kp-cart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.kp-cart-title{font-weight:800;color:#1e293b;font-size:14px}.kp-cart-count{font-size:12px;color:#64748b}.kp-cart-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 14px;background:#f8fafc;border:1px solid #e5edf5;border-radius:12px;margin-bottom:8px}.kp-cart-route{font-weight:700;color:#1e293b}.kp-cart-meta{font-size:12px;color:#64748b;margin-top:4px}.kp-cart-price{font-weight:800;color:#2b6cb0;text-align:right}.kp-cart-actions{display:flex;gap:6px;margin-top:6px}.kp-cart-actions button{border:0;background:transparent;color:#64748b;font-size:12px;font-weight:700;cursor:pointer;padding:3px 6px}.kp-cart-actions .remove{color:#c53030}@media(max-width:600px){.kp-actions{grid-template-columns:1fr}.kp-cart-item{grid-template-columns:1fr}.kp-cart-price{text-align:left}}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
 </head>
 <body>
 
@@ -770,84 +771,137 @@ function deliveryLabel(value){
 }
 async function generateKpPdf(){
  if(!kpCartItems.length){kpSetStatus("Добавьте хотя бы одно направление в КП.","error");return;}
- if(typeof html2pdf==="undefined"){kpSetStatus("Не удалось загрузить модуль PDF. Обновите страницу и попробуйте ещё раз.","error");return;}
+ if(typeof pdfMake==="undefined"){kpSetStatus("Не удалось загрузить модуль PDF. Обновите страницу и попробуйте ещё раз.","error");return;}
 
- const esc=s=>{const d=document.createElement("div");d.textContent=String(s);return d.innerHTML;};
  const money=n=>Number(n).toLocaleString("ru-RU")+" ₽";
  const quantity=item=>item.unit==="kg"
    ? Number(item.value).toLocaleString("ru-RU")+" кг"
    : Number(item.value).toLocaleString("ru-RU",{maximumFractionDigits:3})+" м³";
-
- const rows=kpCartItems.map(item=>{
-   const tariff=money(item.m3Price)+"/м³";
-   return '<tr>'+
-     '<td class="route"><div class="route-from">'+esc(item.from)+'</div><div class="route-arrow">→</div><div class="route-to">'+esc(item.to)+'</div></td>'+
-     '<td class="center">'+quantity(item)+'</td>'+
-     '<td class="center"><span class="delivery">'+esc(deliveryLabel(item.delivery))+'</span></td>'+
-     '<td><div class="tariff">'+tariff+'</div><div class="row-cost">Стоимость: '+money(item.price)+'</div></td>'+
-   '</tr>';
- }).join("");
-
  const now=new Date().toLocaleDateString("ru-RU");
- const doc=document.createElement("div");
- doc.id="kp-pdf-document";
- doc.style.position="absolute";
- doc.style.left="0";
- doc.style.top="0";
- doc.style.width="794px";
- doc.style.minHeight="1123px";
- doc.style.background="#fff";
- doc.style.zIndex="999999";
- doc.innerHTML=
- '<style>'+
- '*{box-sizing:border-box}.kp-page{width:794px;min-height:1123px;padding:48px 52px 42px;background:#fff;color:#1f3045;font-family:Arial,"Segoe UI",sans-serif;font-size:11px;line-height:1.4}.top{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:14px;border-bottom:3px solid #1f6fae}.brand{font-size:17px;font-weight:800;letter-spacing:1.2px;color:#173b5c}.brand-sub{display:block;margin-top:3px;font-size:8px;font-weight:700;letter-spacing:2px;color:#5f7890}.company-data{text-align:right;color:#64788b;font-size:8.5px;line-height:1.55}.company-data strong{color:#173b5c;font-size:9.5px}.title{margin:23px 0 4px;text-align:center;font-size:23px;font-weight:800;color:#173b5c;letter-spacing:.3px}.subtitle{text-align:center;color:#2b78b6;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase}.date{text-align:center;margin-top:7px;color:#8797a7;font-size:8px}.hero{margin:18px 0 20px;padding:14px 16px;background:#f4f8fb;border:1px solid #dce7f0;border-left:4px solid #2b78b6}.hero-title{font-size:12px;font-weight:800;color:#173b5c;margin-bottom:5px}.hero p{margin:0;color:#53697e;font-size:9.5px}.section{margin-top:18px}.section h2{margin:0 0 8px;font-size:11px;color:#173b5c;letter-spacing:.8px;text-transform:uppercase}.section p{margin:0 0 7px;color:#53697e;font-size:9.5px}.section ul{margin:4px 0 0;padding-left:17px;color:#53697e;font-size:9px}.section li{margin:4px 0}.split{display:grid;grid-template-columns:1fr 1fr;gap:18px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:9px}.card{padding:10px 11px;border:1px solid #dce7f0;border-radius:6px;background:#fbfcfe}.card h3{margin:0 0 5px;font-size:9.5px;color:#173b5c}.card p{margin:0;font-size:8.5px;color:#64788b}.page-break{page-break-before:always}.table-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:8px}.table-head h2{margin:0;font-size:11px;color:#173b5c;letter-spacing:.8px;text-transform:uppercase}.table-head span{font-size:8px;color:#8797a7}table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #cfdce8;border-radius:7px;overflow:hidden;table-layout:fixed}th{padding:9px 8px;background:#173b5c;color:#fff;border-right:1px solid rgba(255,255,255,.16);font-size:8px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;text-align:left}th:last-child{border-right:0}td{padding:9px 8px;border-top:1px solid #dce5ed;border-right:1px solid #dce5ed;vertical-align:middle;font-size:9.5px}td:last-child{border-right:0}tbody tr:nth-child(even){background:#f8fafc}.route{line-height:1.1}.route-from,.route-to{font-weight:800;color:#213b55}.route-arrow{margin:2px 0;color:#2b78b6;font-weight:800}.center{text-align:center}.delivery{display:inline-block;padding:4px 7px;border-radius:999px;background:#eef6fc;color:#235e8d;font-weight:800;font-size:8.5px}.tariff{font-weight:800;color:#173b5c;font-size:10px}.row-cost{margin-top:3px;color:#2b78b6;font-size:8.5px;font-weight:700}.note{margin-top:14px;padding:10px 12px;border:1px solid #dce7f0;border-radius:6px;background:#fbfcfe}.note strong{display:block;margin-bottom:5px;color:#173b5c;font-size:9px}.note p{margin:3px 0;color:#64788b;font-size:8.5px}.contact{margin-top:20px;padding:14px 16px;background:#173b5c;color:#fff;border-radius:7px}.contact-title{font-size:10px;font-weight:800;letter-spacing:.6px;margin-bottom:7px}.contact p{margin:3px 0;color:#dce9f3;font-size:8.5px}.footer{margin-top:18px;padding-top:8px;border-top:2px solid #1f6fae;display:flex;justify-content:space-between;gap:20px;color:#7a8c9d;font-size:8px}.footer strong{color:#173b5c}'+
- '</style>'+
- '<div class="kp-page">'+
-   '<div class="top"><div><div class="brand">ООО «ТК ГРУЗОВАЯ КОМПАНИЯ»</div><span class="brand-sub">ЭКСПРЕСС-ДОСТАВКА ПО РОССИИ</span></div><div class="company-data"><strong>ИНН 5406820437</strong><br>630005, Новосибирская область<br>г. Новосибирск, ул. Советская, д.52а, оф.11,12<br>8 800 222 2527</div></div>'+
-   '<div class="title">КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ</div><div class="subtitle">ЭКСПРЕСС-ДОСТАВКА ПО РОССИИ</div><div class="date">Дата формирования: '+now+'</div>'+
-   '<div class="hero"><div class="hero-title">ВАШ ТОВАР ДОЛЖЕН РАБОТАТЬ, А НЕ ЖДАТЬ В ПУТИ</div><p>Экспресс-доставка сборных грузов для федеральных компаний: быстрее пополняйте запасы, выполняйте заказы и возвращайте товар в оборот.</p></div>'+
-   '<div class="section"><h2>Когда поставка задерживается — бизнес теряет темп</h2><p>Дефицит ходовых позиций, ожидание заказов, деньги в товаре, который ещё находится в пути, и риск упущенных продаж — типичные последствия долгой логистики. Мы предлагаем сократить время между отгрузкой и поступлением товара на склад или в торговую точку.</p></div>'+
-   '<div class="section"><h2>Наше решение: экспресс-доставка по ключевым маршрутам</h2><p>ООО «ТК Грузовая Компания» организует доставку сборных грузов по России автомобильным, железнодорожным и воздушным транспортом. Контролируем своевременную подачу транспорта и перевозку, помогаем выстроить логистику с учётом географии и потребностей вашей компании.</p></div>'+
-   '<div class="cards"><div class="card"><h3>Для кого это предложение</h3><p>Федеральные поставщики и дистрибьюторы: запчасти для легковых и грузовых автомобилей; товары для дома и дачи; электрооборудование; спецодежда; торговое оборудование; мебельные комплектующие; двери и фурнитура.</p></div><div class="card"><h3>Почему с нами удобно работать</h3><p>Комплекс логистических услуг по России, контроль подачи транспорта и надёжной транспортировки груза, городские перевозки и транзитные склады, автомобили различной грузоподъёмности и с разными типами кузова.</p></div></div>'+
-   '<div class="section"><h2>Условия сотрудничества</h2><p>Прозрачный принцип расчёта для регулярных и разовых отправок. Итоговую стоимость подтверждаем после получения параметров груза и согласования состава услуг.</p></div>'+
-   '<div class="section page-break"><div class="table-head"><h2>Расчёт перевозки</h2><span>Плотность расчёта: 250 кг/м³</span></div><table><thead><tr><th style="width:38%">НАПРАВЛЕНИЕ</th><th style="width:18%">ВЕС / ОБЪЁМ</th><th style="width:16%">СРОК</th><th style="width:28%">ТАРИФ / СТОИМОСТЬ</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
-   '<div class="note"><strong>Расчёт и условия</strong><p>• Тариф за 1 м³ указан по действующему прайсу калькулятора.</p><p>• Для пересчёта кг ↔ м³ используется плотность 250 кг/м³.</p><p>• Срок доставки указан в рабочих днях и зависит от условий перевозки.</p></div>'+
-   '<div class="section"><h2>Дополнительные логистические возможности</h2><p>По запросу организуем забор и городскую доставку груза, погрузочно-разгрузочные работы, работу через транзитные склады, авизацию и комплексное логистическое сопровождение. Состав и стоимость дополнительных услуг согласовываются отдельно.</p></div>'+
-   '<div class="section"><h2>Как начать сотрудничество</h2><ul><li>Направьте нам маршрут, наименование груза, вес, объём, габариты одного грузоместа и регулярность отправок.</li><li>Укажите адреса забора и доставки, необходимость дополнительных услуг и желаемую дату отправки.</li><li>Мы подготовим расчёт и согласуем условия перевозки для вашей компании.</li></ul></div>'+
-   '<div class="section"><h2>Наш опыт</h2><p>Среди организаций, оценивших сотрудничество: ООО «ГазЭнергоСибирь», ЗАО «Газпромнефть-терминал», ООО «Завод СибПромСвязь», ООО «ФишМэн», ООО «Династия», ООО «Агротех», ООО «ЦКФ» и ООО «Движение».</p></div>'+
-   '<div class="contact"><div class="contact-title">ПРЕДЛАГАЕМ ОБСУДИТЬ ВАШИ МАРШРУТЫ</div><p>Отправьте параметры грузопотока — рассчитаем доставку по нужным направлениям и подготовим индивидуальное предложение для регулярных поставок.</p><p><strong>ООО «ТК Грузовая Компания»</strong> · info@tk-gk.ru · tk-gk.ru · 8 800 222 2527</p></div>'+
-   '<div class="footer"><div><strong>ООО «ТК Грузовая Компания»</strong></div><div>Быстрее доставка. Быстрее товар в обороте.</div></div>'+
- '</div>';
+ const filename="КП_"+kpCartItems.map(x=>x.to+"_"+x.from).join("_").replace(/[^a-zA-Zа-яА-ЯёЁ0-9_ -]/g,"")+".pdf";
 
- const appContainer=document.querySelector(".container");
- const previousDisplay=appContainer ? appContainer.style.display : "";
- if(appContainer) appContainer.style.display="none";
- document.body.appendChild(doc);
+ const routeRows=kpCartItems.map((item,i)=>[
+   {text:item.from+" → "+item.to,style:"routeCell"},
+   {text:quantity(item),alignment:"center"},
+   {text:deliveryLabel(item.delivery),alignment:"center",style:"deliveryCell"},
+   {stack:[
+      {text:money(item.m3Price)+"/м³",style:"tariffCell"},
+      {text:"Стоимость: "+money(item.price),style:"costCell"}
+   ]}
+ ]);
+
+ const dd={
+   pageSize:"A4",
+   pageMargins:[42,42,42,38],
+   defaultStyle:{font:"Roboto",fontSize:9,color:"#53697e",lineHeight:1.25},
+   styles:{
+     brand:{fontSize:15,bold:true,color:"#173b5c",characterSpacing:1},
+     brandSub:{fontSize:7,bold:true,color:"#5f7890",characterSpacing:1.5},
+     requisites:{fontSize:7.5,color:"#64788b",alignment:"right",lineHeight:1.35},
+     title:{fontSize:20,bold:true,color:"#173b5c",alignment:"center",margin:[0,16,0,3]},
+     subtitle:{fontSize:8,bold:true,color:"#2b78b6",alignment:"center",characterSpacing:1.5},
+     date:{fontSize:7.5,color:"#8797a7",alignment:"center",margin:[0,5,0,12]},
+     hero:{fontSize:10,bold:true,color:"#173b5c"},
+     body:{fontSize:8.5,color:"#53697e",lineHeight:1.3},
+     h2:{fontSize:9.5,bold:true,color:"#173b5c",characterSpacing:.5,margin:[0,11,0,5]},
+     cardTitle:{fontSize:8.5,bold:true,color:"#173b5c"},
+     cardText:{fontSize:7.7,color:"#64788b",lineHeight:1.25},
+     tableHead:{fontSize:7.2,bold:true,color:"#ffffff",characterSpacing:.4},
+     routeCell:{fontSize:8.3,bold:true,color:"#213b55"},
+     deliveryCell:{fontSize:8,bold:true,color:"#235e8d"},
+     tariffCell:{fontSize:8.5,bold:true,color:"#173b5c"},
+     costCell:{fontSize:7.5,bold:true,color:"#2b78b6",margin:[0,2,0,0]},
+     noteTitle:{fontSize:8,bold:true,color:"#173b5c"},
+     note:{fontSize:7.5,color:"#64788b",lineHeight:1.3},
+     contactTitle:{fontSize:9,bold:true,color:"#ffffff",characterSpacing:.5},
+     contact:{fontSize:7.5,color:"#dce9f3",lineHeight:1.3},
+     footer:{fontSize:7,color:"#7a8c9d"}
+   },
+   content:[
+     {columns:[
+       {stack:[{text:"ООО «ТК ГРУЗОВАЯ КОМПАНИЯ»",style:"brand"},{text:"ЭКСПРЕСС-ДОСТАВКА ПО РОССИИ",style:"brandSub",margin:[0,2,0,0]}]},
+       {stack:[
+         {text:"ИНН 5406820437",style:"requisites",bold:true,color:"#173b5c"},
+         {text:"630005, Новосибирская область",style:"requisites"},
+         {text:"г. Новосибирск, ул. Советская, д.52а, оф.11,12",style:"requisites"},
+         {text:"8 800 222 2527",style:"requisites"}
+       ]}
+     ],margin:[0,0,0,10]},
+     {canvas:[{type:"line",x1:0,y1:0,x2:511,y2:0,lineWidth:2,color:"#1f6fae"}]},
+     {text:"КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ",style:"title"},
+     {text:"ЭКСПРЕСС-ДОСТАВКА ПО РОССИИ",style:"subtitle"},
+     {text:"Дата формирования: "+now,style:"date"},
+     {table:{widths:["*"],body:[[{stack:[
+       {text:"ВАШ ТОВАР ДОЛЖЕН РАБОТАТЬ, А НЕ ЖДАТЬ В ПУТИ",style:"hero",margin:[0,0,0,4]},
+       {text:"Экспресс-доставка сборных грузов для федеральных компаний: быстрее пополняйте запасы, выполняйте заказы и возвращайте товар в оборот.",style:"body"}
+     ],fillColor:"#f4f8fb",margin:[10,10,10,10]}]]},layout:{hLineColor:"#dce7f0",vLineColor:"#dce7f0",hLineWidth:()=>.6,vLineWidth:()=>.6}},
+     {text:"КОГДА ПОСТАВКА ЗАДЕРЖИВАЕТСЯ — БИЗНЕС ТЕРЯЕТ ТЕМП",style:"h2"},
+     {text:"Дефицит ходовых позиций, ожидание заказов, деньги в товаре, который ещё находится в пути, и риск упущенных продаж — типичные последствия долгой логистики. Мы предлагаем сократить время между отгрузкой и поступлением товара на склад или в торговую точку.",style:"body"},
+     {text:"НАШЕ РЕШЕНИЕ: ЭКСПРЕСС-ДОСТАВКА ПО КЛЮЧЕВЫМ МАРШРУТАМ",style:"h2"},
+     {text:"ООО «ТК Грузовая Компания» организует доставку сборных грузов по России автомобильным, железнодорожным и воздушным транспортом. Контролируем своевременную подачу транспорта и перевозку, помогаем выстроить логистику с учётом географии и потребностей вашей компании.",style:"body"},
+     {text:"ДЛЯ КОГО ЭТО ПРЕДЛОЖЕНИЕ",style:"h2"},
+     {table:{widths:["*","*"],body:[[
+       {stack:[{text:"Федеральные поставщики и дистрибьюторы",style:"cardTitle",margin:[0,0,0,4]},{text:"Запчасти для легковых и грузовых автомобилей; товары для дома и дачи; электрооборудование; спецодежда; торговое оборудование; мебельные комплектующие; двери и фурнитура.",style:"cardText"}],fillColor:"#fbfcfe",margin:[8,8,8,8]},
+       {stack:[{text:"Почему с нами удобно работать",style:"cardTitle",margin:[0,0,0,4]},{text:"Комплекс логистических услуг по России, контроль подачи транспорта и надёжной транспортировки груза, городские перевозки и транзитные склады, автомобили различной грузоподъёмности и с разными типами кузова.",style:"cardText"}],fillColor:"#fbfcfe",margin:[8,8,8,8]}
+     ]]},layout:{hLineColor:"#dce7f0",vLineColor:"#dce7f0",hLineWidth:()=>.6,vLineWidth:()=>.6}},
+     {text:"УСЛОВИЯ СОТРУДНИЧЕСТВА",style:"h2"},
+     {text:"Прозрачный принцип расчёта для регулярных и разовых отправок. Итоговую стоимость подтверждаем после получения параметров груза и согласования состава услуг.",style:"body"},
+     {text:"РАСЧЁТ ПЕРЕВОЗКИ",style:"h2",pageBreak:"before"},
+     {columns:[
+       {text:"Выбранные менеджером направления",style:"body"},
+       {text:"Плотность расчёта: 250 кг/м³",style:"body",alignment:"right"}
+     ],margin:[0,0,0,6]},
+     {table:{
+       headerRows:1,
+       widths:["*","18%","15%","27%"],
+       body:[
+         [
+           {text:"НАПРАВЛЕНИЕ",style:"tableHead",fillColor:"#173b5c"},
+           {text:"ВЕС / ОБЪЁМ",style:"tableHead",fillColor:"#173b5c",alignment:"center"},
+           {text:"СРОК",style:"tableHead",fillColor:"#173b5c",alignment:"center"},
+           {text:"ТАРИФ / СТОИМОСТЬ",style:"tableHead",fillColor:"#173b5c"}
+         ],
+         ...routeRows
+       ]
+     },layout:{
+       hLineColor:"#dce5ed",vLineColor:"#dce5ed",hLineWidth:()=>.6,vLineWidth:()=>.6,
+       paddingLeft:()=>7,paddingRight:()=>7,paddingTop:()=>7,paddingBottom:()=>7
+     }},
+     {table:{widths:["*"],body:[[{stack:[
+       {text:"РАСЧЁТ И УСЛОВИЯ",style:"noteTitle",margin:[0,0,0,4]},
+       {text:"• Тариф за 1 м³ указан по действующему прайсу калькулятора.\n• Для пересчёта кг ↔ м³ используется плотность 250 кг/м³.\n• Срок доставки указан в рабочих днях и зависит от условий перевозки.",style:"note"}
+     ],fillColor:"#fbfcfe",margin:[9,8,9,8]}]]},layout:{hLineColor:"#dce7f0",vLineColor:"#dce7f0",hLineWidth:()=>.6,vLineWidth:()=>.6}},
+     {text:"ДОПОЛНИТЕЛЬНЫЕ ЛОГИСТИЧЕСКИЕ ВОЗМОЖНОСТИ",style:"h2"},
+     {text:"По запросу организуем забор и городскую доставку груза, погрузочно-разгрузочные работы, работу через транзитные склады, авизацию и комплексное логистическое сопровождение. Состав и стоимость дополнительных услуг согласовываются отдельно.",style:"body"},
+     {text:"КАК НАЧАТЬ СОТРУДНИЧЕСТВО",style:"h2"},
+     {ol:[
+       "Направьте нам маршрут, наименование груза, вес, объём, габариты одного грузоместа и регулярность отправок.",
+       "Укажите адреса забора и доставки, необходимость дополнительных услуг и желаемую дату отправки.",
+       "Мы подготовим расчёт и согласуем условия перевозки для вашей компании."
+     ],style:"body",margin:[0,0,0,0]},
+     {text:"НАШ ОПЫТ",style:"h2"},
+     {text:"Среди организаций, оценивших сотрудничество: ООО «ГазЭнергоСибирь», ЗАО «Газпромнефть-терминал», ООО «Завод СибПромСвязь», ООО «ФишМэн», ООО «Династия», ООО «Агротех», ООО «ЦКФ» и ООО «Движение».",style:"body"},
+     {table:{widths:["*"],body:[[{stack:[
+       {text:"ПРЕДЛАГАЕМ ОБСУДИТЬ ВАШИ МАРШРУТЫ",style:"contactTitle",margin:[0,0,0,5]},
+       {text:"Отправьте параметры грузопотока — рассчитаем доставку по нужным направлениям и подготовим индивидуальное предложение для регулярных поставок.",style:"contact"},
+       {text:"ООО «ТК Грузовая Компания» · info@tk-gk.ru · tk-gk.ru · 8 800 222 2527",style:"contact",margin:[0,5,0,0]}
+     ],fillColor:"#173b5c",margin:[11,11,11,11]}]]},layout:"noBorders",margin:[0,14,0,0]}
+   ],
+   footer:(currentPage,pageCount)=>({
+     margin:[42,0,42,15],
+     columns:[
+       {text:"ООО «ТК Грузовая Компания»",style:"footer"},
+       {text:"Быстрее доставка. Быстрее товар в обороте.",style:"footer",alignment:"right"}
+     ]
+   })
+ };
+
  kpSetStatus("Формируем PDF…","success");
  try{
-   await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-   const page=doc.querySelector(".kp-page");
-   const rect=page ? page.getBoundingClientRect() : {width:0,height:0};
-   const textLength=page ? page.innerText.trim().length : 0;
-   if(!page || rect.width<700 || rect.height<900 || textLength<500){
-     throw new Error("Не удалось подготовить содержимое КП для PDF.");
-   }
-   const filename="КП_"+kpCartItems.map(x=>x.to+"_"+x.from).join("_").replace(/[^a-zA-Zа-яА-ЯёЁ0-9_ -]/g,"")+".pdf";
-   await html2pdf().set({
-     margin:0,
-     filename,
-     image:{type:"jpeg",quality:.98},
-     html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},
-     jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},
-     pagebreak:{mode:["css","legacy"]}
-   }).from(doc).save();
-   kpSetStatus("PDF готов и скачан на компьютер.","success");
+   pdfMake.createPdf(dd).download(filename,()=>kpSetStatus("PDF готов и скачан на компьютер.","success"));
  }catch(err){
    console.error(err);
    kpSetStatus("Не удалось сформировать PDF: "+(err&&err.message?err.message:"ошибка"),"error");
- }finally{
-   doc.remove();
-   if(appContainer) appContainer.style.display=previousDisplay;
  }
 }
 kpGenerateBtn.addEventListener("click",generateKpPdf);
