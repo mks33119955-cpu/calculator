@@ -787,51 +787,44 @@ function getStoredTemplate(){
  const bin=atob(b64),bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return bytes;
 }
 function xmlEsc(v){return String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-function replaceCellText(cell,text,secondLine=false){
- const runs=cell.match(/<w:r[\s\S]*?<\/w:r>/g)||[];
- const firstText=cell.indexOf("<w:t");
- if(firstText<0)return cell;
- const tOpen=cell.indexOf(">",firstText)+1,tClose=cell.indexOf("</w:t>",tOpen);
- if(tClose<0)return cell;
- let out=cell.slice(0,tOpen)+xmlEsc(text)+cell.slice(tClose);
- if(secondLine){
-   out=out.slice(0,-("</w:tc>".length))+'<w:p><w:r><w:rPr><w:color w:val="5D6F89"/><w:sz w:val="15"/></w:rPr><w:t>Вес: '+xmlEsc(secondLine)+' кг</w:t></w:r></w:p></w:tc>';
- }
- return out;
+function replaceCellText(cell,text,secondLine=""){
+ const tcPrEnd=cell.indexOf("</w:tcPr>"); if(tcPrEnd<0)return cell;
+ const prefix=cell.slice(0,tcPrEnd+8);
+ const p1='<w:p><w:pPr><w:spacing w:before="60" w:after="60"/></w:pPr><w:r><w:t>'+xmlEsc(text)+'</w:t></w:r></w:p>';
+ const p2=secondLine?'<w:p><w:pPr><w:spacing w:before="0" w:after="60"/></w:pPr><w:r><w:rPr><w:color w:val="5D6F89"/><w:sz w:val="15"/></w:rPr><w:t>'+xmlEsc(secondLine)+'</w:t></w:r></w:p>':"";
+ return prefix+p1+p2+"</w:tc>";
 }
 function deliveryLabel(value){
  const s=String(value).trim();
  if(/дн|день|дня|дней/i.test(s))return s;
  if(s.includes("-"))return s.replace(/-/g,"–")+" дней";
- const n=Number(s);
- if(n===1)return "1 день";
- if(n>=2&&n<=4)return s+" дня";
- return s+" дней";
+ const n=Number(s); if(n===1)return "1 день"; if(n>=2&&n<=4)return s+" дня"; return s+" дней";
 }
 function setRowData(row,item,index){
- const cells=row.match(/<w:tc(?:\s|>)[\s\S]*?<\/w:tc>/g);if(!cells||cells.length<3)return row;
- let r=row;
+ const cells=row.match(/<w:tc(?:\s|>)[\s\S]*?<\/w:tc>/g); if(!cells||cells.length<3)return row;
  const newCells=[
-   replaceCellText(cells[0],item.from+" → "+item.to,String(Math.round(item.weight))),
+   replaceCellText(cells[0],item.from+" → "+item.to,"Вес: "+formatNumber(Math.round(item.weight))+" кг"),
    replaceCellText(cells[1],deliveryLabel(item.delivery)),
-   replaceCellText(cells[2],formatNumber(item.m3Price)+" ₽/м³")
+   replaceCellText(cells[2],formatNumber(item.m3Price)+" ₽/м³","Стоимость: "+formatNumber(item.price)+" ₽")
  ];
- newCells[2]=newCells[2].slice(0,-("</w:tc>".length))+'<w:p><w:r><w:rPr><w:color w:val="5D6F89"/><w:sz w:val="15"/></w:rPr><w:t>Стоимость: '+xmlEsc(formatNumber(item.price))+' ₽</w:t></w:r></w:p></w:tc>';
- newCells[0]=newCells[0].replace(/<w:shd[^>]*w:fill="[^"]+"[^>]*\/>/,'<w:shd w:val="clear" w:color="auto" w:fill="'+(index%2===0?"EAF3FC":"F7FAFE")+'"/>');
- for(let i=0;i<3;i++)r=r.replace(cells[i],newCells[i]);
- return r;
+ for(let i=0;i<3;i++)row=row.replace(cells[i],newCells[i]);
+ const fill=index%2===0?"EAF3FC":"F7FAFE";
+ return row.replace(/<w:shd\b[^>]*\/>/g,function(m){return m.replace(/w:fill="[^"]*"/,'w:fill="'+fill+'"');});
 }
 async function makeTemplateDocx(items){
- const bytes=getStoredTemplate();if(!bytes)throw new Error("NO_TEMPLATE");
- const zip=await JSZip.loadAsync(bytes);let xml=await zip.file("word/document.xml").async("string");
- const tbls=xml.match(/<w:tbl[\s\S]*?<\/w:tbl>/g)||[];let target=null;
+ const bytes=getStoredTemplate(); if(!bytes)throw new Error("NO_TEMPLATE");
+ const zip=await JSZip.loadAsync(bytes);
+ let xml=await zip.file("word/document.xml").async("string");
+ const tbls=xml.match(/<w:tbl(?:\s|>)[\s\S]*?<\/w:tbl>/g)||[];
+ let target=null;
  for(const t of tbls)if(t.includes("НАПРАВЛЕНИЕ")&&t.includes("ТАРИФ ЗА 1 М³")){target=t;break;}
  if(!target)throw new Error("TABLE_NOT_FOUND");
- const rows=target.match(/<w:tr(?:\s|>)[\s\S]*?<\/w:tr>/g)||[];if(rows.length<3)throw new Error("ROWS_NOT_FOUND");
- const templateRow=rows[2];
- const generated=items.map((item,i)=>setRowData(templateRow,item,i)).join("");
- const replaced=target.replace(rows.slice(2).join(""),generated);
- xml=xml.replace(target,replaced);
+ const rows=target.match(/<w:tr(?:\s|>)[\s\S]*?<\/w:tr>/g)||[];
+ if(rows.length<2)throw new Error("ROWS_NOT_FOUND");
+ const templateRow=rows[1];
+ const generated=items.map(function(item,i){return setRowData(templateRow,item,i);}).join("");
+ const dataRows=rows.slice(1).join("");
+ xml=xml.replace(target,target.replace(dataRows,generated));
  zip.file("word/document.xml",xml);
  return await zip.generateAsync({type:"blob",mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
 }
