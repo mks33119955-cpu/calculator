@@ -570,7 +570,7 @@ select,input{
 
 .kp-actions{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:12px}.kp-btn,.kp-template-btn{min-height:46px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}.kp-btn{border:1px solid #cfe3f7;background:#eff8ff;color:#2467a6}.kp-btn:hover{background:#e2f2ff;transform:translateY(-1px)}.kp-template-btn{padding:0 16px;border:1px solid #e2e8f0;background:#fff;color:#64748b}.kp-template-btn:hover{border-color:#4299e1;color:#2b6cb0}.kp-status{min-height:20px;margin-top:8px;text-align:center;color:#64748b;font-size:12px}.kp-status.success{color:#2f855a}.kp-status.error{color:#c53030}.kp-cart{margin-top:14px}.kp-cart:empty{display:none}.kp-cart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.kp-cart-title{font-weight:800;color:#1e293b;font-size:14px}.kp-cart-count{font-size:12px;color:#64748b}.kp-cart-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 14px;background:#f8fafc;border:1px solid #e5edf5;border-radius:12px;margin-bottom:8px}.kp-cart-route{font-weight:700;color:#1e293b}.kp-cart-meta{font-size:12px;color:#64748b;margin-top:4px}.kp-cart-price{font-weight:800;color:#2b6cb0;text-align:right}.kp-cart-actions{display:flex;gap:6px;margin-top:6px}.kp-cart-actions button{border:0;background:transparent;color:#64748b;font-size:12px;font-weight:700;cursor:pointer;padding:3px 6px}.kp-cart-actions .remove{color:#c53030}@media(max-width:600px){.kp-actions{grid-template-columns:1fr}.kp-template-btn{min-height:42px}.kp-cart-item{grid-template-columns:1fr}.kp-cart-price{text-align:left}}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><script src="https://unpkg.com/docx-preview@0.3.6/dist/docx-preview.min.js"></script>
 </head>
 <body>
 
@@ -621,7 +621,7 @@ select,input{
 
         <!-- КНОПКА РАСЧЁТА -->
         <button class="calc-btn" id="calcBtn">🧮 Рассчитать стоимость</button>
-<div class="kp-actions"><button class="kp-btn" id="addToKpBtn" type="button">➕ Добавить расчёт в КП</button><button class="kp-template-btn" id="generateKpBtn" type="button">📄 Сформировать PDF КП</button></div><div id="kpStatus" class="kp-status"></div><div id="kpCart" class="kp-cart"></div>
+<div class="kp-actions"><button class="kp-btn" id="addToKpBtn" type="button">➕ Добавить расчёт в КП</button><label class="kp-template-btn" for="kpTemplateInput">⚙️ Загрузить исходный Word</label><input id="kpTemplateInput" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden></div><div class="kp-actions"><button class="kp-btn" id="generateKpBtn" type="button">📄 Сформировать PDF КП</button></div><div id="kpStatus" class="kp-status"></div><div id="kpCart" class="kp-cart"></div>
 
         <!-- РЕЗУЛЬТАТЫ -->
         <div id="resultsContainer" class="results"></div>
@@ -738,55 +738,110 @@ function renderHistory(){
     }));
 }
 clearHistoryBtn.addEventListener("click",clearHistory);
-const kpGenerateBtn = document.getElementById("generateKpBtn");
-const addToKpBtn = document.getElementById("addToKpBtn");
-const kpStatus = document.getElementById("kpStatus");
-const kpCart = document.getElementById("kpCart");
-let kpCartItems = [];
-let kpEditingIndex = -1;
+const kpGenerateBtn=document.getElementById("generateKpBtn");
+const addToKpBtn=document.getElementById("addToKpBtn");
+const kpTemplateInput=document.getElementById("kpTemplateInput");
+const kpStatus=document.getElementById("kpStatus");
+const kpCart=document.getElementById("kpCart");
+const KP_TEMPLATE_KEY="calculator_kp_template_v2";
+let kpCartItems=[];let kpEditingIndex=-1;
 
 function kpSetStatus(text,type=""){kpStatus.textContent=text;kpStatus.className="kp-status "+type;}
 function formatNumber(value,digits=0){return Number(value).toLocaleString("ru-RU",{minimumFractionDigits:digits,maximumFractionDigits:digits});}
 function escapeHtml(v){const d=document.createElement("div");d.textContent=String(v);return d.innerHTML;}
 function currentCalculation(){
-  const from=fromSelect.value,to=toSelect.value,unit=document.querySelector(".unit-btn.active").dataset.unit,value=parseFloat(valueInput.value);
-  if(!from||!to||!value||value<=0)return null;
-  const tariff=getTariff(from,to);if(!tariff)return null;
-  const unitPrice=unit==="kg"?tariff.kgPrice:tariff.m3Price;
-  return {from,to,unit,value,weight:unit==="kg"?value:value*DENSITY_KG_PER_M3,volume:unit==="m3"?value:value/DENSITY_KG_PER_M3,price:Math.round(value*unitPrice),m3Price:tariff.m3Price,delivery:tariff.delivery};
+ const from=fromSelect.value,to=toSelect.value,unit=document.querySelector(".unit-btn.active").dataset.unit,value=parseFloat(valueInput.value);
+ if(!from||!to||!value||value<=0)return null; const tariff=getTariff(from,to);if(!tariff)return null;
+ const unitPrice=unit==="kg"?tariff.kgPrice:tariff.m3Price;
+ return {from,to,unit,value,weight:unit==="kg"?value:value*DENSITY_KG_PER_M3,volume:unit==="m3"?value:value/DENSITY_KG_PER_M3,price:Math.round(value*unitPrice),m3Price:tariff.m3Price,delivery:tariff.delivery};
 }
 function renderKpCart(){
-  if(!kpCartItems.length){kpCart.innerHTML="";return;}
-  kpCart.innerHTML='<div class="kp-cart-head"><span class="kp-cart-title">📑 Направления в КП</span><span class="kp-cart-count">'+kpCartItems.length+'</span></div>'+
-  kpCartItems.map((item,i)=>'<div class="kp-cart-item"><div><div class="kp-cart-route">'+escapeHtml(item.from)+' → '+escapeHtml(item.to)+'</div><div class="kp-cart-meta">'+formatNumber(item.weight)+' кг · '+formatNumber(item.volume,3)+' м³ · срок '+escapeHtml(item.delivery)+' дн.</div><div class="kp-cart-actions"><button type="button" data-edit="'+i+'">Изменить</button><button type="button" class="remove" data-remove="'+i+'">Удалить</button></div></div><div class="kp-cart-price">'+formatNumber(item.price)+' ₽</div></div>').join("");
-  kpCart.querySelectorAll("[data-edit]").forEach(btn=>btn.addEventListener("click",()=>editKpItem(Number(btn.dataset.edit))));
-  kpCart.querySelectorAll("[data-remove]").forEach(btn=>btn.addEventListener("click",()=>{kpCartItems.splice(Number(btn.dataset.remove),1);renderKpCart();}));
+ if(!kpCartItems.length){kpCart.innerHTML="";return;}
+ kpCart.innerHTML='<div class="kp-cart-head"><span class="kp-cart-title">📑 Направления в КП</span><span class="kp-cart-count">'+kpCartItems.length+'</span></div>'+
+ kpCartItems.map((item,i)=>'<div class="kp-cart-item"><div><div class="kp-cart-route">'+escapeHtml(item.from)+' → '+escapeHtml(item.to)+'</div><div class="kp-cart-meta">'+formatNumber(item.weight)+' кг · '+formatNumber(item.volume,3)+' м³ · срок '+escapeHtml(item.delivery)+' дн.</div><div class="kp-cart-actions"><button type="button" data-edit="'+i+'">Изменить</button><button type="button" class="remove" data-remove="'+i+'">Удалить</button></div></div><div class="kp-cart-price">'+formatNumber(item.price)+' ₽</div></div>').join("");
+ kpCart.querySelectorAll("[data-edit]").forEach(btn=>btn.addEventListener("click",()=>editKpItem(Number(btn.dataset.edit))));
+ kpCart.querySelectorAll("[data-remove]").forEach(btn=>btn.addEventListener("click",()=>{kpCartItems.splice(Number(btn.dataset.remove),1);renderKpCart();}));
 }
 function editKpItem(index){
-  const item=kpCartItems[index];if(!item)return;
-  fromSelect.value=item.from;fromSelect.dispatchEvent(new Event("change"));
-  setTimeout(()=>{toSelect.value=item.to;},0);
-  const b=document.querySelector('.unit-btn[data-unit="'+item.unit+'"]');if(b)b.click();
-  valueInput.value=item.value;kpEditingIndex=index;valueInput.focus();
-  kpSetStatus("Позиция загружена в форму. Нажмите «Рассчитать», затем добавьте её обратно в КП.","success");
+ const item=kpCartItems[index];if(!item)return;fromSelect.value=item.from;fromSelect.dispatchEvent(new Event("change"));
+ setTimeout(()=>{toSelect.value=item.to;},0);const b=document.querySelector('.unit-btn[data-unit="'+item.unit+'"]');if(b)b.click();
+ valueInput.value=item.value;kpEditingIndex=index;valueInput.focus();kpSetStatus("Позиция загружена в форму. Нажмите «Рассчитать», затем добавьте её обратно в КП.","success");
 }
 addToKpBtn.addEventListener("click",()=>{
-  const calc=currentCalculation();if(!calc){kpSetStatus("Сначала выполните корректный расчёт.","error");return;}
-  if(kpEditingIndex>=0){kpCartItems[kpEditingIndex]=calc;kpEditingIndex=-1;}else{kpCartItems.push(calc);}
-  renderKpCart();kpSetStatus("Позиция добавлена в КП.","success");
+ const calc=currentCalculation();if(!calc){kpSetStatus("Сначала выполните корректный расчёт.","error");return;}
+ if(kpEditingIndex>=0){kpCartItems[kpEditingIndex]=calc;kpEditingIndex=-1;}else kpCartItems.push(calc);
+ renderKpCart();kpSetStatus("Позиция добавлена в КП.","success");
 });
-function buildKpPrintHtml(items){
-  const rows=items.map(item=>'<tr><td>'+escapeHtml(item.from+' → '+item.to)+'<br><span>Вес: '+formatNumber(item.weight)+' кг</span></td><td>'+escapeHtml(item.delivery)+' дн.</td><td>'+formatNumber(item.m3Price)+' ₽/м³<br><span>Стоимость: '+formatNumber(item.price)+' ₽</span></td></tr>').join("");
-  return '<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>КП</title><style>@page{size:A4;margin:0}body{margin:0;color:#203a68;font-family:Arial,sans-serif}.page{width:210mm;min-height:297mm;padding:14mm 15mm;page-break-after:always}.page:last-child{page-break-after:auto}.top{display:flex;justify-content:space-between;margin-bottom:15mm}.brand{font-weight:800;letter-spacing:2px;border:3px solid #0b3b87;padding:9px;color:#0b3b87}.head{text-align:right;font-size:11px;line-height:1.55;font-weight:700}.hero{font-size:20px;font-weight:800}.section{font-size:12px;font-weight:800;margin:5mm 0 2mm;color:#17396f}.text{font-size:10.5px;line-height:1.42;color:#40516b}.table{width:100%;border-collapse:collapse;font-size:10px;margin:4mm 0 1mm}.table th{background:#173d78;color:#fff;text-align:left;padding:7px}.table td{padding:6px;color:#243d62}.table tr:nth-child(odd) td{background:#eaf3fb}.table span,.small{font-size:8.5px;color:#60728e}.bullets{margin:0;padding-left:15px}.bullets li{font-size:10px;line-height:1.5;color:#40516b}</style></head><body><div class="page"><div class="top"><div class="brand">ГРУЗОВАЯ КОМПАНИЯ РФ</div><div class="head">КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ<br>ЭКСПРЕСС-ДОСТАВКА ПО РОССИИ<br>ООО ТК «Грузовая компания»<br>ИНН 5406820437<br>г. Новосибирск, ул. Советская, д.52а, оф.11,12<br>8 800 222 2527</div></div><div class="hero">ВАШ ТОВАР ДОЛЖЕН РАБОТАТЬ, А НЕ ЖДАТЬ В ПУТИ</div><p class="text">Экспресс-доставка сборных грузов для федеральных компаний: быстрее пополняйте запасы, выполняйте заказы и возвращайте товар в оборот.</p><div class="section">НАШЕ РЕШЕНИЕ: ЭКСПРЕСС-ДОСТАВКА ПО КЛЮЧЕВЫМ МАРШРУТАМ</div><p class="text"><b>ООО «ТК Грузовая Компания»</b> организует доставку сборных грузов по России автомобильным, железнодорожным и воздушным транспортом.</p><table class="table"><thead><tr><th>НАПРАВЛЕНИЕ / ВЕС</th><th>СРОК</th><th>ТАРИФ / СТОИМОСТЬ</th></tr></thead><tbody>'+rows+'</tbody></table><p class="small">Тарифы за 1 м³ указаны по прайсу, с НДС, без применения скидок.</p><div class="section">ДЛЯ КОГО ЭТО ПРЕДЛОЖЕНИЕ</div><p class="text">Федеральные поставщики и дистрибьюторы: запчасти для легковых и грузовых автомобилей; товары для дома и дачи; электрооборудование; спецодежда; торговое оборудование; мебельные комплектующие; двери и фурнитура.</p><div class="section">ПОЧЕМУ С НАМИ УДОБНО РАБОТАТЬ</div><ul class="bullets"><li>Комплекс логистических услуг по России — от грузчиков до функций транспортного отдела на аутсорсинге.</li><li>Контроль подачи транспорта и надёжной транспортировки груза.</li><li>Городские перевозки, при необходимости с авизацией, и транзитные склады.</li><li>Автомобили различной грузоподъёмности и с разными типами кузова.</li></ul></div><div class="page"><div class="section">УСЛОВИЯ СОТРУДНИЧЕСТВА</div><p class="text">Прозрачный принцип расчёта для регулярных и разовых отправок. Итоговую стоимость подтверждаем после получения параметров груза и согласования состава услуг.</p><div class="section">ТАРИФЫ И ПОРЯДОК РАСЧЁТА</div><p class="small">• Прайс действует по состоянию на 15.09.2026. Все цены указаны в рублях с учётом НДС. Тариф действует на перевозку в одну сторону.</p><p class="small">• Расчётный коэффициент: 1 м³ = 250 кг.</p><p class="small">• Если вес одного грузоместа составляет 800 кг и более либо хотя бы один его габарит достигает 3 м и более, стоимость перевозки увеличивается на 20%.</p><p class="small">• В прайсе приведены тарифные колонки со скидками 10%, 15% и 20%. Применимость скидки к конкретному клиенту и отправке требует отдельного согласования.</p><div class="section">ДОПОЛНИТЕЛЬНЫЕ ЛОГИСТИЧЕСКИЕ ВОЗМОЖНОСТИ</div><p class="text">По запросу организуем забор и городскую доставку груза, погрузочно-разгрузочные работы, работу через транзитные склады, авизацию и комплексное логистическое сопровождение.</p><div class="section">КАК НАЧАТЬ СОТРУДНИЧЕСТВО</div><ol class="bullets"><li>Направьте нам маршрут, наименование груза, вес, объём, габариты одного грузоместа и регулярность отправок.</li><li>Укажите адреса забора и доставки, необходимость дополнительных услуг и желаемую дату отправки.</li><li>Мы подготовим расчёт и согласуем условия перевозки.</li></ol><div class="section">НАШ ОПЫТ</div><p class="text">Среди организаций, оценивших сотрудничество: ООО «ГазЭнергоСибирь», ЗАО «Газпромнефть-терминал», ООО «Завод СибПромСвязь», ООО «ФишМэн», ООО «Династия», ООО «Агротех», ООО «ЦКФ» и ООО «Движение».</p><div class="section">ПРЕДЛАГАЕМ ОБСУДИТЬ ВАШИ МАРШРУТЫ</div><p class="text">Отправьте параметры грузопотока — рассчитаем доставку по нужным направлениям и подготовим индивидуальное предложение для регулярных поставок.</p><p class="small"><b>ООО «ТК Грузовая Компания»</b><br>Электронная почта: info@tk-gk.ru | Сайт: https://tk-gk.ru/<br><b>Быстрее доставка. Быстрее товар в обороте.</b></p></div></body></html>';
+
+kpTemplateInput.addEventListener("change",async e=>{
+ const file=e.target.files&&e.target.files[0];if(!file)return;
+ if(!file.name.toLowerCase().endsWith(".docx")){kpSetStatus("Нужен исходный файл Word в формате .docx.","error");return;}
+ const bytes=new Uint8Array(await file.arrayBuffer());
+ let bin="";const chunk=0x8000;for(let i=0;i<bytes.length;i+=chunk)bin+=String.fromCharCode(...bytes.subarray(i,i+chunk));
+ localStorage.setItem(KP_TEMPLATE_KEY,btoa(bin));
+ kpSetStatus("Исходный Word сохранён в браузере. Теперь КП будет строиться на его основе.","success");
+});
+
+function getStoredTemplate(){
+ const b64=localStorage.getItem(KP_TEMPLATE_KEY);if(!b64)return null;
+ const bin=atob(b64),bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return bytes;
 }
-function generateKpPdf(){
-  if(!kpCartItems.length){kpSetStatus("Добавьте хотя бы одно направление в КП.","error");return;}
+function xmlEsc(v){return String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function replaceCellText(cell,text,secondLine=false){
+ const runs=cell.match(/<w:r[\s\S]*?<\/w:r>/g)||[];
+ const firstText=cell.indexOf("<w:t");
+ if(firstText<0)return cell;
+ const tOpen=cell.indexOf(">",firstText)+1,tClose=cell.indexOf("</w:t>",tOpen);
+ if(tClose<0)return cell;
+ let out=cell.slice(0,tOpen)+xmlEsc(text)+cell.slice(tClose);
+ if(secondLine){
+   out=out.slice(0,-("</w:tc>".length))+'<w:p><w:r><w:rPr><w:color w:val="5D6F89"/><w:sz w:val="15"/></w:rPr><w:t>Вес: '+xmlEsc(secondLine)+' кг</w:t></w:r></w:p></w:tc>';
+ }
+ return out;
+}
+function setRowData(row,item,index){
+ const cells=row.match(/<w:tc[\s\S]*?<\/w:tc>/g);if(!cells||cells.length<3)return row;
+ let r=row;
+ const newCells=[
+   replaceCellText(cells[0],item.from+" → "+item.to,String(Math.round(item.weight))),
+   replaceCellText(cells[1],String(item.delivery).replace("-", "–")+" "+(String(item.delivery).includes("–")?"дня":"день")),
+   replaceCellText(cells[2],formatNumber(item.m3Price)+" ₽/м³")
+ ];
+ newCells[2]=newCells[2].slice(0,-("</w:tc>".length))+'<w:p><w:r><w:rPr><w:color w:val="5D6F89"/><w:sz w:val="15"/></w:rPr><w:t>Стоимость: '+xmlEsc(formatNumber(item.price))+' ₽</w:t></w:r></w:p></w:tc>';
+ newCells[0]=newCells[0].replace(/<w:shd[^>]*w:fill="[^"]+"[^>]*\/>/,'<w:shd w:val="clear" w:color="auto" w:fill="'+(index%2===0?"EAF3FC":"F7FAFE")+'"/>');
+ for(let i=0;i<3;i++)r=r.replace(cells[i],newCells[i]);
+ return r;
+}
+async function makeTemplateDocx(items){
+ const bytes=getStoredTemplate();if(!bytes)throw new Error("NO_TEMPLATE");
+ const zip=await JSZip.loadAsync(bytes);let xml=await zip.file("word/document.xml").async("string");
+ const tbls=xml.match(/<w:tbl[\s\S]*?<\/w:tbl>/g)||[];let target=null;
+ for(const t of tbls)if(t.includes("НАПРАВЛЕНИЕ")&&t.includes("ТАРИФ ЗА 1 М³")){target=t;break;}
+ if(!target)throw new Error("TABLE_NOT_FOUND");
+ const rows=target.match(/<w:tr[\s\S]*?<\/w:tr>/g)||[];if(rows.length<3)throw new Error("ROWS_NOT_FOUND");
+ const templateRow=rows[2];
+ const generated=items.map((item,i)=>setRowData(templateRow,item,i)).join("");
+ const replaced=target.replace(rows.slice(2).join(""),generated);
+ xml=xml.replace(target,replaced);
+ zip.file("word/document.xml",xml);
+ return await zip.generateAsync({type:"blob",mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+}
+async function generateKpPdf(){
+ if(!kpCartItems.length){kpSetStatus("Добавьте хотя бы одно направление в КП.","error");return;}
+ if(!getStoredTemplate()){kpSetStatus("Сначала нажмите «Загрузить исходный Word» и выберите ваш КП .docx.","error");kpTemplateInput.click();return;}
+ try{
+  kpSetStatus("Формирую КП на основе исходного Word…");
+  const blob=await makeTemplateDocx(kpCartItems);
   const win=window.open("","_blank");if(!win){kpSetStatus("Разрешите всплывающие окна для сайта.","error");return;}
-  win.document.open();win.document.write(buildKpPrintHtml(kpCartItems));win.document.close();
-  setTimeout(()=>{win.focus();win.print();},400);kpSetStatus("КП подготовлено. В печати выберите «Сохранить как PDF».","success");
+  win.document.write('<!doctype html><html><head><title>КП</title><style>@page{size:A4;margin:0}html,body{margin:0;padding:0;background:#fff}#docx{width:100%;} .docx-wrapper{background:#fff!important;padding:0!important}.docx{margin:0 auto!important;box-shadow:none!important;page-break-after:always}</style></head><body><div id="docx"></div></body></html>');win.document.close();
+  await new Promise(resolve=>win.addEventListener("load",resolve,{once:true}));
+  await win.docx.renderAsync(blob,win.document.getElementById("docx"),null,{className:"docx",inWrapper:true,breakPages:true,ignoreWidth:false,ignoreHeight:false});
+  if(win.document.fonts&&win.document.fonts.ready)await win.document.fonts.ready;
+  setTimeout(()=>{win.focus();win.print();},700);
+  kpSetStatus("КП открыто в исходной верстке. В окне печати выберите «Сохранить как PDF».","success");
+ }catch(e){console.error(e);kpSetStatus(e.message==="NO_TEMPLATE"?"Не найден исходный Word-шаблон. Загрузите его через «Загрузить исходный Word».":"Не удалось сформировать КП: "+e.message,"error");}
 }
 kpGenerateBtn.addEventListener("click",generateKpPdf);
-
 calcBtn.addEventListener("click",function(){
     const from=fromSelect.value, to=toSelect.value;
     const unit=document.querySelector(".unit-btn.active").dataset.unit;
