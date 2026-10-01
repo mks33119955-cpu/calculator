@@ -570,7 +570,7 @@ select,input{
 
 .kp-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.kp-btn{min-height:46px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}.kp-btn{border:1px solid #cfe3f7;background:#eff8ff;color:#2467a6}.kp-btn:hover{background:#e2f2ff;transform:translateY(-1px)}.kp-status{min-height:20px;margin-top:8px;text-align:center;color:#64748b;font-size:12px}.kp-status.success{color:#2f855a}.kp-status.error{color:#c53030}.kp-cart{margin-top:14px}.kp-cart:empty{display:none}.kp-cart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.kp-cart-title{font-weight:800;color:#1e293b;font-size:14px}.kp-cart-count{font-size:12px;color:#64748b}.kp-cart-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 14px;background:#f8fafc;border:1px solid #e5edf5;border-radius:12px;margin-bottom:8px}.kp-cart-route{font-weight:700;color:#1e293b}.kp-cart-meta{font-size:12px;color:#64748b;margin-top:4px}.kp-cart-price{font-weight:800;color:#2b6cb0;text-align:right}.kp-cart-actions{display:flex;gap:6px;margin-top:6px}.kp-cart-actions button{border:0;background:transparent;color:#64748b;font-size:12px;font-weight:700;cursor:pointer;padding:3px 6px}.kp-cart-actions .remove{color:#c53030}@media(max-width:600px){.kp-actions{grid-template-columns:1fr}.kp-cart-item{grid-template-columns:1fr}.kp-cart-price{text-align:left}}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><script src="https://unpkg.com/docx-preview@0.3.6/dist/docx-preview.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><script src="https://unpkg.com/docx-preview@0.3.6/dist/docx-preview.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -813,42 +813,74 @@ async function makeTemplateDocx(items){
  zip.file("word/document.xml",xml);
  return await zip.generateAsync({type:"blob",mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
 }
-function generateKpPdf(){
+async function generateKpPdf(){
  if(!kpCartItems.length){kpSetStatus("Добавьте хотя бы одно направление в КП.","error");return;}
- const win=window.open("","_blank");
- if(!win){kpSetStatus("Разрешите всплывающие окна для сайта.","error");return;}
+ if(typeof html2pdf==="undefined"){kpSetStatus("Не удалось загрузить модуль PDF. Обновите страницу и попробуйте ещё раз.","error");return;}
+
  const esc=s=>{const d=document.createElement("div");d.textContent=String(s);return d.innerHTML;};
  const money=n=>Number(n).toLocaleString("ru-RU")+" ₽";
+ const quantity=item=>item.unit==="kg"
+   ? Number(item.value).toLocaleString("ru-RU")+" кг"
+   : Number(item.value).toLocaleString("ru-RU",{maximumFractionDigits:3})+" м³";
+
  const rows=kpCartItems.map(item=>{
-   const quantity=item.unit==="kg"
-     ? Number(item.value).toLocaleString("ru-RU")+" кг"
-     : Number(item.value).toLocaleString("ru-RU",{maximumFractionDigits:3})+" м³";
    const tariff=money(item.m3Price)+"/м³";
    return '<tr>'+
      '<td class="route"><div class="route-from">'+esc(item.from)+'</div><div class="route-arrow">→</div><div class="route-to">'+esc(item.to)+'</div></td>'+
-     '<td class="center">'+quantity+'</td>'+
+     '<td class="center">'+quantity(item)+'</td>'+
      '<td class="center"><span class="delivery">'+esc(deliveryLabel(item.delivery))+'</span></td>'+
-     '<td><div class="tariff">'+tariff+'</div><div class="row-cost">'+money(item.price)+'</div></td>'+
+     '<td><div class="tariff">'+tariff+'</div><div class="row-cost">Стоимость: '+money(item.price)+'</div></td>'+
    '</tr>';
  }).join("");
- const now=new Date().toLocaleDateString("ru-RU");
 
- win.document.open();
- win.document.write('<!doctype html><html lang="ru"><head><meta charset="UTF-8"><title>Коммерческое предложение</title><style>'+
- '@page{size:A4;margin:12mm 13mm 13mm}*{box-sizing:border-box}html,body{margin:0;padding:0;background:#fff;color:#1f3045;font-family:Arial,"Segoe UI",sans-serif}body{font-size:11px;line-height:1.35}.page{width:100%;max-width:794px;margin:0 auto;padding:2px 0 0}.top{display:flex;justify-content:space-between;align-items:flex-start;padding:0 0 13px;border-bottom:3px solid #1f6fae}.brand{font-size:18px;font-weight:800;letter-spacing:1.4px;color:#173b5c}.brand-sub{display:block;margin-top:3px;font-size:8px;font-weight:700;letter-spacing:2.2px;color:#5f7890}.meta{text-align:right;color:#6b7f93;font-size:9px;line-height:1.6}.meta strong{display:block;color:#173b5c;font-size:10px}.title{margin:25px 0 5px;text-align:center;font-size:23px;line-height:1.15;font-weight:800;letter-spacing:.5px;color:#173b5c}.subtitle{text-align:center;color:#2b78b6;font-size:9px;font-weight:800;letter-spacing:2.1px;text-transform:uppercase}.intro{margin:17px 0 19px;padding:11px 14px;border:1px solid #dce7f0;border-left:4px solid #2b78b6;background:#f7fafc;color:#53697e;font-size:10px}.section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:8px}.section-title{font-size:11px;font-weight:800;color:#173b5c;letter-spacing:.8px;text-transform:uppercase}.section-caption{font-size:8px;color:#8797a7}table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #cfdce8;border-radius:7px;overflow:hidden;table-layout:fixed}th{padding:9px 9px;background:#173b5c;color:#fff;border-right:1px solid rgba(255,255,255,.16);font-size:8px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;text-align:left}th:last-child{border-right:0}td{padding:10px 9px;border-top:1px solid #dce5ed;border-right:1px solid #dce5ed;vertical-align:middle;font-size:10px}td:last-child{border-right:0}tbody tr:nth-child(even){background:#f8fafc}.route{line-height:1.15}.route-from,.route-to{font-weight:800;color:#213b55}.route-arrow{margin:2px 0;color:#2b78b6;font-weight:800}.center{text-align:center}.delivery{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef6fc;color:#235e8d;font-weight:800;font-size:9px}.tariff{font-weight:800;color:#173b5c;font-size:11px}.row-cost{margin-top:3px;color:#2b78b6;font-size:9px;font-weight:700}.note-card{margin-top:15px;padding:10px 13px;border:1px solid #dce7f0;border-radius:6px;background:#fbfcfe}.note-title{font-size:9px;font-weight:800;color:#173b5c;text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}.note-card p{margin:2px 0;color:#64788b;font-size:8.8px}.signature{margin-top:25px;display:grid;grid-template-columns:1fr 170px;gap:28px;align-items:end}.signature-line{border-bottom:1px solid #9eafbf;height:28px}.signature-label{margin-top:4px;font-size:8px;color:#8797a7}.stamp{padding:10px;border:1px solid #cbdbe8;border-radius:6px;text-align:center;color:#58728a;font-size:8px;line-height:1.5}.stamp strong{display:block;color:#173b5c;font-size:9px}.footer{margin-top:20px;padding-top:8px;border-top:2px solid #1f6fae;display:flex;justify-content:space-between;gap:20px;color:#7a8c9d;font-size:8px}.footer strong{color:#173b5c}@media print{.page{max-width:none}}'+
- '</style></head><body><div class="page">'+
- '<div class="top"><div><div class="brand">ГРУЗОВАЯ КОМПАНИЯ РФ</div><span class="brand-sub">ТРАНСПОРТНАЯ ЛОГИСТИКА ПО РОССИИ</span></div><div class="meta"><strong>КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ</strong>Дата: '+now+'</div></div>'+
- '<div class="title">Коммерческое предложение</div><div class="subtitle">Расчёт стоимости перевозки</div>'+
- '<div class="intro">Предлагаем тарифный расчёт по выбранным направлениям. Стоимость указана за конкретный объём или вес груза и сформирована на основании действующего прайса калькулятора.</div>'+
- '<div class="section-head"><div class="section-title">Расчёт перевозки</div><div class="section-caption">Плотность расчёта: 250 кг/м³</div></div>'+
- '<table><thead><tr><th style="width:38%">НАПРАВЛЕНИЕ</th><th style="width:18%">ВЕС / ОБЪЁМ</th><th style="width:16%">СРОК</th><th style="width:28%">ТАРИФ / СТОИМОСТЬ</th></tr></thead><tbody>'+rows+'</tbody></table>'+
- '<div class="note-card"><div class="note-title">Условия расчёта</div><p>• Стоимость рассчитана по действующему тарифу калькулятора.</p><p>• Для пересчёта кг ↔ м³ используется плотность 250 кг/м³.</p><p>• Срок доставки указан в рабочих днях и зависит от условий перевозки.</p></div>'+
- '<div class="signature"><div><div class="signature-line"></div><div class="signature-label">Менеджер / ответственное лицо</div></div><div class="stamp"><strong>ГРУЗОВАЯ КОМПАНИЯ РФ</strong>Коммерческое предложение<br>сформировано автоматически</div></div>'+
- '<div class="footer"><div><strong>ГРУЗОВАЯ КОМПАНИЯ РФ</strong></div><div>Тарифы актуальны на дату формирования документа</div></div>'+
- '</div></body></html>');
- win.document.close();
- setTimeout(()=>{win.focus();win.print();},350);
- kpSetStatus("КП готово. В окне печати выберите «Сохранить как PDF».","success");
+ const now=new Date().toLocaleDateString("ru-RU");
+ const doc=document.createElement("div");
+ doc.id="kp-pdf-document";
+ doc.style.position="fixed";
+ doc.style.left="-10000px";
+ doc.style.top="0";
+ doc.style.width="794px";
+ doc.style.background="#fff";
+ doc.innerHTML=
+ '<style>'+
+ '*{box-sizing:border-box}.kp-page{width:794px;min-height:1123px;padding:48px 52px 42px;background:#fff;color:#1f3045;font-family:Arial,"Segoe UI",sans-serif;font-size:11px;line-height:1.4}.top{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:14px;border-bottom:3px solid #1f6fae}.brand{font-size:17px;font-weight:800;letter-spacing:1.2px;color:#173b5c}.brand-sub{display:block;margin-top:3px;font-size:8px;font-weight:700;letter-spacing:2px;color:#5f7890}.company-data{text-align:right;color:#64788b;font-size:8.5px;line-height:1.55}.company-data strong{color:#173b5c;font-size:9.5px}.title{margin:23px 0 4px;text-align:center;font-size:23px;font-weight:800;color:#173b5c;letter-spacing:.3px}.subtitle{text-align:center;color:#2b78b6;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase}.date{text-align:center;margin-top:7px;color:#8797a7;font-size:8px}.hero{margin:18px 0 20px;padding:14px 16px;background:#f4f8fb;border:1px solid #dce7f0;border-left:4px solid #2b78b6}.hero-title{font-size:12px;font-weight:800;color:#173b5c;margin-bottom:5px}.hero p{margin:0;color:#53697e;font-size:9.5px}.section{margin-top:18px}.section h2{margin:0 0 8px;font-size:11px;color:#173b5c;letter-spacing:.8px;text-transform:uppercase}.section p{margin:0 0 7px;color:#53697e;font-size:9.5px}.section ul{margin:4px 0 0;padding-left:17px;color:#53697e;font-size:9px}.section li{margin:4px 0}.split{display:grid;grid-template-columns:1fr 1fr;gap:18px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:9px}.card{padding:10px 11px;border:1px solid #dce7f0;border-radius:6px;background:#fbfcfe}.card h3{margin:0 0 5px;font-size:9.5px;color:#173b5c}.card p{margin:0;font-size:8.5px;color:#64788b}.page-break{page-break-before:always}.table-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:8px}.table-head h2{margin:0;font-size:11px;color:#173b5c;letter-spacing:.8px;text-transform:uppercase}.table-head span{font-size:8px;color:#8797a7}table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #cfdce8;border-radius:7px;overflow:hidden;table-layout:fixed}th{padding:9px 8px;background:#173b5c;color:#fff;border-right:1px solid rgba(255,255,255,.16);font-size:8px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;text-align:left}th:last-child{border-right:0}td{padding:9px 8px;border-top:1px solid #dce5ed;border-right:1px solid #dce5ed;vertical-align:middle;font-size:9.5px}td:last-child{border-right:0}tbody tr:nth-child(even){background:#f8fafc}.route{line-height:1.1}.route-from,.route-to{font-weight:800;color:#213b55}.route-arrow{margin:2px 0;color:#2b78b6;font-weight:800}.center{text-align:center}.delivery{display:inline-block;padding:4px 7px;border-radius:999px;background:#eef6fc;color:#235e8d;font-weight:800;font-size:8.5px}.tariff{font-weight:800;color:#173b5c;font-size:10px}.row-cost{margin-top:3px;color:#2b78b6;font-size:8.5px;font-weight:700}.note{margin-top:14px;padding:10px 12px;border:1px solid #dce7f0;border-radius:6px;background:#fbfcfe}.note strong{display:block;margin-bottom:5px;color:#173b5c;font-size:9px}.note p{margin:3px 0;color:#64788b;font-size:8.5px}.contact{margin-top:20px;padding:14px 16px;background:#173b5c;color:#fff;border-radius:7px}.contact-title{font-size:10px;font-weight:800;letter-spacing:.6px;margin-bottom:7px}.contact p{margin:3px 0;color:#dce9f3;font-size:8.5px}.footer{margin-top:18px;padding-top:8px;border-top:2px solid #1f6fae;display:flex;justify-content:space-between;gap:20px;color:#7a8c9d;font-size:8px}.footer strong{color:#173b5c}'+
+ '</style>'+
+ '<div class="kp-page">'+
+   '<div class="top"><div><div class="brand">ООО «ТК ГРУЗОВАЯ КОМПАНИЯ»</div><span class="brand-sub">ЭКСПРЕСС-ДОСТАВКА ПО РОССИИ</span></div><div class="company-data"><strong>ИНН 5406820437</strong><br>630005, Новосибирская область<br>г. Новосибирск, ул. Советская, д.52а, оф.11,12<br>8 800 222 2527</div></div>'+
+   '<div class="title">КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ</div><div class="subtitle">ЭКСПРЕСС-ДОСТАВКА ПО РОССИИ</div><div class="date">Дата формирования: '+now+'</div>'+
+   '<div class="hero"><div class="hero-title">ВАШ ТОВАР ДОЛЖЕН РАБОТАТЬ, А НЕ ЖДАТЬ В ПУТИ</div><p>Экспресс-доставка сборных грузов для федеральных компаний: быстрее пополняйте запасы, выполняйте заказы и возвращайте товар в оборот.</p></div>'+
+   '<div class="section"><h2>Когда поставка задерживается — бизнес теряет темп</h2><p>Дефицит ходовых позиций, ожидание заказов, деньги в товаре, который ещё находится в пути, и риск упущенных продаж — типичные последствия долгой логистики. Мы предлагаем сократить время между отгрузкой и поступлением товара на склад или в торговую точку.</p></div>'+
+   '<div class="section"><h2>Наше решение: экспресс-доставка по ключевым маршрутам</h2><p>ООО «ТК Грузовая Компания» организует доставку сборных грузов по России автомобильным, железнодорожным и воздушным транспортом. Контролируем своевременную подачу транспорта и перевозку, помогаем выстроить логистику с учётом географии и потребностей вашей компании.</p></div>'+
+   '<div class="cards"><div class="card"><h3>Для кого это предложение</h3><p>Федеральные поставщики и дистрибьюторы: запчасти для легковых и грузовых автомобилей; товары для дома и дачи; электрооборудование; спецодежда; торговое оборудование; мебельные комплектующие; двери и фурнитура.</p></div><div class="card"><h3>Почему с нами удобно работать</h3><p>Комплекс логистических услуг по России, контроль подачи транспорта и надёжной транспортировки груза, городские перевозки и транзитные склады, автомобили различной грузоподъёмности и с разными типами кузова.</p></div></div>'+
+   '<div class="section"><h2>Условия сотрудничества</h2><p>Прозрачный принцип расчёта для регулярных и разовых отправок. Итоговую стоимость подтверждаем после получения параметров груза и согласования состава услуг.</p></div>'+
+   '<div class="section page-break"><div class="table-head"><h2>Расчёт перевозки</h2><span>Плотность расчёта: 250 кг/м³</span></div><table><thead><tr><th style="width:38%">НАПРАВЛЕНИЕ</th><th style="width:18%">ВЕС / ОБЪЁМ</th><th style="width:16%">СРОК</th><th style="width:28%">ТАРИФ / СТОИМОСТЬ</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+   '<div class="note"><strong>Расчёт и условия</strong><p>• Тариф за 1 м³ указан по действующему прайсу калькулятора.</p><p>• Для пересчёта кг ↔ м³ используется плотность 250 кг/м³.</p><p>• Срок доставки указан в рабочих днях и зависит от условий перевозки.</p></div>'+
+   '<div class="section"><h2>Дополнительные логистические возможности</h2><p>По запросу организуем забор и городскую доставку груза, погрузочно-разгрузочные работы, работу через транзитные склады, авизацию и комплексное логистическое сопровождение. Состав и стоимость дополнительных услуг согласовываются отдельно.</p></div>'+
+   '<div class="section"><h2>Как начать сотрудничество</h2><ul><li>Направьте нам маршрут, наименование груза, вес, объём, габариты одного грузоместа и регулярность отправок.</li><li>Укажите адреса забора и доставки, необходимость дополнительных услуг и желаемую дату отправки.</li><li>Мы подготовим расчёт и согласуем условия перевозки для вашей компании.</li></ul></div>'+
+   '<div class="section"><h2>Наш опыт</h2><p>Среди организаций, оценивших сотрудничество: ООО «ГазЭнергоСибирь», ЗАО «Газпромнефть-терминал», ООО «Завод СибПромСвязь», ООО «ФишМэн», ООО «Династия», ООО «Агротех», ООО «ЦКФ» и ООО «Движение».</p></div>'+
+   '<div class="contact"><div class="contact-title">ПРЕДЛАГАЕМ ОБСУДИТЬ ВАШИ МАРШРУТЫ</div><p>Отправьте параметры грузопотока — рассчитаем доставку по нужным направлениям и подготовим индивидуальное предложение для регулярных поставок.</p><p><strong>ООО «ТК Грузовая Компания»</strong> · info@tk-gk.ru · tk-gk.ru · 8 800 222 2527</p></div>'+
+   '<div class="footer"><div><strong>ООО «ТК Грузовая Компания»</strong></div><div>Быстрее доставка. Быстрее товар в обороте.</div></div>'+
+ '</div>';
+
+ document.body.appendChild(doc);
+ kpSetStatus("Формируем PDF…","success");
+ try{
+   const filename="КП_"+kpCartItems.map(x=>x.to+"_"+x.from).join("_").replace(/[^a-zA-Zа-яА-ЯёЁ0-9_ -]/g,"")+".pdf";
+   await html2pdf().set({
+     margin:0,
+     filename,
+     image:{type:"jpeg",quality:.98},
+     html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},
+     jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},
+     pagebreak:{mode:["css","legacy"]}
+   }).from(doc).save();
+   kpSetStatus("PDF готов и скачан на компьютер.","success");
+ }catch(err){
+   console.error(err);
+   kpSetStatus("Не удалось сформировать PDF: "+(err&&err.message?err.message:"ошибка"),"error");
+ }finally{
+   doc.remove();
+ }
 }
 kpGenerateBtn.addEventListener("click",generateKpPdf);
 calcBtn.addEventListener("click",function(){
