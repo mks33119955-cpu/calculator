@@ -833,8 +833,13 @@ async function generateKpPdf(){
   kpSetStatus("Формирую КП на основе исходного Word…");
   const blob=await makeTemplateDocx(kpCartItems);
   const win=window.open("","_blank");if(!win){kpSetStatus("Разрешите всплывающие окна для сайта.","error");return;}
-  win.document.write('<!doctype html><html><head><title>КП</title><style>@page{size:A4;margin:0}html,body{margin:0;padding:0;background:#fff}#docx{width:100%;} .docx-wrapper{background:#fff!important;padding:0!important}.docx{margin:0 auto!important;box-shadow:none!important;page-break-after:always}</style></head><body><div id="docx"></div></body></html>');win.document.close();
-  await new Promise(resolve=>win.addEventListener("load",resolve,{once:true}));
+  await new Promise((resolve,reject)=>{
+    win.document.open();
+    win.document.write('<!doctype html><html><head><title>КП</title><style>@page{size:A4;margin:0}html,body{margin:0;padding:0;background:#fff}#docx{width:100%}.docx-wrapper{background:#fff!important;padding:0!important}.docx{margin:0 auto!important;box-shadow:none!important;page-break-after:always}</style><script src="https://unpkg.com/docx-preview@0.3.6/dist/docx-preview.min.js"><\/script></head><body><div id="docx"></div></body></html>');
+    win.document.close();
+    const timer=setInterval(()=>{if(win.docx){clearInterval(timer);resolve();}},50);
+    setTimeout(()=>{clearInterval(timer);reject(new Error("Не загрузился модуль отображения Word"));},10000);
+  });
   await win.docx.renderAsync(blob,win.document.getElementById("docx"),null,{className:"docx",inWrapper:true,breakPages:true,ignoreWidth:false,ignoreHeight:false});
   if(win.document.fonts&&win.document.fonts.ready)await win.document.fonts.ready;
   setTimeout(()=>{win.focus();win.print();},700);
