@@ -742,7 +742,7 @@ const kpGenerateBtn=document.getElementById("generateKpBtn");
 const addToKpBtn=document.getElementById("addToKpBtn");
 const kpStatus=document.getElementById("kpStatus");
 const kpCart=document.getElementById("kpCart");
-const KP_TEMPLATE_URL="https://raw.githubusercontent.com/mks33119955-cpu/calculator/main/kp-template/base64.txt";
+const KP_TEMPLATE_URL="https://raw.githubusercontent.com/mks33119955-cpu/calculator/main/kp-template/base64.txt?v=2";
 let kpTemplatePromise=null;
 let kpCartItems=[];let kpEditingIndex=-1;
 
@@ -778,7 +778,7 @@ async function getStoredTemplate(){
   kpTemplatePromise=fetch(KP_TEMPLATE_URL,{cache:"force-cache"}).then(r=>{if(!r.ok)throw new Error("Не удалось загрузить встроенный Word-шаблон");return r.text();}).then(b64=>{
    const clean=b64.replace(/\s/g,""),bin=atob(clean),bytes=new Uint8Array(bin.length);
    for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
-   return bytes;
+   return JSZip.loadAsync(bytes).then(function(zip){ if(!zip.file("word/document.xml")) throw new Error("Встроенный Word-шаблон повреждён."); return bytes; });
   });
  }
  return kpTemplatePromise;
