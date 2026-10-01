@@ -799,12 +799,21 @@ function replaceCellText(cell,text,secondLine=false){
  }
  return out;
 }
+function deliveryLabel(value){
+ const s=String(value).trim();
+ if(/дн|день|дня|дней/i.test(s))return s;
+ if(s.includes("-"))return s.replace(/-/g,"–")+" дней";
+ const n=Number(s);
+ if(n===1)return "1 день";
+ if(n>=2&&n<=4)return s+" дня";
+ return s+" дней";
+}
 function setRowData(row,item,index){
  const cells=row.match(/<w:tc[\s\S]*?<\/w:tc>/g);if(!cells||cells.length<3)return row;
  let r=row;
  const newCells=[
    replaceCellText(cells[0],item.from+" → "+item.to,String(Math.round(item.weight))),
-   replaceCellText(cells[1],String(item.delivery).replace("-", "–")+" "+(String(item.delivery).includes("–")?"дня":"день")),
+   replaceCellText(cells[1],deliveryLabel(item.delivery)),
    replaceCellText(cells[2],formatNumber(item.m3Price)+" ₽/м³")
  ];
  newCells[2]=newCells[2].slice(0,-("</w:tc>".length))+'<w:p><w:r><w:rPr><w:color w:val="5D6F89"/><w:sz w:val="15"/></w:rPr><w:t>Стоимость: '+xmlEsc(formatNumber(item.price))+' ₽</w:t></w:r></w:p></w:tc>';
@@ -829,22 +838,35 @@ async function makeTemplateDocx(items){
 async function generateKpPdf(){
  if(!kpCartItems.length){kpSetStatus("Добавьте хотя бы одно направление в КП.","error");return;}
  if(!getStoredTemplate()){kpSetStatus("Сначала нажмите «Загрузить исходный Word» и выберите ваш КП .docx.","error");kpTemplateInput.click();return;}
+ // Окно открываем сразу по клику, иначе браузер может заблокировать его после await.
+ const win=window.open("","_blank");
+ if(!win){kpSetStatus("Разрешите всплывающие окна для сайта.","error");return;}
+ win.document.open();
+ win.document.write('<!doctype html><html><head><title>Формирование КП…</title><style>html,body{margin:0;padding:24px;background:#fff;font-family:Arial,sans-serif;color:#334155}.loading{max-width:720px;margin:15vh auto;text-align:center;font-size:18px}</style><script src="https://unpkg.com/docx-preview@0.3.6/dist/docx-preview.min.js"><\\/script></head><body><div class="loading">Формирую коммерческое предложение…</div></body></html>');
+ win.document.close();
  try{
   kpSetStatus("Формирую КП на основе исходного Word…");
   const blob=await makeTemplateDocx(kpCartItems);
-  const win=window.open("","_blank");if(!win){kpSetStatus("Разрешите всплывающие окна для сайта.","error");return;}
   await new Promise((resolve,reject)=>{
-    win.document.open();
-    win.document.write('<!doctype html><html><head><title>КП</title><style>@page{size:A4;margin:0}html,body{margin:0;padding:0;background:#fff}#docx{width:100%}.docx-wrapper{background:#fff!important;padding:0!important}.docx{margin:0 auto!important;box-shadow:none!important;page-break-after:always}</style><script src="https://unpkg.com/docx-preview@0.3.6/dist/docx-preview.min.js"><\/script></head><body><div id="docx"></div></body></html>');
-    win.document.close();
-    const timer=setInterval(()=>{if(win.docx){clearInterval(timer);resolve();}},50);
-    setTimeout(()=>{clearInterval(timer);reject(new Error("Не загрузился модуль отображения Word"));},10000);
+   const started=Date.now();
+   const timer=setInterval(()=>{
+    if(win.docx){clearInterval(timer);resolve();}
+    else if(Date.now()-started>10000){clearInterval(timer);reject(new Error("Не загрузился модуль отображения Word"));}
+   },50);
   });
+  win.document.body.innerHTML='<div id="docx"></div>';
   await win.docx.renderAsync(blob,win.document.getElementById("docx"),null,{className:"docx",inWrapper:true,breakPages:true,ignoreWidth:false,ignoreHeight:false});
+  const style=win.document.createElement("style");
+  style.textContent='@page{size:A4;margin:0}html,body{margin:0;padding:0;background:#fff}.docx-wrapper{background:#fff!important;padding:0!important}.docx{margin:0 auto!important;box-shadow:none!important;page-break-after:always}';
+  win.document.head.appendChild(style);
   if(win.document.fonts&&win.document.fonts.ready)await win.document.fonts.ready;
   setTimeout(()=>{win.focus();win.print();},700);
   kpSetStatus("КП открыто в исходной верстке. В окне печати выберите «Сохранить как PDF».","success");
- }catch(e){console.error(e);kpSetStatus(e.message==="NO_TEMPLATE"?"Не найден исходный Word-шаблон. Загрузите его через «Загрузить исходный Word».":"Не удалось сформировать КП: "+e.message,"error");}
+ }catch(e){
+  console.error(e);
+  try{win.close();}catch{}
+  kpSetStatus(e.message==="NO_TEMPLATE"?"Не найден исходный Word-шаблон. Загрузите его через «Загрузить исходный Word»." : "Не удалось сформировать КП: "+e.message,"error");
+ }
 }
 kpGenerateBtn.addEventListener("click",generateKpPdf);
 calcBtn.addEventListener("click",function(){
