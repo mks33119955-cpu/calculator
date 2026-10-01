@@ -809,7 +809,7 @@ function deliveryLabel(value){
  return s+" дней";
 }
 function setRowData(row,item,index){
- const cells=row.match(/<w:tc[\s\S]*?<\/w:tc>/g);if(!cells||cells.length<3)return row;
+ const cells=row.match(/<w:tc(?:\s|>)[\s\S]*?<\/w:tc>/g);if(!cells||cells.length<3)return row;
  let r=row;
  const newCells=[
    replaceCellText(cells[0],item.from+" → "+item.to,String(Math.round(item.weight))),
@@ -827,7 +827,7 @@ async function makeTemplateDocx(items){
  const tbls=xml.match(/<w:tbl[\s\S]*?<\/w:tbl>/g)||[];let target=null;
  for(const t of tbls)if(t.includes("НАПРАВЛЕНИЕ")&&t.includes("ТАРИФ ЗА 1 М³")){target=t;break;}
  if(!target)throw new Error("TABLE_NOT_FOUND");
- const rows=target.match(/<w:tr[\s\S]*?<\/w:tr>/g)||[];if(rows.length<3)throw new Error("ROWS_NOT_FOUND");
+ const rows=target.match(/<w:tr(?:\s|>)[\s\S]*?<\/w:tr>/g)||[];if(rows.length<3)throw new Error("ROWS_NOT_FOUND");
  const templateRow=rows[2];
  const generated=items.map((item,i)=>setRowData(templateRow,item,i)).join("");
  const replaced=target.replace(rows.slice(2).join(""),generated);
