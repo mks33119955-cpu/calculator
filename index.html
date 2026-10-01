@@ -621,7 +621,7 @@ select,input{
 
         <!-- КНОПКА РАСЧЁТА -->
         <button class="calc-btn" id="calcBtn">🧮 Рассчитать стоимость</button>
-<div class="kp-actions"><button class="kp-btn" id="addToKpBtn" type="button">➕ Добавить расчёт в КП</button><button class="kp-btn" id="generateKpBtn" type="button">📄 Сформировать PDF КП</button></div><div id="kpStatus" class="kp-status"></div><div id="kpCart" class="kp-cart"></div>
+<div class="kp-actions"><button class="kp-btn" id="addToKpBtn" type="button">➕ Добавить расчёт в КП</button><button class="kp-btn" id="generateKpBtn" type="button">📄 Скачать КП</button></div><div id="kpStatus" class="kp-status"></div><div id="kpCart" class="kp-cart"></div>
 
         <!-- РЕЗУЛЬТАТЫ -->
         <div id="resultsContainer" class="results"></div>
@@ -782,14 +782,14 @@ async function generateKpPdf(){
 
  const p=(text="",opts={})=>{
    const align=opts.align?'<w:jc w:val="'+opts.align+'"/>':"";
-   const before=opts.before||0, after=opts.after??90, size=opts.size||18, color=opts.color||"53697e";
+   const before=opts.before||0, after=opts.after??55, size=opts.size||18, color=opts.color||"53697e";
    const bold=opts.bold?' <w:b/>':"";
    const spacing='<w:spacing w:before="'+before+'" w:after="'+after+'" w:line="260"/>';
    return '<w:p><w:pPr>'+align+spacing+'</w:pPr><w:r><w:rPr>'+bold+'<w:color w:val="'+color+'"/><w:sz w:val="'+size+'"/><w:szCs w:val="'+size+'"/></w:rPr><w:t xml:space="preserve">'+esc(text)+'</w:t></w:r></w:p>';
  };
  const richP=(parts,opts={})=>{
    const align=opts.align?'<w:jc w:val="'+opts.align+'"/>':"";
-   const before=opts.before||0, after=opts.after??90;
+   const before=opts.before||0, after=opts.after??55;
    const runs=parts.map(x=>'<w:r><w:rPr>'+(x.bold?'<w:b/>':"")+'<w:color w:val="'+(x.color||opts.color||"53697e")+'"/><w:sz w:val="'+(x.size||opts.size||18)+'"/><w:szCs w:val="'+(x.size||opts.size||18)+'"/></w:rPr><w:t xml:space="preserve">'+esc(x.text)+'</w:t></w:r>').join("");
    return '<w:p><w:pPr>'+align+'<w:spacing w:before="'+before+'" w:after="'+after+'" w:line="260"/></w:pPr>'+runs+'</w:p>';
  };
@@ -823,14 +823,14 @@ async function generateKpPdf(){
    ])
  ];
 
- const sect=(title,text)=>p(title,{bold:true,size:19,color:"173b5c",before:130,after:65})+p(text,{size:17,after:90});
+ const sect=(title,text)=>p(title,{bold:true,size:19,color:"173b5c",before:80,after:35})+p(text,{size:17,after:50});
  let body="";
  body+=richP([{text:"ООО «ТК ГРУЗОВАЯ КОМПАНИЯ»",bold:true,size:30,color:"173b5c"},{text:"\nЭКСПРЕСС-ДОСТАВКА ПО РОССИИ",bold:true,size:14,color:"5f7890"}],{after:30});
  body+=p("ИНН 5406820437  ·  630005, Новосибирская область, г. Новосибирск, ул. Советская, д.52а, оф.11,12  ·  8 800 222 2527",{align:"right",size:13,color:"64788b",after:80});
  body+='<w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="18" w:color="1f6fae"/></w:pBdr></w:pPr></w:p>';
  body+=p("КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ",{align:"center",bold:true,size:32,color:"173b5c",before:220,after:45});
  body+=p("ЭКСПРЕСС-ДОСТАВКА ПО РОССИИ",{align:"center",bold:true,size:13,color:"2b78b6",after:35});
- body+=p("Дата формирования: "+now,{align:"center",size:13,color:"8797a7",after:130});
+ body+=p("Дата формирования: "+now,{align:"center",size:13,color:"8797a7",after:70});
  body+=box("ВАШ ТОВАР ДОЛЖЕН РАБОТАТЬ, А НЕ ЖДАТЬ В ПУТИ","Экспресс-доставка сборных грузов для федеральных компаний: быстрее пополняйте запасы, выполняйте заказы и возвращайте товар в оборот.");
  body+=sect("КОГДА ПОСТАВКА ЗАДЕРЖИВАЕТСЯ — БИЗНЕС ТЕРЯЕТ ТЕМП","Дефицит ходовых позиций, ожидание заказов, деньги в товаре, который ещё находится в пути, и риск упущенных продаж — типичные последствия долгой логистики. Мы предлагаем сократить время между отгрузкой и поступлением товара на склад или в торговую точку.");
  body+=sect("НАШЕ РЕШЕНИЕ: ЭКСПРЕСС-ДОСТАВКА ПО КЛЮЧЕВЫМ МАРШРУТАМ","ООО «ТК Грузовая Компания» организует доставку сборных грузов по России автомобильным, железнодорожным и воздушным транспортом. Контролируем своевременную подачу транспорта и перевозку, помогаем выстроить логистику с учётом географии и потребностей вашей компании.");
@@ -839,9 +839,9 @@ async function generateKpPdf(){
     {text:"ПОЧЕМУ С НАМИ УДОБНО РАБОТАТЬ\nКомплекс логистических услуг по России, контроль подачи транспорта и надёжной транспортировки груза, городские перевозки и транзитные склады, автомобили различной грузоподъёмности и с разными типами кузова.",fill:"fbfcfe"}]
  ],["5250","5250"],false);
  body+=sect("УСЛОВИЯ СОТРУДНИЧЕСТВА","Прозрачный принцип расчёта для регулярных и разовых отправок. Итоговую стоимость подтверждаем после получения параметров груза и согласования состава услуг.");
- body+='<w:p><w:r><w:br w:type="page"/></w:r></w:p>';
- body+=p("РАСЧЁТ ПЕРЕВОЗКИ",{bold:true,size:24,color:"173b5c",after:45});
- body+=p("Выбранные менеджером направления  ·  Плотность расчёта: 250 кг/м³",{size:14,color:"64788b",after:80});
+ 
+ body+=p("РАСЧЁТ ПЕРЕВОЗКИ",{bold:true,size:24,color:"173b5c",before:80,after:35});
+ body+=p("Выбранные менеджером направления  ·  Плотность расчёта: 250 кг/м³",{size:14,color:"64788b",after:45});
  body+=table(routeRows,["3600","2050","1500","3350"]);
  body+=box("РАСЧЁТ И УСЛОВИЯ","• Стоимость в таблице рассчитана для каждого выбранного направления по действующему прайсу калькулятора.\n• Тарифная база — ₽/м³; для пересчёта кг ↔ м³ используется плотность 250 кг/м³.\n• Срок доставки указан в рабочих днях и зависит от условий перевозки.","fbfcfe");
  body+=sect("ДОПОЛНИТЕЛЬНЫЕ ЛОГИСТИЧЕСКИЕ ВОЗМОЖНОСТИ","По запросу организуем забор и городскую доставку груза, погрузочно-разгрузочные работы, работу через транзитные склады, авизацию и комплексное логистическое сопровождение. Состав и стоимость дополнительных услуг согласовываются отдельно.");
