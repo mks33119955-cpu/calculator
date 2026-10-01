@@ -813,37 +813,26 @@ async function makeTemplateDocx(items){
  zip.file("word/document.xml",xml);
  return await zip.generateAsync({type:"blob",mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
 }
-async function generateKpPdf(){
+function generateKpPdf(){
  if(!kpCartItems.length){kpSetStatus("Добавьте хотя бы одно направление в КП.","error");return;}
-  // Окно открываем сразу по клику, иначе браузер может заблокировать его после await.
  const win=window.open("","_blank");
  if(!win){kpSetStatus("Разрешите всплывающие окна для сайта.","error");return;}
+ const esc=s=>{const d=document.createElement("div");d.textContent=String(s);return d.innerHTML;};
+ const money=n=>Number(n).toLocaleString("ru-RU")+" ₽";
+ const rows=kpCartItems.map(item=>{
+   const weight=item.unit==="kg"?Number(item.value).toLocaleString("ru-RU")+" кг":Number(item.value).toLocaleString("ru-RU",{maximumFractionDigits:3})+" м³";
+   const tariff=money(item.m3Price)+"/м³";
+   return '<tr><td><strong>'+esc(item.from)+' → '+esc(item.to)+'</strong></td><td>'+weight+'</td><td>'+esc(deliveryLabel(item.delivery))+'</td><td><strong>'+tariff+'</strong><br><span class="total">Стоимость: '+money(item.price)+'</span></td></tr>';
+ }).join("");
+ const total=kpCartItems.reduce((sum,item)=>sum+Number(item.price||0),0);
+ const now=new Date().toLocaleDateString("ru-RU");
  win.document.open();
- win.document.write('<!doctype html><html><head><title>Формирование КП…</title><style>html,body{margin:0;padding:24px;background:#fff;font-family:Arial,sans-serif;color:#334155}.loading{max-width:720px;margin:15vh auto;text-align:center;font-size:18px}</style><script src="https://unpkg.com/docx-preview@0.3.6/dist/docx-preview.min.js"><\\/script></head><body><div class="loading">Формирую коммерческое предложение…</div></body></html>');
+ win.document.write('<!doctype html><html lang="ru"><head><meta charset="UTF-8"><title>Коммерческое предложение</title><style>'+
+ '@page{size:A4;margin:14mm 13mm 14mm 13mm}*{box-sizing:border-box}html,body{margin:0;padding:0;background:#fff;color:#25364d;font-family:Arial,"Segoe UI",sans-serif}body{font-size:12px;line-height:1.35}.page{width:100%;max-width:794px;margin:0 auto;padding:4px 2px}.top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #2f80c9;padding-bottom:10px}.brand{font-size:19px;font-weight:800;letter-spacing:1.5px;color:#183b5b}.brand small{display:block;font-size:9px;letter-spacing:2.5px;color:#2f80c9;margin-top:2px}.date{text-align:right;font-size:10px;color:#718096}.title{text-align:center;margin:20px 0 4px;font-size:24px;font-weight:800;color:#183b5b;letter-spacing:.3px}.subtitle{text-align:center;color:#2f80c9;font-size:12px;font-weight:700;letter-spacing:1.5px}.slogan{text-align:center;margin:13px 0 20px;font-size:11px;color:#64748b;font-style:italic}.section-title{font-size:13px;font-weight:800;color:#183b5b;margin:0 0 8px;text-transform:uppercase;letter-spacing:.6px}table{width:100%;border-collapse:collapse;table-layout:fixed;border:1px solid #cbd8e6}th{background:#eaf3fc;color:#183b5b;font-size:9px;text-transform:uppercase;letter-spacing:.4px;padding:9px 7px;border:1px solid #cbd8e6;text-align:left}td{padding:9px 7px;border:1px solid #d9e3ed;vertical-align:middle;font-size:10.5px}th:nth-child(1){width:39%}th:nth-child(2){width:18%}th:nth-child(3){width:16%}th:nth-child(4){width:27%}tbody tr:nth-child(even){background:#f7fafe}.total{font-size:9px;color:#5d6f89}.sum{margin-top:10px;display:flex;justify-content:flex-end}.sum-box{background:#eaf3fc;border:1px solid #cbd8e6;border-radius:7px;padding:8px 13px;text-align:right}.sum-label{font-size:9px;color:#64748b;text-transform:uppercase}.sum-value{font-size:17px;font-weight:800;color:#183b5b}.conditions{margin-top:22px;border-top:1px solid #d9e3ed;padding-top:11px}.conditions h3{margin:0 0 7px;font-size:11px;color:#183b5b}.conditions p{margin:3px 0;font-size:9.5px;color:#64748b}.footer{margin-top:20px;padding-top:9px;border-top:2px solid #2f80c9;display:flex;justify-content:space-between;font-size:9px;color:#64748b}.footer strong{color:#183b5b}@media print{.page{max-width:none}.no-print{display:none}}'+
+ '</style></head><body><div class="page"><div class="top"><div><div class="brand">ГРУЗОВАЯ КОМПАНИЯ РФ</div><small class="brand">ЭКСПРЕСС-ДОСТАВКА ПО РОССИИ</small></div><div class="date">Коммерческое предложение<br>от '+now+'</div></div><div class="title">КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ</div><div class="subtitle">ЭКСПРЕСС-ДОСТАВКА ПО РОССИИ</div><div class="slogan">ВАШ ТОВАР ДОЛЖЕН РАБОТАТЬ, А НЕ ЖДАТЬ В ПУТИ</div><div class="section-title">НАПРАВЛЕНИЯ И РАСЧЁТ</div><table><thead><tr><th>НАПРАВЛЕНИЕ</th><th>ВЕС / ОБЪЁМ</th><th>СРОК</th><th>ТАРИФ ЗА 1 М³</th></tr></thead><tbody>'+rows+'</tbody></table><div class="sum"><div class="sum-box"><div class="sum-label">ИТОГО ПО КП</div><div class="sum-value">'+money(total)+'</div></div></div><div class="conditions"><h3>УСЛОВИЯ</h3><p>• Стоимость рассчитана по действующему тарифу калькулятора.</p><p>• Расчёт выполнен исходя из плотности 250 кг/м³.</p><p>• Срок доставки указан в рабочих днях и зависит от условий перевозки.</p></div><div class="footer"><div><strong>ГРУЗОВАЯ КОМПАНИЯ РФ</strong></div><div>Коммерческое предложение действительно на дату расчёта</div></div></div></body></html>');
  win.document.close();
- try{
-  kpSetStatus("Формирую КП на встроенном Word-шаблоне…");
-  const blob=await makeTemplateDocx(kpCartItems);
-  await new Promise((resolve,reject)=>{
-   const started=Date.now();
-   const timer=setInterval(()=>{
-    if(win.docx){clearInterval(timer);resolve();}
-    else if(Date.now()-started>10000){clearInterval(timer);reject(new Error("Не загрузился модуль отображения Word"));}
-   },50);
-  });
-  win.document.body.innerHTML='<div id="docx"></div>';
-  await win.docx.renderAsync(blob,win.document.getElementById("docx"),null,{className:"docx",inWrapper:true,breakPages:true,ignoreWidth:false,ignoreHeight:false});
-  const style=win.document.createElement("style");
-  style.textContent='@page{size:A4;margin:0}html,body{margin:0;padding:0;background:#fff}.docx-wrapper{background:#fff!important;padding:0!important}.docx{margin:0 auto!important;box-shadow:none!important;page-break-after:always}';
-  win.document.head.appendChild(style);
-  if(win.document.fonts&&win.document.fonts.ready)await win.document.fonts.ready;
-  setTimeout(()=>{win.focus();win.print();},700);
-  kpSetStatus("КП открыто в исходной верстке. В окне печати выберите «Сохранить как PDF».","success");
- }catch(e){
-  console.error(e);
-  try{win.close();}catch{}
-  kpSetStatus(e.message==="NO_TEMPLATE"?"Не найден исходный Word-шаблон. Загрузите его через «Загрузить исходный Word»." : "Не удалось сформировать КП: "+e.message,"error");
- }
+ setTimeout(()=>{win.focus();win.print();},350);
+ kpSetStatus("КП готово. В окне печати выберите «Сохранить как PDF».","success");
 }
 kpGenerateBtn.addEventListener("click",generateKpPdf);
 calcBtn.addEventListener("click",function(){
